@@ -1,0 +1,204 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="personnal.askinquery.CreerSondageFragment"
+    android:orientation="vertical"
+    android:weightSum="1">
+    <!-- TODO: Update blank fragment layout -->
+
+    <Button
+        android:text="Terminer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/sondage_edit_done" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/sondage_edit_questions_error"
+        android:visibility="invisible"
+        android:textColor="@color/colorRed"/>
+
+    <!--<TextView
+        android:id="@+id/textView2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Attention, le processus peut prendre du temps dû à l'envoi de nombreux fichiers au serveur"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat" />-->
+
+    <TabHost
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/TabHost">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TabWidget
+                android:id="@android:id/tabs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <FrameLayout
+                android:id="@android:id/tabcontent"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:id="@+id/TabSondage"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <ScrollView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical" >
+
+                            <TextView
+                                android:text="Créer un sondage"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+
+                            <EditText
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="textPersonName"
+                                android:ems="10"
+                                android:id="@+id/sondage_edit_titre"
+                                android:hint="Titre" />
+
+                            <TextView
+                                android:text="TextView"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:visibility="invisible"
+                                android:id="@+id/sondage_edit_titre_error"
+                                android:textAppearance="@style/TextAppearance.AppCompat"
+                                android:textColor="@color/colorRed" />
+
+                            <TextView
+                                android:text="Date d'échéance du sondage"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/textView3"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                                android:textAlignment="center" />
+
+                            <DatePicker
+                                android:layout_width="match_parent"
+                                android:id="@+id/sondage_edit_date"
+                                android:datePickerMode="spinner"
+                                android:spinnersShown="false"
+                                android:layout_height="wrap_content" />
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/sondage_edit_date_error"
+                                android:visibility="invisible"
+                                android:textColor="@color/colorRed"/>
+
+                            <TextView
+                                android:text="date sélectionnée :"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/textView5"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                                android:textAlignment="center"
+                                android:textSize="18sp" />
+
+                            <TextView
+                                android:text="TextView"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/sondage_edit_date_confirm"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                                android:textAlignment="center" />
+
+                            <CheckBox
+                                android:text="Résultats publiques"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/sondage_edit_public_results" />
+
+                            <TextView
+                                android:text="Téléverser une image"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/textView6" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:orientation="horizontal">
+
+                                <Button
+                                    android:id="@+id/sondage_edit_upload_img"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:drawableTop="@drawable/ic_file_upload"
+                                    android:text="Téléverser" />
+
+                                <Button
+                                    android:id="@+id/sondage_edit_remove_img"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:drawableTop="@drawable/ic_clear_black"
+                                    android:text="Retirer l'image" />
+                            </LinearLayout>
+                            <ImageView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                app:srcCompat="@drawable/ic_menu_gallery"
+                                android:id="@+id/sondage_edit_image_preview" />
+                        </LinearLayout>
+                    </ScrollView>
+
+                </LinearLayout>
+
+
+
+                <LinearLayout
+                    android:id="@+id/TabQuestions"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <ImageButton
+                            android:layout_width="75dp"
+                            app:srcCompat="@drawable/ic_ajout"
+                            android:layout_centerInParent="true"
+                            android:id="@+id/sondage_edit_add_question"
+                            android:layout_height="75dp"
+                            android:scaleType="fitCenter" />
+
+                    </RelativeLayout>
+
+                    <ListView
+                        android:layout_width="match_parent"
+                        android:layout_height="fill_parent"
+                        android:descendantFocusability="beforeDescendants"
+                        android:id="@+id/sondage_edit_questions_list" />
+                </LinearLayout>
+
+            </FrameLayout>
+
+        </LinearLayout>
+    </TabHost>
+
+</LinearLayout>

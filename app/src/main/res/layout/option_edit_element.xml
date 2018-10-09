@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:text="TextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/sondage_edit_option_num"
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            android:layout_weight="1" />
+
+        <ImageButton
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/ic_delete"
+            android:id="@+id/sondage_edit_option_delete"
+            android:layout_weight="2" />
+    </LinearLayout>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:ems="10"
+        android:id="@+id/sondage_edit_option_texte"
+        android:hint="Réponse" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/option_edit_texte_error"
+        android:textAppearance="@style/TextAppearance.AppCompat"
+        android:visibility="invisible"
+        android:textColor="@color/colorRed" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/sondage_edit_option_upload">
+
+        <Button
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:drawableTop="@drawable/ic_file_upload"
+            android:text="Télécharger"
+            android:id="@+id/sondage_edit_option_upload_btn"
+            android:layout_weight="1" />
+
+
+
+    </RelativeLayout>
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/option_edit_media_error"
+        android:visibility="invisible"
+        android:textAppearance="@style/TextAppearance.AppCompat"
+        android:textColor="@color/colorRed" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/ic_menu_gallery"
+        android:layout_gravity="center"
+        android:id="@+id/sondage_edit_option_image_preview" />
+    <VideoView
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:maxHeight="150dp"
+        android:id="@+id/sondage_edit_option_video_preview" />
+
+</LinearLayout>

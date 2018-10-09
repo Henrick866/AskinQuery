@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:title="@string/profile_group_title" android:id="@+id/NotConnected">
+        <menu>
+            <item
+                android:id="@+id/nav_profil_connexion"
+                android:icon="@drawable/ic_menu_profil_connecter"
+                android:title="Se Connecter" />
+            <item
+                android:id="@+id/nav_profil_creation"
+                android:icon="@drawable/ic_menu_profil_creer"
+                android:title="Créer un compte" />
+        </menu>
+    </item>
+    <item android:title="Votre profil" android:id="@+id/Connected">
+        <menu>
+            <item
+                android:id="@+id/nav_profil_consulter"
+                android:title="Voir votre profil"
+                android:icon="@drawable/ic_menu_profil_consulter" />
+            <item
+                android:id="@+id/nav_profil_sondages_manage"
+                android:title="Vos sondages"
+                android:icon="@drawable/ic_menu_sondages" />
+            <item
+                android:id="@+id/nav_profil_communaute"
+                android:title="Votre communauté"
+                android:icon="@drawable/ic_menu_communaute" />
+            <item
+                android:id="@+id/nav_profil_suivis"
+                android:title="Créateurs suivis"
+                android:icon="@drawable/ic_menu_profil_suivi" />
+        </menu>
+    </item>
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_recherche"
+            android:icon="@drawable/ic_search"
+            android:title="Rechercher" />
+        <item
+            android:id="@+id/nav_sondages"
+            android:icon="@drawable/ic_menu_sondages"
+            android:title="Sondages" />
+    </group>
+</menu>

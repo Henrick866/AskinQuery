@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            >
+
+            <TextView
+                android:text="TITRE"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/sondage_elem_titre"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+
+            <TextView
+                android:text="Par: @Auteur"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/sondage_elem_nom_auteur"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textSize="18sp" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:text="publié: @Date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/sondage_elem_date_debut"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                    android:textSize="14sp"
+                    android:layout_weight="1" />
+                <TextView
+                    android:text="Fin: @Date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/sondage_elem_date_fin"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                    android:textSize="14sp"
+                    android:layout_weight="1" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.1">
+
+            <ImageButton
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                app:srcCompat="@drawable/ic_flag"
+                android:id="@+id/sondage_elem_plainte_btn"
+                android:layout_centerInParent="true"
+                android:layout_marginTop="10dp"
+                android:background="@color/colorPrimary"
+                style="@style/Widget.AppCompat.ImageButton" />
+        </RelativeLayout>
+
+        <!--<personnal.askinquery.FlagButton
+            android:layout_width="30dp"
+            android:src="@drawable/ic_flag"
+            android:id="@+id/imageButton"
+            android:layout_height="30dp"
+            android:layout_weight="0.1"
+            android:elevation="0dp"
+            android:padding="5dp"
+            android:onClick=""
+            android:adjustViewBounds="true"
+            android:cropToPadding="false"
+            android:scaleType="fitCenter" /> -->
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@android:drawable/ic_menu_gallery"
+        android:id="@+id/sondage_elem_image"
+        android:maxHeight="100dp"
+        android:layout_gravity="center"
+        android:layout_weight="1"
+        android:scaleType="fitCenter" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:id="@+id/sondage_elem_zone_admin">
+
+        <ImageButton
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:srcCompat="@drawable/ic_edit"
+            android:id="@+id/sondage_elem_edit_btn"
+            android:layout_weight="1"
+            android:background="@color/colorPrimary"
+            android:scaleType="fitCenter" />
+
+        <ImageButton
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:srcCompat="@drawable/ic_stats"
+            android:id="@+id/sondage_elem_stats_btn"
+            android:layout_weight="1"
+            android:background="@color/colorPrimary"
+            android:scaleType="fitCenter" />
+
+        <ImageButton
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:srcCompat="@drawable/ic_delete"
+            android:id="@+id/sondage_elem_delete_btn"
+            android:layout_weight="1"
+            android:background="@color/colorAccent"
+            android:scaleType="fitCenter"
+            android:tint="@android:color/black" />
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_vote_layout">
+
+        <Button
+            android:text="Commencer"
+            android:drawableTop="@drawable/ic_sondage_debut"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/sondage_elem_start_btn"
+            android:textAlignment="center"
+            android:layout_centerInParent="true"
+            android:elevation="0dp"
+            android:backgroundTint="@color/colorPrimary"
+            android:background="@color/colorPrimary" />
+    </RelativeLayout>
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/sondage_elem_id"
+        android:visibility="invisible" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/sondage_elem_id_auteur"
+        android:visibility="invisible" />
+
+</LinearLayout>

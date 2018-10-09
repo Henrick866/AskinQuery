@@ -1,0 +1,35 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    android:orientation="vertical">
+    <!--tools:context="personnal.askinquery.SondageListFragment" xmlns:tools="http://schemas.android.com/tools"-->
+
+
+    <Button
+        android:text="Créer un sondage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/sondage_ajout_btn"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:drawableTop="@drawable/ic_ajout"
+        android:background="@android:drawable/btn_default"
+        android:backgroundTint="@color/colorPrimary" />
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@id/android:list"
+        android:headerDividersEnabled="false"
+        android:footerDividersEnabled="false" />
+
+    <TextView
+        android:id="@id/android:empty"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:text="Il n'y a rien ici."
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"/>
+
+</LinearLayout>
