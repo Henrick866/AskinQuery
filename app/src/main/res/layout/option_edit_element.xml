@@ -75,11 +75,10 @@
         android:layout_height="wrap_content"
         app:srcCompat="@drawable/ic_menu_gallery"
         android:layout_gravity="center"
+        android:adjustViewBounds="true"
+        android:cropToPadding="false"
+        android:layout_weight="1"
         android:id="@+id/sondage_edit_option_image_preview" />
-    <VideoView
-        android:layout_width="match_parent"
-        android:layout_height="150dp"
-        android:maxHeight="150dp"
-        android:id="@+id/sondage_edit_option_video_preview" />
+
 
 </LinearLayout>

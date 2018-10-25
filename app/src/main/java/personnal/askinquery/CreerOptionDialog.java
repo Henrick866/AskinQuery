@@ -1,18 +1,30 @@
 package personnal.askinquery;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.graphics.Point;
+import android.graphics.drawable.GradientDrawable;
+import android.media.ExifInterface;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
+import android.support.v4.app.ActivityCompat;
+import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -26,6 +38,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
+import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -46,7 +63,7 @@ public class CreerOptionDialog extends DialogFragment implements CreerOptionAdap
     private static final String ARG_PARAM3 = "param3";
 
     private static final int MEDIA_GALL_OPTION = 3;
-
+    private static final int MY_PERMISSION_REQUEST_READ_STORAGE = 200;
     // TODO: Rename and change types of parameters
     private Question mParam1;
     ListView OptionListe;
@@ -54,6 +71,8 @@ public class CreerOptionDialog extends DialogFragment implements CreerOptionAdap
     ImageButton btnAjout;
     Button Cancel;
     Button Done;
+    Uri Image;
+    Bitmap ImageBitmap;
     int optionPosition;
     CreerOptionAdapter creerOptionAdapter;
     private OnFragmentInteractionListener mListener;
@@ -70,7 +89,7 @@ public class CreerOptionDialog extends DialogFragment implements CreerOptionAdap
      * @return A new instance of fragment CreerOptionDialog.
      */
     // TODO: Rename and change types and number of parameters
-    public static CreerOptionDialog newInstance(Question question, int Position, CreerQuestionAdapter creerQuestionAdapter) {
+    public static CreerOptionDialog newInstance(Question question, int Position, CreerQuestionAdapter.DialogFunctions creerQuestionAdapter) {
         CreerOptionDialog fragment = new CreerOptionDialog();
         Bundle args = new Bundle();
 
@@ -86,7 +105,7 @@ public class CreerOptionDialog extends DialogFragment implements CreerOptionAdap
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mParam1 = (Question)getArguments().getSerializable(ARG_PARAM1);
-            optionDialogListener = (CreerQuestionAdapter)getArguments().getSerializable(ARG_PARAM3);
+            optionDialogListener = (CreerQuestionAdapter.DialogFunctions)getArguments().getSerializable(ARG_PARAM3);
             QuestionPosition = getArguments().getInt(ARG_PARAM2);
         }
     }
@@ -124,7 +143,10 @@ public class CreerOptionDialog extends DialogFragment implements CreerOptionAdap
         btnAjout = view.findViewById(R.id.sondage_edit_question_add_option);
         Done = view.findViewById(R.id.option_edit_done_btn);
         Cancel = view.findViewById(R.id.option_edit_cancel_btn);
-        creerOptionAdapter = new CreerOptionAdapter(getContext(), mParam1.Options, mParam1.Type_Question, this);
+        if(mParam1.Type_Question != Question.TYPE_TEXTE){
+            DownloadImagesList();
+        }
+        creerOptionAdapter = new CreerOptionAdapter(getActivity(), mParam1.Options, mParam1.Type_Question, this);
         OptionListe.setAdapter(creerOptionAdapter);
         btnAjout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -144,7 +166,10 @@ public class CreerOptionDialog extends DialogFragment implements CreerOptionAdap
 
             @Override
             public void onClick(View view) {
-                optionDialogListener.onFinishedOptionDialog(mParam1.Options, QuestionPosition);
+
+
+                String isDone = optionDialogListener.onFinishedOptionDialog(mParam1.Options, QuestionPosition);
+                OptionListe.setAdapter(null);
                 dismiss();
             }
         });
@@ -222,21 +247,79 @@ public class CreerOptionDialog extends DialogFragment implements CreerOptionAdap
         if(requestCode == MEDIA_GALL_OPTION && resultCode == Activity.RESULT_OK){
 
             if(mParam1.Options.get(this.optionPosition).Question_parent.Type_Question == Question.TYPE_IMAGE){
-                mParam1.Options.get(this.optionPosition).Image = data.getData();
+                Image = data.getData();
+                if(ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) + ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSION_REQUEST_READ_STORAGE);
+                }else{
+                    MakeImage();
+                }
             }
             if(mParam1.Options.get(this.optionPosition).Question_parent.Type_Question == Question.TYPE_VIDEO){
-                mParam1.Options.get(this.optionPosition).Video = data.getData();
+                mParam1.Options.get(this.optionPosition).UriVideo = data.getData().toString();
+                TraitementVideo.getThumbnail(data.getData(), getActivity());
+                mParam1.Options.get(this.optionPosition).ImagePreload = TraitementVideo.ThumbnailTemp;
+                TraitementVideo.ThumbnailTemp = null;
             }
 
             creerOptionAdapter.notifyDataSetChanged();
-            Toast.makeText(getContext(), "Le fichier sera envoyé au serveur lorsque le sondage sera créé/modifié",Toast.LENGTH_LONG);
+            Toast.makeText(getActivity(), "Le fichier sera envoyé au serveur lorsque le sondage sera créé/modifié",Toast.LENGTH_LONG).show();
         }
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults){
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(requestCode == MY_PERMISSION_REQUEST_READ_STORAGE){
+            if(grantResults.length == 0){
+                mParam1.Options.get(this.optionPosition).UriImage = Image.toString();
+                Image = null;
+            }else{//accepte
+                MakeImage();
+            }
+        }
+    }
+    private void DownloadImagesList(){ // charge les images/thumbnails une fois lors de l'initialisation de la liste.
+        //si imagepreload = null -> si opt.notonserv = false
+        StorageReference OptionMedRef;
+        for(int i = 0; i > mParam1.Options.size(); i++){
+            Option o = mParam1.Options.get(i);
+            final int index = i;
+            if(o.ImagePreload != null){
+                if(!o.notOnServer){ //si il est sur le serveur et que l'image == null ET que le type est bon (condition avant l'appel de la methode).
+                    if(mParam1.Type_Question == Question.TYPE_IMAGE) {
+                        OptionMedRef = FirebaseStorage.getInstance().getReference().child(o.Chemin_Media);
+                    }else{//le type TEXTE est déjà préfiltré lors de l'appel
+                        OptionMedRef = FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.OPTIONS_VIDEOS_THUMBNAILS).child(o.ID+".jpg");
+                    }
+                    OptionMedRef.getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                        @Override
+                        public void onSuccess(byte[] bytes) {
+                            mParam1.Options.get(index).ImagePreload = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                        }
+                    });
+                }else{//si il n'st pas sur le serveur, il est local, deux options, l'image a été choisi donc un bitmap existe, sinon il ne l'est pas;
+
+                }
+            }
+        }
+
+    }
+    private void MakeImage(){
+        ImageBitmap = TraitementImage.RotateImage(Image, getActivity());
+        Image = TraitementImage.ConvertBitmapToUri(ImageBitmap, getActivity());
+        mParam1.Options.get(this.optionPosition).Chemin_Media = "N";
+        mParam1.Options.get(this.optionPosition).UriImage = Image.toString();
+        mParam1.Options.get(this.optionPosition).ImagePreload = ImageBitmap;
+        Image = null;
+        ImageBitmap = null;
     }
     public void ToggleDoneBtn(boolean b){
         Done.setEnabled(b);
     }
+    public FragmentManager getFragmentManagerQ(){
+        return getFragmentManager();
+    }
     public interface OptionDialogListener{
-        void onFinishedOptionDialog(ArrayList<Option> liste_option, int Position);
+        String onFinishedOptionDialog(ArrayList<Option> liste_option, int Position);
     }
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name

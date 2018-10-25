@@ -21,6 +21,7 @@ public class FireBaseInteraction {
         final static String SONDAGES_IMAGES = "Media/Sondages/Thumbnails/";
         final static String OPTIONS_IMAGES = "Media/Sondages/Options/Images/";
         final static String OPTIONS_VIDEOS = "Media/Sondages/Options/Videos/";
+        final static String OPTIONS_VIDEOS_THUMBNAILS = "Media/Sondages/Options/Videos/Thumbnails/";
         final static String PROFILS_AVATARS = "Media/Profils/";
     }
     public static class Sondage_Keys{

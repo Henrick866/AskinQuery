@@ -1,8 +1,11 @@
 package personnal.askinquery;
 
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Context;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -36,10 +39,10 @@ import java.util.List;
  * Created by Henrick on 2018-09-21.
  */
 
-public class CreerQuestionAdapter extends ArrayAdapter<Question> implements CreerOptionAdapter.OptionsToQuestion, CreerOptionDialog.OptionDialogListener, Serializable {
+public class CreerQuestionAdapter extends ArrayAdapter<Question> implements CreerOptionAdapter.OptionsToQuestion, Serializable {
     static public ArrayList<Question> QuestionData;
     private static CreerQuestionAdapter.AdaptListener adaptListener;
-    CreerSondageFragment creerSondageFragment;
+    transient CreerSondageFragment creerSondageFragment;
 
     static Context c;
     static TabHost Host;
@@ -75,22 +78,8 @@ public class CreerQuestionAdapter extends ArrayAdapter<Question> implements Cree
             viewHolder = (CreerQuestionAdapter.ViewHolder)view.getTag();
             question = viewHolder.question;
         }
-
-
         viewHolder.NumQuestion.setText("Question #"+(position+1));
-        if(QuestionData.get(position).Texte_Question != null) {
-            if (!QuestionData.get(position).Texte_Question.isEmpty()) {
-                viewHolder.TexteQuestion.setText(QuestionData.get(position).Texte_Question);
-            } else {
-                viewHolder.TexteQuestion.setText("");
-                viewHolder.TexteError.setText("Vous devez poser une question");
-                viewHolder.TexteError.setVisibility(View.VISIBLE);
-            }
-        }else{
-            viewHolder.TexteQuestion.setText("");
-            viewHolder.TexteError.setText("Vous devez poser une question");
-            viewHolder.TexteError.setVisibility(View.VISIBLE);
-        }
+
         List<String> spinnerArray =  new ArrayList<>();
         spinnerArray.add("(Non sélectionné)");
         spinnerArray.add("Texte");
@@ -111,18 +100,25 @@ public class CreerQuestionAdapter extends ArrayAdapter<Question> implements Cree
             creerSondageFragment.QuestionsError.setVisibility(View.VISIBLE);
         }
         final CreerQuestionAdapter questionAdapter = this;
+        final CreerQuestionAdapter.DialogFunctions dialogFunctions = new CreerQuestionAdapter.DialogFunctions();
         if(QuestionData.get(position).Options.isEmpty()){
             viewHolder.OptionsError.setText("Vous devez ajouter au moins deux choix de réponses.");
             viewHolder.OptionsError.setVisibility(View.VISIBLE);
         }
         //Question Q = QuestionData.get(position);
-        final CreerOptionDialog creerOptionDialog = CreerOptionDialog.newInstance(QuestionData.get(Position), Position, questionAdapter);
+
         viewHolder.btnDropDown.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 FragmentManager fm = adaptListener.getFragmentManagerQ();
-
-                creerOptionDialog.show(fm, "fragment_creer_option_dialog");
+                FragmentTransaction ft = fm.beginTransaction();
+                Fragment prev = fm.findFragmentByTag("fragment_creer_option_dialog");
+                if (prev != null) {
+                    ft.remove(prev);
+                }
+                ft.addToBackStack(null);
+                CreerOptionDialog creerOptionDialog = CreerOptionDialog.newInstance(QuestionData.get(POSITION), POSITION, dialogFunctions);
+                creerOptionDialog.show(ft, "fragment_creer_option_dialog");
 
             }
         });
@@ -141,7 +137,7 @@ public class CreerQuestionAdapter extends ArrayAdapter<Question> implements Cree
                 questionToSondage.DeleteQuestion(q);*/
             }
         });
-        viewHolder.TexteQuestion.addTextChangedListener(new TextWatcher() {
+        TextWatcher questionTxtWatcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -167,7 +163,26 @@ public class CreerQuestionAdapter extends ArrayAdapter<Question> implements Cree
                     }
                 }
             }
-        });
+        };
+        TextWatcher oldWatcher = (TextWatcher)viewHolder.TexteQuestion.getTag();
+        if(oldWatcher != null){
+            viewHolder.TexteQuestion.removeTextChangedListener(oldWatcher);
+        }
+        if(QuestionData.get(POSITION).Texte_Question != null) {
+            if (!QuestionData.get(POSITION).Texte_Question.isEmpty()) {
+                viewHolder.TexteQuestion.setText(QuestionData.get(POSITION).Texte_Question);
+            } else {
+                viewHolder.TexteQuestion.setText("");
+                viewHolder.TexteError.setText("Vous devez poser une question");
+                viewHolder.TexteError.setVisibility(View.VISIBLE);
+            }
+        }else{
+            viewHolder.TexteQuestion.setText("");
+            viewHolder.TexteError.setText("Vous devez poser une question");
+            viewHolder.TexteError.setVisibility(View.VISIBLE);
+        }
+        viewHolder.TexteQuestion.setTag(questionTxtWatcher);
+        viewHolder.TexteQuestion.addTextChangedListener(questionTxtWatcher);
 
         viewHolder.TypeSelect.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -199,13 +214,24 @@ public class CreerQuestionAdapter extends ArrayAdapter<Question> implements Cree
 
         return view;
     }
+    class DialogFunctions implements CreerOptionDialog.OptionDialogListener, Serializable{
+        public DialogFunctions(){
+        }
+        public String onFinishedOptionDialog(ArrayList<Option> options, int Position){
+            QuestionData.get(Position).Options = options;
+            //creerOptionDialog.dismiss();
+            Toast.makeText(getContext(), "La liste des options de la question #"+(Position+1)+" a été mis à jour", Toast.LENGTH_LONG).show();
+            return "done";
+        }
+
+    }
     public void updateOptions(int pos, ArrayList<Option> options){
         QuestionData.get(pos).Options = options;
     }
     public ArrayList<Question> getQuestions(){
         return QuestionData;
     }
-    static class ViewHolder{
+    static class ViewHolder implements Serializable{
         Spinner TypeSelect;
         EditText TexteQuestion;
         TextView NumQuestion;
@@ -235,10 +261,11 @@ public class CreerQuestionAdapter extends ArrayAdapter<Question> implements Cree
 
         }
     }
-    public void onFinishedOptionDialog(ArrayList<Option> Options, int Position){
+    public String onFinishedOptionDialog(ArrayList<Option> Options, int Position){
         QuestionData.get(Position).Options = Options;
-
-        Toast.makeText(getContext(), "La liste des options de la question #"+Position+" a été mis à jour", Toast.LENGTH_LONG);
+        //creerOptionDialog.dismiss();
+        Toast.makeText(getContext(), "La liste des options de la question #"+(Position+1)+" a été mis à jour", Toast.LENGTH_LONG).show();
+        return "done";
     }
     public interface AdaptListener{
         void changePage(Fragment fragment);

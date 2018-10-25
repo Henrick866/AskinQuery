@@ -157,11 +157,15 @@
                                     android:drawableTop="@drawable/ic_clear_black"
                                     android:text="Retirer l'image" />
                             </LinearLayout>
+
                             <ImageView
+                                android:id="@+id/sondage_edit_image_preview"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                app:srcCompat="@drawable/ic_menu_gallery"
-                                android:id="@+id/sondage_edit_image_preview" />
+                                android:adjustViewBounds="true"
+                                android:cropToPadding="false"
+                                android:layout_weight="1"
+                                app:srcCompat="@drawable/ic_menu_gallery" />
                         </LinearLayout>
                     </ScrollView>
 
