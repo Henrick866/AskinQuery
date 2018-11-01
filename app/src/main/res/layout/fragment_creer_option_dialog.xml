@@ -11,37 +11,63 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
+        <com.balysv.materialripple.MaterialRippleLayout
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:layout_height="wrap_content">
 
         <Button
             android:id="@+id/option_edit_done_btn"
+            android:padding="10dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:drawableStart="@drawable/ic_sondage_debut"
-            android:text="Terminer" />
 
+            android:background="@color/transparent"
+            android:drawableStart="@drawable/ic_done_color"
+            android:text="Terminer"
+            android:textColor="@color/colorPrimary" />
+    </com.balysv.materialripple.MaterialRippleLayout>
+        <View
+            android:layout_width="2dp"
+            android:layout_height="match_parent"
+            android:background="@color/LightGrey"/>
+        <com.balysv.materialripple.MaterialRippleLayout
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:layout_height="wrap_content">
         <Button
+            android:padding="10dp"
             android:id="@+id/option_edit_cancel_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:drawableStart="@drawable/ic_clear_black"
-            android:text="Annuler" />
+            android:background="@color/transparent"
+            android:drawableStart="@drawable/ic_clear_color"
+            android:text="Annuler"
+            android:textColor="@color/colorRed" />
+        </com.balysv.materialripple.MaterialRippleLayout>
     </LinearLayout>
 
 
 
     <RelativeLayout
+        android:layout_marginTop="5dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-
+        <com.balysv.materialripple.MaterialRippleLayout
+            android:layout_width="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_height="wrap_content">
         <ImageButton
             android:id="@+id/sondage_edit_question_add_option"
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:layout_centerInParent="true"
-            android:scaleType="fitCenter"
-            app:srcCompat="@drawable/ic_ajout" />
+
+            android:background="@drawable/button_border"
+            android:scaleType="centerCrop"
+            android:tint="@color/colorPrimary"
+            android:src="@drawable/ic_ajout" />
+    </com.balysv.materialripple.MaterialRippleLayout>
 
     </RelativeLayout>
 

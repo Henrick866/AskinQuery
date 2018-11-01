@@ -11,8 +11,8 @@
     <string name="title_activity_main">Accueil</string>
 
     <string name="profile_group_title">Profil</string>
-
-
+    <string name="Connexion"><u>Se connecter</u></string>
+    <string name="Deconnexion"><u>Se déconnecter</u></string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

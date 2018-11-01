@@ -1,9 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#00574B</color>
-    <color name="colorAccent">#D81B60</color>
-    <color name="colorRed">#ffcc0000</color>
+
+    <color name="colorPrimaryLight">#5AD3D3</color>
+    <color name="colorPrimaryMedLight">#32C6C6</color>
+    <color name="colorPrimary">#0FBDBD</color>
+    <color name="colorPrimaryMedDark">#009C9C</color>
+    <color name="colorPrimaryDark">#007676</color>
+
+    <color name="colorSecondaryLight">#6B8DDB</color>
+    <color name="colorSecondaryMedLight">#456FD0</color>
+    <color name="colorSecondary">#2355C9</color>
+    <color name="colorSecondaryMedDark">#0D3DAD</color>
+    <color name="colorSecondaryDark">#0A2F84</color>
+
+    <color name="colorTertiaryLight">#FFCE6D</color>
+    <color name="colorTertiaryMedLight">#FFBF40</color>
+    <color name="colorTertiary">#FFB114</color>
+    <color name="colorTertiaryMedDark">#FFAA00</color>
+    <color name="colorTertiaryDark">#C48300</color>
+
+    <color name="colorAccentLight">#FFAF6D</color>
+    <color name="colorAccentMedLight">#FF9740</color>
+    <color name="colorAccent">#FF7E14</color>
+    <color name="colorAccentMedDark">#FF7400</color>
+    <color name="colorAccentDark">#C45900</color>
+
+    <color name="colorRed">#D50110</color>
     <color name="colorYellow">#ffffbb33</color>
     <color name="colorGreen">#ff669900</color>
+    <color name="LightGrey">#c8c8c8</color>
+    <!-- Pallette -->
+
 </resources>

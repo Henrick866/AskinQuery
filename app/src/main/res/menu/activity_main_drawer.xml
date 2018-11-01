@@ -16,7 +16,7 @@
         <menu>
             <item
                 android:id="@+id/nav_profil_consulter"
-                android:title="Voir votre profil"
+                android:title="Gérer votre profil"
                 android:icon="@drawable/ic_menu_profil_consulter" />
             <item
                 android:id="@+id/nav_profil_sondages_manage"
@@ -30,6 +30,10 @@
                 android:id="@+id/nav_profil_suivis"
                 android:title="Créateurs suivis"
                 android:icon="@drawable/ic_menu_profil_suivi" />
+            <item
+                android:id="@+id/nav_profil_sondages_repondus"
+                android:icon="@drawable/ic_menu_sondages_done"
+                android:title="Sondages répondus" />
         </menu>
     </item>
     <group android:checkableBehavior="single">

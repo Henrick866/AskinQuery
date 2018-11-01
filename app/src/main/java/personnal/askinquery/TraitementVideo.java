@@ -13,23 +13,13 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 
+import java.util.concurrent.ExecutionException;
+
 public class TraitementVideo {
-    static Bitmap ThumbnailTemp;
-    public static void getThumbnail(Uri Video, Context context){
+    public static Bitmap getThumbnail(Uri Video, Context context) throws ExecutionException, InterruptedException {
         RequestOptions requestOptions = new RequestOptions();
 
-        Glide.with(context).setDefaultRequestOptions(requestOptions).asBitmap().load(Video).listener(new RequestListener<Bitmap>() {
-            @Override
-            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
-                return false;
-            }
-
-            @Override
-            public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
-                ThumbnailTemp = resource;
-                return true;
-            }
-        }).preload();
+        return Glide.with(context).setDefaultRequestOptions(requestOptions).asBitmap().load(Video).submit().get();
     }
 
 }

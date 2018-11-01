@@ -48,11 +48,9 @@ public class FireBaseInteraction {
     public static class Profil_Keys{
         final static String STRUCT_NAME = "Profils";
         final static String USERNAME = "Username";
-        final static String MDPCRYPTED = "MDPcrypted";
-        final static String SALT = "salt";
         final static String COURRIEL = "Courriel";
         final static String AVATAR = "Avatar";
+        final static String PASS = "Pass";
         final static String AUTEURS_SUIVIS = "Auteurs_Suivis";
-        final static String ID_NOMENCLATURE = "ID_Nomenclature";
     }
 }

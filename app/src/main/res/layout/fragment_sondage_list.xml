@@ -6,17 +6,21 @@
     android:orientation="vertical">
     <!--tools:context="personnal.askinquery.SondageListFragment" xmlns:tools="http://schemas.android.com/tools"-->
 
-
+    <com.balysv.materialripple.MaterialRippleLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
     <Button
-        android:text="Créer un sondage"
+        android:id="@+id/sondage_ajout_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/sondage_ajout_btn"
         android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"
         android:layout_marginRight="5dp"
-        android:drawableTop="@drawable/ic_ajout"
-        android:background="@android:drawable/btn_default"
-        android:backgroundTint="@color/colorPrimary" />
+        android:background="@drawable/button_border"
+        android:shadowColor="@color/LightGrey"
+        android:text="Créer un sondage"
+        android:textColor="@color/colorPrimary" />
+    </com.balysv.materialripple.MaterialRippleLayout>
 
     <ListView
         android:layout_width="match_parent"

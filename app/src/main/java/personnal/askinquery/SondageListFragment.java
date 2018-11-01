@@ -2,6 +2,7 @@ package personnal.askinquery;
 
 import android.app.Fragment;
 import android.app.ListFragment;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,6 +12,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.bumptech.glide.util.Util;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -31,16 +35,15 @@ import java.util.ArrayList;
 public class SondageListFragment extends ListFragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
     // TODO: Rename and change types of parameters
-    private boolean mParam1;
-    private boolean mParam2;
-    Profil AuteurTEST;
-    boolean Loading_DONE;
+    private static final String mParam1 = "Si_Gestion_Sond";
+    Profil Utilisateur;
+    boolean Loading_DONE, Si_Gestion_Sond;
     ArrayList<Sondage> SondageList;
     private OnFragmentInteractionListener mListener;
-
+    private FirebaseAuth mAuth;
+    private FirebaseUser user;
+    private ProgressDialog progressDialog;
     public SondageListFragment() {
         // Required empty public constructor
     }
@@ -52,10 +55,10 @@ public class SondageListFragment extends ListFragment {
      * @return A new instance of fragment SondageListFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static SondageListFragment newInstance(boolean Admin) {
+    public static SondageListFragment newInstance(boolean si_Gestion_Sond) {
         SondageListFragment fragment = new SondageListFragment();
         Bundle args = new Bundle();
-        args.putBoolean(ARG_PARAM1, Admin);
+        args.putBoolean(mParam1, si_Gestion_Sond);
         fragment.setArguments(args);
 
         return fragment;
@@ -65,32 +68,17 @@ public class SondageListFragment extends ListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getBoolean(ARG_PARAM1);
+            Si_Gestion_Sond = getArguments().getBoolean(mParam1);
         }
         Loading_DONE = false;
         SondageList = new ArrayList<>();
-
-        ValueEventListener SondageListListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
-                    Sondage S = dataSnapshot1.getValue(Sondage.class);
-                    S.ID = dataSnapshot1.getKey();
-                    SondageList.add(S);
-                    //À supprimer
-
-                }
-                SondageAdapter adapter = new SondageAdapter(getActivity(), SondageList, mParam1);
-                setListAdapter(adapter);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        };
-        DatabaseReference sondageRef = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Sondage_Keys.STRUCT_NAME);
-        sondageRef.addListenerForSingleValueEvent(SondageListListener);
+        progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setTitle("Chargement des sondages...");
+        mAuth = FirebaseAuth.getInstance();
+        user = mAuth.getCurrentUser();
+        if(user != null && Si_Gestion_Sond) {
+            Utilisateur = new Profil(user.getUid(), user.getEmail(), user.getPhotoUrl().toString());
+        }
 
     }
 
@@ -101,34 +89,53 @@ public class SondageListFragment extends ListFragment {
         View view = inflater.inflate(R.layout.fragment_sondage_list, container, false);
         final Button btn_Ajout = (Button)view.findViewById(R.id.sondage_ajout_btn);
 
-        ValueEventListener AuteurTestListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                AuteurTEST = dataSnapshot.getValue(Profil.class);
-                AuteurTEST.ID = dataSnapshot.getKey();
-                btn_Ajout.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        mListener.changePage(CreerSondageFragment.newInstance(true, false, AuteurTEST, null));
 
+        if(!Si_Gestion_Sond){
+            btn_Ajout.setVisibility(View.GONE);
+        }else{
+
+            btn_Ajout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                     mListener.changePage(CreerSondageFragment.newInstance(true, false, Utilisateur, null));
+                }
+            });
+        }
+        progressDialog.show();
+        ValueEventListener SondageListListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
+                    Sondage S = dataSnapshot1.getValue(Sondage.class);
+                    if(Si_Gestion_Sond){ //si on gere les sondages, on ne retire que ceux qui nous intéresse
+                        if(S.AuteurRef == user.getUid()){
+                            S.ID = dataSnapshot1.getKey();
+                            SondageList.add(S);
+                        }
+                    }else {//sinon on prend tout
+                        S.ID = dataSnapshot1.getKey();
+                        SondageList.add(S);
                     }
-                });
+                    //À supprimer
+                }
+                SondageAdapter adapter = new SondageAdapter(getActivity(), SondageList, Si_Gestion_Sond);
+                setListAdapter(adapter);
+                progressDialog.dismiss();
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+            public void onCancelled(DatabaseError databaseError) {
 
             }
         };
-        DatabaseReference AuteurRef = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Profil_Keys.STRUCT_NAME).child("Profil1");
-        AuteurRef.addListenerForSingleValueEvent(AuteurTestListener);
-        if(mParam1 == false){
-            btn_Ajout.setVisibility(View.GONE);
-        }
+        DatabaseReference sondageRef = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Sondage_Keys.STRUCT_NAME);
+        sondageRef.addListenerForSingleValueEvent(SondageListListener);
         return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
+
 
 
     @Override

@@ -5,6 +5,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.net.Uri;
@@ -53,5 +55,15 @@ public class TraitementImage {
             cursor.close();
             return Path;
         }
+    }
+    public static Bitmap createSquaredBitmap(Bitmap srcBmp) {
+        int dim = Math.max(srcBmp.getWidth(), srcBmp.getHeight());
+        Bitmap dstBmp = Bitmap.createBitmap(dim, dim, Bitmap.Config.ARGB_8888);
+
+        Canvas canvas = new Canvas(dstBmp);
+        canvas.drawColor(Color.WHITE);
+        canvas.drawBitmap(srcBmp, (dim - srcBmp.getWidth()) / 2, (dim - srcBmp.getHeight()) / 2, null);
+
+        return dstBmp;
     }
 }

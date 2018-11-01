@@ -85,14 +85,16 @@ public class CreerOptionAdapter extends ArrayAdapter<Option> {
         holder.OptionNum.setText("Option #"+(position+1));
         if(Type != Question.TYPE_TEXTE){//exécute ce chargement trop souvent pour rien, comment enregistrer les médias en cache?
             StorageReference OptionMedRef;
-                if(option.notOnServer){//si n'est pas sur le serveur, créé récement
-                    if(option.ImagePreload == null){
+                if(OptionData.get(POSITION).notOnServer){//si n'est pas sur le serveur, créé récement
+                    if(OptionData.get(POSITION).ImagePreload == null){//si l'image bitmap n'existe pas
+                        Log.e("Test", "Dud");
                         holder.ImagePreview.setVisibility(View.GONE);
                         holder.MediaError.setVisibility(View.VISIBLE);
                         holder.MediaError.setText("Aucune image/vidéo sélectionnée, veuillez en choisir une.");
-                    }else{
-                        holder.ImagePreview.setImageBitmap(option.ImagePreload);
-                        if(Type == Question.TYPE_VIDEO){
+                    }else{//si bitmap existe
+                        holder.ImagePreview.setImageBitmap(OptionData.get(POSITION).ImagePreload);
+                        Log.e("Test", "Loaded");
+                        if(Type == Question.TYPE_VIDEO){// + si c'est une vidéo, mets un clicklistener sur l'image qui ouvre un dialog
                             holder.ImagePreview.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
@@ -103,14 +105,30 @@ public class CreerOptionAdapter extends ArrayAdapter<Option> {
                                         ft.remove(prev);
                                     }
                                     ft.addToBackStack(null);
-                                    VideoDialogFragment creerOptionDialog = VideoDialogFragment.newInstance(option.Chemin_Media);
+                                    VideoDialogFragment creerOptionDialog = VideoDialogFragment.newInstance(OptionData.get(POSITION).UriVideo, OptionData.get(POSITION).notOnServer);
                                     creerOptionDialog.show(ft, "fragment_video_dialog");
                                 }
                             });
                         }
                     }
                 }else{
-                    holder.ImagePreview.setImageBitmap(option.ImagePreload);
+                    holder.ImagePreview.setImageBitmap(OptionData.get(POSITION).ImagePreload);
+                    if(Type == Question.TYPE_VIDEO){// + si c'est une vidéo, mets un clicklistener sur l'image qui ouvre un dialog
+                        holder.ImagePreview.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                FragmentManager fm = adaptListener.getFragmentManagerQ();
+                                FragmentTransaction ft = fm.beginTransaction();
+                                Fragment prev = fm.findFragmentByTag("fragment_video_dialog");
+                                if (prev != null) {
+                                    ft.remove(prev);
+                                }
+                                ft.addToBackStack(null);
+                                VideoDialogFragment creerOptionDialog = VideoDialogFragment.newInstance(OptionData.get(POSITION).Chemin_Media, OptionData.get(POSITION).notOnServer);
+                                creerOptionDialog.show(ft, "fragment_video_dialog");
+                            }
+                        });
+                    }
                 }
         }else{
             holder.ZoneUpload.setVisibility(View.GONE);

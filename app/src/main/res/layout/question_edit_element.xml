@@ -2,6 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical" android:layout_width="match_parent"
+    android:paddingEnd="7dp"
+    android:paddingStart="7dp"
     android:layout_height="wrap_content">
 
     <LinearLayout
@@ -15,23 +17,29 @@
             android:layout_height="wrap_content"
             android:id="@+id/sondage_edit_num_quest"
             android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-            android:layout_weight="1" />
-
+            android:layout_weight="3" />
+        <com.balysv.materialripple.MaterialRippleLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
         <ImageButton
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:srcCompat="@drawable/ic_delete"
             android:id="@+id/sondage_edit_question_delete"
-            android:layout_weight="2" />
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@color/common_google_signin_btn_text_dark_disabled"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:src="@drawable/ic_delete"
+            android:tint="@color/colorRed" />
+        </com.balysv.materialripple.MaterialRippleLayout>
     </LinearLayout>
 
     <EditText
+        android:id="@+id/sondage_edit_question_titre"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="textPersonName"
         android:ems="10"
-        android:id="@+id/sondage_edit_question_titre"
-        android:hint="Votre question" />
+        android:hint="Votre question"
+        android:inputType="textPersonName" />
 
     <TextView
         android:text="TextView"
@@ -41,17 +49,19 @@
         android:visibility="invisible"
         android:textAppearance="@style/TextAppearance.AppCompat"
         android:textColor="@color/colorRed" />
-
     <TextView
-        android:text="Type de question"
+        android:id="@+id/textView4"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/textView4"
-        android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+        android:text="Type de question"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        android:textSize="18sp" />
 
     <Spinner
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
         android:id="@+id/sondage_edit_question_type" />
 
     <TextView
@@ -62,13 +72,13 @@
         android:visibility="invisible"
         android:textAppearance="@style/TextAppearance.AppCompat"
         android:textColor="@color/colorRed" />
-
     <TextView
-        android:text="Réponses"
+        android:id="@+id/textView7"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/textView7"
-        android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+        android:text="Réponses"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        android:textSize="18sp" />
 
     <TextView
         android:text="TextView"
@@ -78,12 +88,26 @@
         android:textAppearance="@style/TextAppearance.AppCompat"
         android:visibility="invisible"
         android:textColor="@color/colorRed" />
-
-    <Button
-        android:text="Ouvrir la liste"
+    <com.balysv.materialripple.MaterialRippleLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:drawableRight="@drawable/ic_drop_down"
-        android:id="@+id/question_edit_dropdown_button" />
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/question_edit_dropdown_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_border"
+            android:drawableEnd="@drawable/ic_fleche_droite"
+            android:text="Ouvrir la liste"
+            android:paddingEnd="10dp"
+            android:paddingStart="10dp"
+            android:textColor="@color/colorPrimary" />
+    </com.balysv.materialripple.MaterialRippleLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/LightGrey"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"/>
 
 </LinearLayout>

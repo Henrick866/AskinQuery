@@ -4,8 +4,10 @@ import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Point;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.Display;
@@ -17,11 +19,14 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.MediaController;
+import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
@@ -40,11 +45,15 @@ public class VideoDialogFragment extends DialogFragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
-
+    private static final String ARG_PARAM2 = "param2";
     // TODO: Rename and change types of parameters
     private String mParam1;
-
+    private boolean mParam2;
+    private MediaController mediaController;
+    private int position;
+    private VideoView videoView;
     private OnFragmentInteractionListener mListener;
+    private ProgressDialog progressDialog;
     public VideoDialogFragment() {
         // Required empty public constructor
     }
@@ -57,19 +66,28 @@ public class VideoDialogFragment extends DialogFragment {
      * @return A new instance of fragment VideoDialogFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static VideoDialogFragment newInstance(String param1) {
+    public static VideoDialogFragment newInstance(String param1, boolean notOnServer) {
         VideoDialogFragment fragment = new VideoDialogFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
+        args.putBoolean(ARG_PARAM2, notOnServer);
         fragment.setArguments(args);
         return fragment;
     }
-
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        //we use onSaveInstanceState in order to store the video playback position for orientation change
+        savedInstanceState.putInt("Position", videoView.getCurrentPosition());
+        videoView.pause();
+    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
+            mParam2 = getArguments().getBoolean(ARG_PARAM2);
+            position = getArguments().getInt("Position");
         }
     }
 
@@ -80,27 +98,72 @@ public class VideoDialogFragment extends DialogFragment {
         return inflater.inflate(R.layout.fragment_video_dialog, container, false);
     }
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState){
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        final VideoView videoView = view.findViewById(R.id.VideoPlayer);
+        videoView = view.findViewById(R.id.VideoPlayer);
         final Button btnClose = view.findViewById(R.id.VideoCloseBtn);
         btnClose.setEnabled(false);
-        MediaController mediaController = new MediaController(getActivity());
-        mediaController.setAnchorView(videoView);
+            mediaController = new MediaController(getActivity());
+            mediaController.setMediaPlayer(mediaPlayerControl);
+            mediaController.setAnchorView(videoView);
+            mediaController.setEnabled(true);
+            mediaController.show(0);
+
         videoView.setMediaController(mediaController);
-        final StorageReference VideoPath = FirebaseStorage.getInstance().getReference().child(mParam1);
-        try {
-            final File videoFile = File.createTempFile("Video", mParam1.substring(mParam1.lastIndexOf(".") + 1));
-            VideoPath.getFile(videoFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                    videoView.setVideoURI(Uri.fromFile(videoFile));
-                    btnClose.setEnabled(true);
-                }
-            });
-        }catch(IOException e){
-            e.printStackTrace();
+
+        if(mParam2){
+
+                videoView.setVideoURI(Uri.parse(mParam1));
+                videoView.setZOrderOnTop(true);//this line solve the problem
+                btnClose.setEnabled(true);
+                //videoView.start();
+        }else {
+            final StorageReference VideoPath = FirebaseStorage.getInstance().getReference().child(mParam1);
+            try {
+                final File videoFile = File.createTempFile("Video", mParam1.substring(mParam1.lastIndexOf(".") + 1));
+                progressDialog = new ProgressDialog(getActivity());
+                progressDialog.setTitle("Téléchargement de la vidéo, veuillez patientez");
+                progressDialog.show();
+                VideoPath.getFile(videoFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                        videoView.setVideoURI(Uri.fromFile(videoFile));
+                        videoView.setZOrderOnTop(true);//this line solve the problem
+                        btnClose.setEnabled(true);
+                        progressDialog.dismiss();
+                    }
+                }).addOnProgressListener(new OnProgressListener<FileDownloadTask.TaskSnapshot>() {
+                    @Override
+                    public void onProgress(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                        double progress = (100.0*taskSnapshot.getBytesTransferred()/taskSnapshot
+                                .getTotalByteCount());
+                        progressDialog.setMessage("Transfert éffectué à "+(int)progress+"%");
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        btnClose.setEnabled(true);
+                        Toast.makeText(getActivity(), "Échec du téléchargement", Toast.LENGTH_LONG).show();
+                        progressDialog.dismiss();
+                    }
+                });
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+        videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            public void onPrepared(MediaPlayer mediaPlayer) {
+                //if we have a position on savedInstanceState, the video playback should start from here
+                videoView.seekTo(position);
+                if (position == 0) {
+                    videoView.start();
+                } else {
+                    //if we come from a resumed activity, video playback will be paused
+                    videoView.pause();
+                }
+            }
+        });
+
         btnClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -133,12 +196,12 @@ public class VideoDialogFragment extends DialogFragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
+        /*if (context instanceof OnFragmentInteractionListener) {
             mListener = (OnFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
-        }
+        }*/
     }
 
     @Override
@@ -161,4 +224,60 @@ public class VideoDialogFragment extends DialogFragment {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
+    private MediaController.MediaPlayerControl mediaPlayerControl = new MediaController.MediaPlayerControl() {
+        @Override
+        public void start() {
+
+        }
+
+        @Override
+        public void pause() {
+
+        }
+
+        @Override
+        public int getDuration() {
+            return 0;
+        }
+
+        @Override
+        public int getCurrentPosition() {
+            return 0;
+        }
+
+        @Override
+        public void seekTo(int i) {
+
+        }
+
+        @Override
+        public boolean isPlaying() {
+            return false;
+        }
+
+        @Override
+        public int getBufferPercentage() {
+            return 0;
+        }
+
+        @Override
+        public boolean canPause() {
+            return false;
+        }
+
+        @Override
+        public boolean canSeekBackward() {
+            return false;
+        }
+
+        @Override
+        public boolean canSeekForward() {
+            return false;
+        }
+
+        @Override
+        public int getAudioSessionId() {
+            return 0;
+        }
+    };
 }

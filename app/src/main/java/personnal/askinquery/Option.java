@@ -31,7 +31,10 @@ import java.util.Map;
  *                               else   -> imgview loadImage()
  *              vid -> if(notonserver)  -> if(bitmap==null)  -> imgview empty, imgview.onclick = none
  *                               else   -> imgview loadImage() imgview.onclick = new dialog(LoadVideo(o.urlvideo))
+ *                                video = id.mp4
+ *                                image = id.jpg
  */
+
 public class Option implements Serializable
 
     {
@@ -42,9 +45,9 @@ public class Option implements Serializable
         public String Chemin_Media;
         String Chemin_Video, Chemin_Image;
         String UriVideo, UriImage;
-        Bitmap ImagePreload;
+        transient Bitmap ImagePreload;
         public int Score;
-        boolean notOnServer, toBeDeleted = false, MediaIsLoading = false;
+        boolean notOnServer, toBeDeleted = false, MediaIsLoading = false, DataChanged = false;
     public Option(){
 
         }

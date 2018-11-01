@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    >
+    <!--Modifier Username-->
+    <LinearLayout
+        android:id="@+id/dialog_username_edit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <EditText
+            android:id="@+id/manage_profil_edit_username"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:text="Username" />
+        <TextView
+            android:id="@+id/manage_profil_username_err"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Erreur Nom User"
+            android:textAppearance="@style/TextAppearance.AppCompat"
+            android:textColor="@color/colorRed"
+            android:visibility="invisible" />
+
+        <com.balysv.materialripple.MaterialRippleLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp">
+
+            <Button
+                android:id="@+id/manage_profil_dispo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:background="@drawable/button_border"
+                android:padding="10dp"
+                android:text="Vérifier la disponibilité"
+                android:textColor="@color/colorPrimary" />
+        </com.balysv.materialripple.MaterialRippleLayout>
+
+        <com.balysv.materialripple.MaterialRippleLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp">
+
+            <Button
+                android:id="@+id/manage_profil_username_confirm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:background="@drawable/button_border"
+                android:padding="10dp"
+                android:text="Confirmer"
+                android:textColor="@color/colorPrimary" />
+        </com.balysv.materialripple.MaterialRippleLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/dialog_email_edit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <EditText
+            android:id="@+id/manage_profil_edit_email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textEmailAddress"
+            android:text="Email" />
+
+        <TextView
+            android:id="@+id/manage_profil_email_err"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Lorem Ipsum"
+            android:textAppearance="@style/TextAppearance.AppCompat"
+            android:textColor="@color/colorRed"
+            android:visibility="invisible" />
+
+        <com.balysv.materialripple.MaterialRippleLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp">
+
+            <Button
+                android:id="@+id/manage_profil_email_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:background="@drawable/button_border"
+                android:padding="10dp"
+                android:text="Confirmer"
+                android:textColor="@color/colorPrimary" />
+        </com.balysv.materialripple.MaterialRippleLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/dialog_pass_edit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="visible">
+
+        <EditText
+            android:id="@+id/manage_profil_edit_pass"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword"
+            android:text="Mot de passe" />
+
+        <ProgressBar
+            android:id="@+id/manage_profil_pass_strength"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/manage_profil_pass_strength_indic"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="textEnd"
+            android:textAppearance="@style/TextAppearance.AppCompat"
+            android:visibility="invisible" />
+
+        <TextView
+            android:id="@+id/manage_profil_pass_err"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Erreur Nom User"
+            android:textAppearance="@style/TextAppearance.AppCompat"
+            android:textColor="@color/colorRed"
+            android:visibility="invisible" />
+
+        <com.balysv.materialripple.MaterialRippleLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp">
+
+            <Button
+                android:id="@+id/manage_profil_pass_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+
+                android:background="@drawable/button_border"
+                android:padding="10dp"
+                android:text="Changer de mot de passe"
+                android:textColor="@color/colorPrimary" />
+        </com.balysv.materialripple.MaterialRippleLayout>
+
+        <com.balysv.materialripple.MaterialRippleLayout
+            android:layout_width="match_parent"
+            android:layout_marginTop="5dp"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/manage_profil_cancel_pass"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:background="@drawable/button_border"
+                android:padding="10dp"
+                android:text="Annuler"
+                android:textColor="@color/colorRed" />
+        </com.balysv.materialripple.MaterialRippleLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/dialog_more_options"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <com.balysv.materialripple.MaterialRippleLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/manage_profil_delete"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:background="@color/transparent"
+                android:padding="10dp"
+                android:text="Supprimer le compte"
+                android:textColor="@color/colorRed" />
+        </com.balysv.materialripple.MaterialRippleLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/LightGrey" />
+
+        <com.balysv.materialripple.MaterialRippleLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/manage_profil_deactivate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:background="@color/transparent"
+                android:padding="10dp"
+                android:text="Désactiver le compte"
+                android:textColor="@color/colorRed" />
+        </com.balysv.materialripple.MaterialRippleLayout>
+
+    </LinearLayout>
+
+</FrameLayout>
