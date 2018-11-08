@@ -2,6 +2,7 @@ package personnal.askinquery;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,6 +12,7 @@ import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.util.DisplayMetrics;
 
 import java.io.ByteArrayOutputStream;
 
@@ -33,8 +35,8 @@ public class TraitementImage {
         return imageFinal;
         }catch(Exception e){
             e.printStackTrace();
+            return null;
         }
-        return null;
     }
     public static Uri ConvertBitmapToUri(Bitmap bitmap, Context context){
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
@@ -56,13 +58,16 @@ public class TraitementImage {
             return Path;
         }
     }
-    public static Bitmap createSquaredBitmap(Bitmap srcBmp) {
+    public static Bitmap createSquaredBitmap(Bitmap srcBmp, Context context) {//pour profil
         int dim = Math.max(srcBmp.getWidth(), srcBmp.getHeight());
         Bitmap dstBmp = Bitmap.createBitmap(dim, dim, Bitmap.Config.ARGB_8888);
+        Resources resources = context.getResources();
+        DisplayMetrics metrics = resources.getDisplayMetrics();
+        float px = 150 * ((float)metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
 
         Canvas canvas = new Canvas(dstBmp);
         canvas.drawColor(Color.WHITE);
-        canvas.drawBitmap(srcBmp, (dim - srcBmp.getWidth()) / 2, (dim - srcBmp.getHeight()) / 2, null);
+        canvas.drawBitmap(srcBmp, (px - srcBmp.getWidth()) / 2, (px - srcBmp.getHeight()) / 2, null);
 
         return dstBmp;
     }

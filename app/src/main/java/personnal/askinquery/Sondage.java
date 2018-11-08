@@ -68,7 +68,7 @@ public class Sondage implements Serializable {
     }
     public Map<String, Object> Map(){
         HashMap<String, Object> newMap = new HashMap<>();
-        newMap.put(FireBaseInteraction.Sondage_Keys.AUTEUR_REF, Auteur.ID);
+        newMap.put(FireBaseInteraction.Sondage_Keys.AUTEUR_REF, AuteurRef);
         newMap.put(FireBaseInteraction.Sondage_Keys.DATE_ECHEANCE, Date_Echeance);
         newMap.put(FireBaseInteraction.Sondage_Keys.DATE_PUBLIC, Date_Public);
         newMap.put(FireBaseInteraction.Sondage_Keys.TITRE, Titre);

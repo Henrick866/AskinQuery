@@ -7,7 +7,6 @@
     android:orientation="vertical"
     tools:context=".ManageProfilFragment">
 
-    <!-- TODO: Update blank fragment layout -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -163,6 +162,29 @@
         <com.balysv.materialripple.MaterialRippleLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/profil_manage_followed"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:drawableEnd="@drawable/ic_fleche_droite"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:paddingStart="20dp"
+                android:paddingTop="10dp"
+                android:paddingEnd="20dp"
+                android:paddingBottom="10dp"
+                android:text="Créateurs suivis"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textSize="16sp" />
+        </com.balysv.materialripple.MaterialRippleLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/LightGrey"/>
+        <com.balysv.materialripple.MaterialRippleLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
         <TextView
             android:id="@+id/profil_manage_moreOptions"
             android:layout_width="match_parent"
@@ -181,15 +203,4 @@
         </com.balysv.materialripple.MaterialRippleLayout>
 
     </LinearLayout>
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/profil_manage_saveBtn"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
-        android:layout_gravity="end|bottom"
-        android:layout_margin="16dp"
-        android:src="@drawable/ic_save"
-        android:tint="@color/common_google_signin_btn_text_dark_default"
-        app:backgroundTint="@color/colorPrimaryMedDark"
-        app:fabSize="normal" />
 </LinearLayout>

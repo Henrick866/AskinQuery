@@ -47,7 +47,7 @@ public class Option implements Serializable
         String UriVideo, UriImage;
         transient Bitmap ImagePreload;
         public int Score;
-        boolean notOnServer, toBeDeleted = false, MediaIsLoading = false, DataChanged = false;
+        boolean notOnServer, toBeDeleted = false, repondu = false /*utilisé pour reprendre un sondage plus tard*/, DataChanged = false;
     public Option(){
 
         }
@@ -93,5 +93,12 @@ public class Option implements Serializable
             newMap.put(FireBaseInteraction.Option_Keys.SCORE, Score);
             newMap.put(FireBaseInteraction.Option_Keys.TEXTE, Texte);
             return newMap;
+        }
+        public int getTotalVotes(){
+            int Total = 0;
+            for(Option o : Question_parent.Options){
+                Total += o.Score;
+            }
+            return Total;
         }
 }

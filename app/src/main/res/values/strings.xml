@@ -8,11 +8,10 @@
     <string name="navigation_drawer_close">Fermer le menu</string>
 
     <string name="action_settings">Paramètres</string>
-    <string name="title_activity_main">Accueil</string>
+    <string name="title_activity_main">AskinQuery</string>
 
     <string name="profile_group_title">Profil</string>
     <string name="Connexion"><u>Se connecter</u></string>
     <string name="Deconnexion"><u>Se déconnecter</u></string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

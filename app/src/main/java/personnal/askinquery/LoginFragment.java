@@ -27,10 +27,8 @@ import com.google.firebase.auth.FirebaseUser;
  * create an instance of this fragment.
  */
 public class LoginFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 
-    // TODO: Rename and change types of parameters
     private EditText EmailField, PassField;
     private TextView LoginErr;
     private Button LoginBtn, CreateBtn;
@@ -49,7 +47,6 @@ public class LoginFragment extends Fragment {
      *
      * @return A new instance of fragment LoginFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static LoginFragment newInstance() {
         LoginFragment fragment = new LoginFragment();
         Bundle args = new Bundle();
@@ -78,19 +75,22 @@ public class LoginFragment extends Fragment {
         CreateBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mListener.changePage(CreerProfilFragment.newInstance(mAuth));
+                mListener.changePage(CreerProfilFragment.newInstance(mAuth), "Profil | Créer");
             }
         });
         LoginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //todo :: sync les données?
+                //todo:: demander la syncronisation
+                //todo: via les transactions, vérifiez si le sondage a été répondu par les deux parties, si oui, décrémentez les scores
                 String Pass = PassField.getEditableText().toString(), Email = EmailField.getEditableText().toString();
                 mAuth.signInWithEmailAndPassword(Email, Pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()){
                             mListener.updateMenu(mAuth.getCurrentUser());
-                            mListener.changePage(SondageListFragment.newInstance(false));
+                            mListener.changePage(SondageListFragment.newInstance(false, null), "Sondages");
                         }else{
                             LoginErr.setText("Courriel ou mot de passe érronné.");
                             LoginErr.setVisibility(View.VISIBLE);
@@ -131,8 +131,10 @@ public class LoginFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void changePage(Fragment fragment);
+        void changePage(Fragment fragment, String Title);
         void updateMenu(FirebaseUser profil);
+    }
+    public String getTitle(){
+        return "Connexion";
     }
 }

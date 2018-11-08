@@ -25,10 +25,11 @@
     <color name="colorAccentMedDark">#FF7400</color>
     <color name="colorAccentDark">#C45900</color>
 
-    <color name="colorRed">#D50110</color>
+    <color name="colorRed">#d50110</color>
     <color name="colorYellow">#ffffbb33</color>
     <color name="colorGreen">#ff669900</color>
     <color name="LightGrey">#c8c8c8</color>
+    <color name="LighterGrey">#e6e6e6</color>
     <!-- Pallette -->
 
 </resources>

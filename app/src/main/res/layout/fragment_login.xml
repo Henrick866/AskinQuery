@@ -8,7 +8,6 @@
     android:paddingEnd="7dp"
     tools:context=".LoginFragment">
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -46,9 +45,9 @@
 
         <Button
             android:id="@+id/login_btn"
+            style="@style/buttonCustom"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/button_border"
             android:text="Se connecter"
             android:textColor="@color/colorPrimary" />
     </com.balysv.materialripple.MaterialRippleLayout>
@@ -56,13 +55,14 @@
         android:layout_width="match_parent"
         android:layout_marginTop="7dp"
         android:layout_height="wrap_content">
-    <Button
-        android:id="@+id/create_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/button_border"
-        android:text="Créer un compte"
-        android:textColor="@color/colorPrimary" />
+
+        <Button
+            android:id="@+id/create_btn"
+            style="@style/buttonCustom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Créer un compte"
+            android:textColor="@color/colorPrimary" />
     </com.balysv.materialripple.MaterialRippleLayout>
 
 </LinearLayout>

@@ -50,7 +50,14 @@ public class FireBaseInteraction {
         final static String USERNAME = "Username";
         final static String COURRIEL = "Courriel";
         final static String AVATAR = "Avatar";
-        final static String PASS = "Pass";
+        final static String SONDAGES = "Sondages";
         final static String AUTEURS_SUIVIS = "Auteurs_Suivis";
+    }
+    public static class Publications_Keys{
+        final static String STRUCT_NAME = "Publications";
+        final static String TITRE = "Titre";
+        final static String TEXTE = "Texte";
+        final static String AUTEUR = "Auteur";
+        final static String MEDIA = "Media";
     }
 }

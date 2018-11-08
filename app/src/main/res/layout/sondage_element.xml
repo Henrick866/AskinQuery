@@ -27,11 +27,14 @@
                 android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
             <TextView
-                android:text="Par: @Auteur"
+                android:id="@+id/sondage_elem_nom_auteur"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/sondage_elem_nom_auteur"
+                android:clickable="true"
+                android:text="Par: @Auteur"
+                android:layout_marginTop="5dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textColor="@android:color/holo_blue_light"
                 android:textSize="18sp" />
 
             <LinearLayout
@@ -44,6 +47,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:layout_marginTop="5dp"
                     android:text="publié: @Date"
                     android:textAppearance="@style/TextAppearance.AppCompat" />
 
@@ -52,6 +56,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:layout_marginTop="5dp"
                     android:text="Fin: @Date"
                     android:textAppearance="@style/TextAppearance.AppCompat" />
             </LinearLayout>
@@ -65,14 +70,15 @@
             <com.balysv.materialripple.MaterialRippleLayout
                 android:layout_width="wrap_content"
                 android:layout_centerInParent="true"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
                 android:layout_height="wrap_content">
 
                 <ImageButton
                     android:id="@+id/sondage_elem_plainte_btn"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginBottom="5dp"
+
                     android:background="@color/common_google_signin_btn_text_light_disabled"
                     android:src="@drawable/ic_flag"
                     android:tint="@color/colorRed" />
@@ -86,6 +92,7 @@
         app:srcCompat="@android:drawable/ic_menu_gallery"
         android:id="@+id/sondage_elem_image"
         android:maxHeight="100dp"
+        android:layout_marginTop="5dp"
         android:layout_gravity="center"
         android:scaleType="fitCenter" />
 
@@ -93,6 +100,7 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="50dp"
+        android:layout_marginTop="5dp"
         android:id="@+id/sondage_elem_zone_admin">
         <com.balysv.materialripple.MaterialRippleLayout
             android:layout_width="match_parent"
@@ -130,7 +138,6 @@
             android:id="@+id/sondage_elem_delete_btn"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
             android:background="@color/transparent"
             android:scaleType="fitCenter"
             android:tint="@color/colorRed"
@@ -146,22 +153,22 @@
         <com.balysv.materialripple.MaterialRippleLayout
             android:layout_width="wrap_content"
             android:layout_centerInParent="true"
+            android:layout_marginTop="5dp"
             android:layout_height="wrap_content">
 
             <Button
                 android:id="@+id/sondage_elem_start_btn"
+                style="@style/buttonCustom"
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
-                android:background="@drawable/button_border"
                 android:text="Commencer"
                 android:textAlignment="center"
                 android:textColor="@color/colorPrimary" />
         </com.balysv.materialripple.MaterialRippleLayout>
     </RelativeLayout>
+
 
     <TextView
         android:text="TextView"

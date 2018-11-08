@@ -8,21 +8,21 @@
     android:paddingStart="7dp"
     android:weightSum="1"
     tools:context="personnal.askinquery.CreerSondageFragment">
-    <!-- TODO: Update blank fragment layout -->
     <com.balysv.materialripple.MaterialRippleLayout
         android:layout_width="match_parent"
         android:layout_marginTop="7dp"
         android:layout_height="wrap_content">
-    <Button
-        android:id="@+id/sondage_edit_done"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/button_border"
-        android:paddingStart="20dp"
-        android:paddingEnd="10dp"
-        android:drawableEnd="@drawable/ic_done_color"
-        android:text="Terminer"
-        android:textColor="@color/colorPrimary" />
+
+        <Button
+            android:id="@+id/sondage_edit_done"
+            style="@style/buttonCustom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableEnd="@drawable/ic_done_color"
+            android:paddingStart="20dp"
+            android:paddingEnd="10dp"
+            android:text="Terminer"
+            android:textColor="@color/colorPrimary" />
     </com.balysv.materialripple.MaterialRippleLayout>
 
     <TextView
@@ -206,8 +206,9 @@
                                 android:id="@+id/sondage_edit_image_preview"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
                                 android:adjustViewBounds="true"
+                                android:maxHeight="100dp"
+                                android:visibility="gone"
                                 android:cropToPadding="false"
                                 android:src="@drawable/ic_menu_gallery" />
                         </LinearLayout>
@@ -227,16 +228,18 @@
                         android:layout_height="wrap_content">
                         <com.balysv.materialripple.MaterialRippleLayout
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content">
-                        <ImageButton
-                            android:id="@+id/sondage_edit_add_question"
-                            android:layout_width="50dp"
-                            android:layout_height="50dp"
                             android:layout_centerInParent="true"
-                            android:background="@drawable/button_border"
-                            android:scaleType="fitCenter"
-                            android:src="@drawable/ic_ajout"
-                            android:tint="@color/colorPrimary" />
+                            android:layout_height="wrap_content">
+
+                            <ImageButton
+                                android:id="@+id/sondage_edit_add_question"
+                                style="@style/buttonImageCustom"
+                                android:layout_width="50dp"
+
+                                android:layout_height="50dp"
+                                android:scaleType="fitCenter"
+                                android:src="@drawable/ic_ajout"
+                                android:tint="@color/colorPrimary" />
                     </com.balysv.materialripple.MaterialRippleLayout>
 
                     </RelativeLayout>

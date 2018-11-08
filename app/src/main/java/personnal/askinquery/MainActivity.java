@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -48,7 +49,10 @@ public class MainActivity extends AppCompatActivity
         SondageAdapter.AdaptListener,
         LoginFragment.OnFragmentInteractionListener,
         CreerProfilFragment.OnFragmentInteractionListener,
-        ManageProfilFragment.OnFragmentInteractionListener
+        ManageProfilFragment.OnFragmentInteractionListener,
+        ConsultProfilFragment.OnFragmentInteractionListener,
+        AnswerOptionAdapter.AdaptListener,
+        AnswerSondageFragment.OnFragmentInteractionListener
         //PublicationAdapter.AdaptListener
 {
     FragmentManager fragmentManager;
@@ -97,7 +101,7 @@ public class MainActivity extends AppCompatActivity
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
         updateMenu(user);
-        changePage(SondageListFragment.newInstance(false));
+        changePage(SondageListFragment.newInstance(false, null), "Sondages");
 
         //changePage(BlankFragment.newInstance("",""));
     }
@@ -131,6 +135,8 @@ public class MainActivity extends AppCompatActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        }else if(id == R.id.action_home){
+            changePage(SondageListFragment.newInstance(false, null),"Sondages");
         }
 
         return super.onOptionsItemSelected(item);
@@ -143,9 +149,9 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_profil_connexion) {
-            changePage(LoginFragment.newInstance());
+            changePage(LoginFragment.newInstance(), "Connexion");
         } else if (id == R.id.nav_profil_creation) {
-            changePage(CreerProfilFragment.newInstance(mAuth));
+            changePage(CreerProfilFragment.newInstance(mAuth), "Profil | Créer");
         } else if (id == R.id.nav_profil_consulter) {
             if(user != null) {
                 LayoutInflater li = LayoutInflater.from(this);
@@ -169,7 +175,7 @@ public class MainActivity extends AppCompatActivity
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if(task.isSuccessful()){
-                                                    changePage(ManageProfilFragment.newInstance(userInput.getEditableText().toString()));
+                                                    changePage(ManageProfilFragment.newInstance(userInput.getEditableText().toString()),"Profil | Gérer");
                                                     Toast.makeText(getApplicationContext(), "Vous êtes bien "+user.getDisplayName(), Toast.LENGTH_LONG).show();
                                                     dialog.dismiss();
                                                 }else{
@@ -184,15 +190,19 @@ public class MainActivity extends AppCompatActivity
                                     public void onClick(DialogInterface dialog, int id) {
                                         dialog.cancel();
                                     }
-                                });
+                                }).show();
             }
 
         } else if (id == R.id.nav_profil_sondages_manage) {
-            changePage(SondageListFragment.newInstance(true));
+            changePage(SondageListFragment.newInstance(true, null),"Sondages | Gérer");
         } else if (id == R.id.nav_profil_communaute) {
 
         } else if (id == R.id.nav_profil_suivis) {
 
+        }else if(id == R.id.nav_sondages){
+            changePage(SondageListFragment.newInstance(false, null), "Sondages");
+        }else if(id == R.id.nav_profil_sondages_repondus){
+            changePage(SondageListFragment.newInstance(false, null, true), "Sondages répondus");
         }
 
 
@@ -203,26 +213,27 @@ public class MainActivity extends AppCompatActivity
     private void logInOut(){
         if(user == null){
             drawer.closeDrawer(GravityCompat.START);
-            changePage(LoginFragment.newInstance());
+            changePage(LoginFragment.newInstance(), "Connexion");
         }else{
-            drawer.closeDrawer(GravityCompat.START);
-            mAuth.signOut();
-            user = mAuth.getCurrentUser();
-            updateMenu(user);
+            if(!user.isAnonymous()) {
+                drawer.closeDrawer(GravityCompat.START);
+                mAuth.signOut();
+                user = mAuth.getCurrentUser();
+                updateMenu(user);
+                changePage(SondageListFragment.newInstance(false, null), "Sondages");
+            }else{
+                drawer.closeDrawer(GravityCompat.START);
+                changePage(LoginFragment.newInstance(), "Connexion");
+            }
         }
     }
 
-    public void changePage(Fragment fragment){
+    public void changePage(Fragment fragment, String Title){
+        this.getSupportActionBar().setTitle(Title);
         fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.Fragment_Container, fragment);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
-    }
-    public void LoadImage(String Image){
-
-    }
-    public void SupprimerSondage(Sondage sondage){
-
     }
     public FragmentManager getFragmentManagerQ(){
         return fragmentManager;
@@ -237,27 +248,39 @@ public class MainActivity extends AppCompatActivity
             NotConnected.setVisible(true);
             ConnectLink.setText(R.string.Connexion);
         }else{
-            MenuUserEmail.setText(user.getEmail());
-            MenuUsername.setText(user.getDisplayName());
-            if(user.getPhotoUrl() != null) {
-                if (user.getPhotoUrl().toString().equals("N")) {//pas d'image
-                    MenuUserAvatar.setImageDrawable(getResources().getDrawable(R.drawable.ic_menu_profil_connecter));
-                } else {//une image
-                    StorageReference ProfilAvRef = FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.PROFILS_AVATARS + user.getUid() + ".jpg");
-                    ProfilAvRef.getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-                        @Override
-                        public void onSuccess(byte[] bytes) {
-                            Bitmap b = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                            MenuUserAvatar.setImageBitmap(b);
-                        }
-                    });
+            if(user.isAnonymous()){
+                MenuUserAvatar.setImageDrawable(getResources().getDrawable(R.drawable.ic_menu_profil_connecter));
+                MenuUsername.setText("Non connecté.");
+                MenuUserEmail.setText("Veuillez vous connecter.");
+                Connected.setVisible(false);
+                NotConnected.setVisible(true);
+                ConnectLink.setText(R.string.Connexion);
+            }else {
+                MenuUserEmail.setText(user.getEmail());
+                MenuUsername.setText(user.getDisplayName());
+                if (user.getPhotoUrl() != null) {
+                    if (user.getPhotoUrl().toString().equals("N")) {//pas d'image
+                        MenuUserAvatar.setImageResource(R.mipmap.ic_launcher);
+                    } else {//une image
+                        StorageReference ProfilAvRef = FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.PROFILS_AVATARS + user.getUid() + ".jpg");
+                        ProfilAvRef.getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                            @Override
+                            public void onSuccess(byte[] bytes) {
+                                Bitmap b = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                                MenuUserAvatar.setImageBitmap(b);
+                            }
+                        });
+                    }
                 }
+                Connected.setVisible(true);
+                NotConnected.setVisible(false);
+                ConnectLink.setText(R.string.Deconnexion);
             }
-            Connected.setVisible(true);
-            NotConnected.setVisible(false);
-            ConnectLink.setText(R.string.Deconnexion);
         }
 
+    }
+    public FirebaseUser getUser(){
+        return user;
     }
 
 }

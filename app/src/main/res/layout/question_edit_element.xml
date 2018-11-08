@@ -94,13 +94,13 @@
 
         <Button
             android:id="@+id/question_edit_dropdown_button"
+            style="@style/buttonCustom"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/button_border"
             android:drawableEnd="@drawable/ic_fleche_droite"
-            android:text="Ouvrir la liste"
-            android:paddingEnd="10dp"
             android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:text="Ouvrir la liste"
             android:textColor="@color/colorPrimary" />
     </com.balysv.materialripple.MaterialRippleLayout>
     <View

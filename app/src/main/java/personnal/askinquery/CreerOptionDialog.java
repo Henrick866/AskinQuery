@@ -57,7 +57,6 @@ import java.util.concurrent.ExecutionException;
  * create an instance of this fragment.
  */
 public class CreerOptionDialog extends DialogFragment implements CreerOptionAdapter.AdaptListener {
-    // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -65,7 +64,6 @@ public class CreerOptionDialog extends DialogFragment implements CreerOptionAdap
 
     private static final int MEDIA_GALL_OPTION = 3;
     private static final int MY_PERMISSION_REQUEST_READ_STORAGE = 200;
-    // TODO: Rename and change types of parameters
     private Question mParam1;
     ListView OptionListe;
     TextView OptionsError;
@@ -79,7 +77,6 @@ public class CreerOptionDialog extends DialogFragment implements CreerOptionAdap
     private OnFragmentInteractionListener mListener;
     OptionDialogListener optionDialogListener;
     int QuestionPosition;
-    Integer CompteurCharges;
     public CreerOptionDialog() {
         // Required empty public constructor
     }
@@ -90,7 +87,6 @@ public class CreerOptionDialog extends DialogFragment implements CreerOptionAdap
      *
      * @return A new instance of fragment CreerOptionDialog.
      */
-    // TODO: Rename and change types and number of parameters
     public static CreerOptionDialog newInstance(Question question, int Position, CreerQuestionAdapter.DialogFunctions creerQuestionAdapter) {
         CreerOptionDialog fragment = new CreerOptionDialog();
         Bundle args = new Bundle();
@@ -185,12 +181,6 @@ public class CreerOptionDialog extends DialogFragment implements CreerOptionAdap
             }
         });
     }
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            //mListener.onFragmentInteraction(uri);
-        }
-    }
 
     @Override
     public void onAttach(Context context) {
@@ -237,8 +227,9 @@ public class CreerOptionDialog extends DialogFragment implements CreerOptionAdap
     public void DeleteOption(int optionPosition) {
         if(!mParam1.Options.get(optionPosition).notOnServer) { //si il est sur le serveur, marque-le pour la suppresion sur le serveur
             mParam1.Options.get(optionPosition).toBeDeleted = true;
+        }else {
+            mParam1.Options.remove(optionPosition);
         }
-        mParam1.Options.remove(optionPosition);
         creerOptionAdapter.notifyDataSetChanged();
         if (mParam1.Options.size() < 2) {
             OptionsError.setText("Vous devez avoir au moins deux choix de réponses");
@@ -271,9 +262,9 @@ public class CreerOptionDialog extends DialogFragment implements CreerOptionAdap
                 mParam1.Options.get(this.optionPosition).ImagePreload = ThumbnailUtils.createVideoThumbnail(picturePath, MediaStore.Video.Thumbnails.MINI_KIND);
                 Log.e("test", "Done");
                     //création bitmap + assignation bitmap;
+                creerOptionAdapter.notifyDataSetChanged();
             }
 
-            creerOptionAdapter.notifyDataSetChanged();
 
             Toast.makeText(getActivity(), "Le fichier sera envoyé au serveur lorsque le sondage sera créé/modifié",Toast.LENGTH_LONG).show();
         }
@@ -286,12 +277,14 @@ public class CreerOptionDialog extends DialogFragment implements CreerOptionAdap
                 try {
                     mParam1.Options.get(this.optionPosition).ImagePreload = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), Image);
                     mParam1.Options.get(this.optionPosition).Chemin_Media = "N";
+                    creerOptionAdapter.notifyDataSetChanged();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
                 Image = null;
             }else{//accepte
                 MakeImage();
+
             }
         }
     }
@@ -332,6 +325,7 @@ public class CreerOptionDialog extends DialogFragment implements CreerOptionAdap
         Image = null;
         ImageBitmap = null;
         mParam1.Options.get(this.optionPosition).DataChanged = true;
+        creerOptionAdapter.notifyDataSetChanged();
     }
     public void ToggleDoneBtn(boolean b){
         Done.setEnabled(b);
@@ -343,7 +337,6 @@ public class CreerOptionDialog extends DialogFragment implements CreerOptionAdap
         String onFinishedOptionDialog(ArrayList<Option> liste_option, int Position);
     }
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         //void onFragmentInteraction(Uri uri);
     }
 }

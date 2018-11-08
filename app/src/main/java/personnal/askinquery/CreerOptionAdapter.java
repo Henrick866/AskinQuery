@@ -1,9 +1,11 @@
 package personnal.askinquery;
 
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -62,6 +64,14 @@ public class CreerOptionAdapter extends ArrayAdapter<Option> {
         currentEdited = -1;
         this.adaptListener = adaptListener;
     }
+    @Override
+    public int getCount(){
+        int n = 0;
+        for(Option o : OptionData){
+           n += o.toBeDeleted ? 0 : 1;
+        }
+        return n;
+    }
 
     public View getView(int position, View convertView, ViewGroup parent){
         final Option option = getItem(position);
@@ -81,20 +91,25 @@ public class CreerOptionAdapter extends ArrayAdapter<Option> {
         }else{
             holder = (CreerOptionAdapter.ViewHolder)view.getTag();
         }
-
-        holder.OptionNum.setText("Option #"+(position+1));
-        if(Type != Question.TYPE_TEXTE){//exécute ce chargement trop souvent pour rien, comment enregistrer les médias en cache?
-            StorageReference OptionMedRef;
-                if(OptionData.get(POSITION).notOnServer){//si n'est pas sur le serveur, créé récement
-                    if(OptionData.get(POSITION).ImagePreload == null){//si l'image bitmap n'existe pas
+        if(OptionData.get(POSITION).toBeDeleted){
+            view.setVisibility(View.GONE);
+        }else {
+            holder.OptionNum.setText("Option #" + (position + 1));
+            if (Type != Question.TYPE_TEXTE) {//exécute ce chargement trop souvent pour rien, comment enregistrer les médias en cache?
+                StorageReference OptionMedRef;
+                if (OptionData.get(POSITION).notOnServer) {//si n'est pas sur le serveur, créé récement
+                    if (OptionData.get(POSITION).ImagePreload == null) {//si l'image bitmap n'existe pas
                         Log.e("Test", "Dud");
                         holder.ImagePreview.setVisibility(View.GONE);
                         holder.MediaError.setVisibility(View.VISIBLE);
                         holder.MediaError.setText("Aucune image/vidéo sélectionnée, veuillez en choisir une.");
-                    }else{//si bitmap existe
+                    } else {//si bitmap existe
+
                         holder.ImagePreview.setImageBitmap(OptionData.get(POSITION).ImagePreload);
+                        holder.ImagePreview.setVisibility(View.VISIBLE);
+                        holder.MediaError.setVisibility(View.INVISIBLE);
                         Log.e("Test", "Loaded");
-                        if(Type == Question.TYPE_VIDEO){// + si c'est une vidéo, mets un clicklistener sur l'image qui ouvre un dialog
+                        if (Type == Question.TYPE_VIDEO) {// + si c'est une vidéo, mets un clicklistener sur l'image qui ouvre un dialog
                             holder.ImagePreview.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
@@ -111,9 +126,11 @@ public class CreerOptionAdapter extends ArrayAdapter<Option> {
                             });
                         }
                     }
-                }else{
+                } else {
                     holder.ImagePreview.setImageBitmap(OptionData.get(POSITION).ImagePreload);
-                    if(Type == Question.TYPE_VIDEO){// + si c'est une vidéo, mets un clicklistener sur l'image qui ouvre un dialog
+                    holder.ImagePreview.setVisibility(View.VISIBLE);
+                    holder.MediaError.setVisibility(View.INVISIBLE);
+                    if (Type == Question.TYPE_VIDEO) {// + si c'est une vidéo, mets un clicklistener sur l'image qui ouvre un dialog
                         holder.ImagePreview.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -130,84 +147,97 @@ public class CreerOptionAdapter extends ArrayAdapter<Option> {
                         });
                     }
                 }
-        }else{
-            holder.ZoneUpload.setVisibility(View.GONE);
-            holder.MediaError.setVisibility(View.GONE);
-            holder.ImagePreview.setVisibility(View.GONE);
-        }
-        final CreerOptionAdapter adapter = this;
-        holder.btnDelete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                adaptListener.DeleteOption(POSITION);
+            } else {
+                holder.ZoneUpload.setVisibility(View.GONE);
+                holder.MediaError.setVisibility(View.GONE);
+                holder.ImagePreview.setVisibility(View.GONE);
             }
-        });
-        holder.btnUpload.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+            final CreerOptionAdapter adapter = this;
+            holder.btnDelete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    new AlertDialog.Builder(c)
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setTitle("Supprimer question")
+                            .setMessage("Voulez-vous vraiment supprimer cette option?")
+                            .setPositiveButton("Oui", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    adaptListener.DeleteOption(POSITION);
+                                }
 
-                adaptListener.LoadMedia(POSITION, Type);
-            }
-        });
-        holder.TexteReponse.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean b) {
-                //adaptListener.ToggleDoneBtn(!b);
-                if(b == true){
-                    currentEdited = POSITION;
+                            })
+                            .setNegativeButton("Non", null)
+                            .show();
+
                 }
-            }
-        });
-        TextWatcher TxtFieldWatcher  = new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            });
+            holder.btnUpload.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
 
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                String newTexte = s.toString();
-                if (newTexte.isEmpty()) {
-                    holder.TexteError.setText("Vous devez proposer une réponse");
-                    holder.TexteError.setVisibility(View.VISIBLE);
-                } else {
-                    if (currentEdited == POSITION) {
-                        if (OptionData.get(POSITION).Texte == null) {//si nouv
-                            OptionData.get(POSITION).Texte = newTexte;
-                        } else if (!OptionData.get(POSITION).Texte.equals(newTexte)) {
-                            OptionData.get(POSITION).Texte = newTexte;
-                            adaptListener.updateOptions(OptionData);
-                        }
-                        holder.TexteError.setVisibility(View.INVISIBLE);
+                    adaptListener.LoadMedia(POSITION, Type);
+                }
+            });
+            holder.TexteReponse.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View view, boolean b) {
+                    //adaptListener.ToggleDoneBtn(!b);
+                    if (b == true) {
+                        currentEdited = POSITION;
                     }
                 }
+            });
+            TextWatcher TxtFieldWatcher = new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    String newTexte = s.toString();
+                    if (newTexte.isEmpty()) {
+                        holder.TexteError.setText("Vous devez proposer une réponse");
+                        holder.TexteError.setVisibility(View.VISIBLE);
+                    } else {
+                        if (currentEdited == POSITION) {
+                            if (OptionData.get(POSITION).Texte == null) {//si nouv
+                                OptionData.get(POSITION).Texte = newTexte;
+                            } else if (!OptionData.get(POSITION).Texte.equals(newTexte)) {
+                                OptionData.get(POSITION).Texte = newTexte;
+                                adaptListener.updateOptions(OptionData);
+                            }
+                            holder.TexteError.setVisibility(View.INVISIBLE);
+                        }
+                    }
+                }
+            };
+            TextWatcher oldWatcher = (TextWatcher) holder.TexteReponse.getTag();
+            if (oldWatcher != null) {
+                holder.TexteReponse.removeTextChangedListener(oldWatcher);
             }
-        };
-        TextWatcher oldWatcher = (TextWatcher) holder.TexteReponse.getTag();
-        if(oldWatcher != null){
-            holder.TexteReponse.removeTextChangedListener(oldWatcher);
-        }
-        if(OptionData.get(POSITION).Texte != null) {
-            if (!OptionData.get(POSITION).Texte.isEmpty()) {
-                holder.TexteReponse.setText(OptionData.get(POSITION).Texte);
+            if (OptionData.get(POSITION).Texte != null) {
+                if (!OptionData.get(POSITION).Texte.isEmpty()) {
+                    holder.TexteReponse.setText(OptionData.get(POSITION).Texte);
+                } else {
+                    holder.TexteReponse.setText("");
+                    holder.TexteError.setText("Vous devez proposer une réponse");
+                    holder.TexteError.setVisibility(View.VISIBLE);
+                }
             } else {
                 holder.TexteReponse.setText("");
                 holder.TexteError.setText("Vous devez proposer une réponse");
                 holder.TexteError.setVisibility(View.VISIBLE);
             }
-        }else{
-            holder.TexteReponse.setText("");
-            holder.TexteError.setText("Vous devez proposer une réponse");
-            holder.TexteError.setVisibility(View.VISIBLE);
+            holder.TexteReponse.setTag(TxtFieldWatcher);
+            holder.TexteReponse.addTextChangedListener(TxtFieldWatcher);
         }
-        holder.TexteReponse.setTag(TxtFieldWatcher);
-        holder.TexteReponse.addTextChangedListener(TxtFieldWatcher);
-
 
         return view;
     }

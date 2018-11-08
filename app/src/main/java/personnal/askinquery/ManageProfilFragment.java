@@ -1,19 +1,32 @@
 package personnal.askinquery;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.Fragment;
+import android.app.ProgressDialog;
+import android.arch.lifecycle.ViewModelProvider;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcel;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +39,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
@@ -38,6 +53,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.database.core.view.Change;
+import com.google.firebase.provider.FirebaseInitProvider;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 
 
 /**
@@ -49,30 +72,32 @@ import com.google.firebase.database.core.view.Change;
  * create an instance of this fragment.
  */
 public class ManageProfilFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private static final int AVATAR_GET = 5;
+    private static final int MY_PERMISSION_REQUEST_READ_STORAGE = 200;
 
-    // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
     private TextView UsernameText, EmailText, PassText, OtherText, DeleteAvatar, ChangeAvatar;
     private ImageView AvatarPreview;
-    private FloatingActionButton SaveBtn;
     private Dialog dialog;
     private FirebaseAuth mAuth;
     private FirebaseUser user;
     private EditText InputField;
-    private Button Confirm;
+    private Button Confirm, Cancel;
     private ProgressBar PassStrength;
     private TextView PassStrengthIndic;
     private LinearLayout Layout;
     private Profil Utilisateur;
+    private Bitmap ImageBitmap;
+    private Uri Image;
     private int SumPass;
     private AuthCredential credential;
-
-
+    private StorageReference AvatarRef;
+    private DatabaseReference UserReference;
+    private ProgressDialog progressDialog;
     private OnFragmentInteractionListener mListener;
 
     public ManageProfilFragment() {
@@ -86,7 +111,6 @@ public class ManageProfilFragment extends Fragment {
      * @param param1 Parameter 1.
      * @return A new instance of fragment ManageProfilFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static ManageProfilFragment newInstance(String param1) {
         ManageProfilFragment fragment = new ManageProfilFragment();
 
@@ -106,21 +130,82 @@ public class ManageProfilFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         user = mAuth.getCurrentUser();
+        progressDialog = new ProgressDialog(getActivity());
         View view = inflater.inflate(R.layout.fragment_manage_profil, container, false);
         UsernameText = view.findViewById(R.id.profil_manage_usernameText);
+        UsernameText.setText(user.getDisplayName());
         EmailText = view.findViewById(R.id.profil_manage_emailText);
+        EmailText.setText(user.getEmail());
         PassText = view.findViewById(R.id.profil_manage_passText);
         OtherText = view.findViewById(R.id.profil_manage_moreOptions);
         DeleteAvatar = view.findViewById(R.id.profil_manage_delete_avatar);
         ChangeAvatar = view.findViewById(R.id.profil_manage_change_avatar);
         AvatarPreview = view.findViewById(R.id.profil_manage_avatarPreview);
-        SaveBtn = view.findViewById(R.id.profil_manage_saveBtn);
         dialog = new Dialog(getActivity());
         dialog.setContentView(R.layout.custom_dialog_manage_profil);
+        UserReference = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Profil_Keys.STRUCT_NAME).child(user.getUid());
+        AvatarRef = FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.PROFILS_AVATARS+user.getUid()+".jpg");
+        AvatarRef.getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+                Bitmap b = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                AvatarPreview.setImageBitmap(b);
+            }
+        });
+        ChangeAvatar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(Intent.ACTION_PICK,MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(i, AVATAR_GET);
+            }
+        });
+        DeleteAvatar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new AlertDialog.Builder(getActivity())
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setTitle("Supprimer l'avatar")
+                        .setMessage("Voulez-vous vraiment supprimer votre avatar?")
+                        .setPositiveButton("Oui", new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                AvatarRef.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if(task.isSuccessful()){
+                                            UserReference.child(FireBaseInteraction.Profil_Keys.AVATAR).setValue("N");
+                                            Toast.makeText(getActivity(), "Avatar Supprimé", Toast.LENGTH_LONG).show();
+                                            UserProfileChangeRequest profileUpdates;
+                                            profileUpdates = new UserProfileChangeRequest.Builder()
+                                                    .setPhotoUri(Uri.parse("N"))
+                                                    .build();
+                                            user.updateProfile(profileUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    if(task.isSuccessful()){
+                                                        AvatarPreview.setImageResource(R.mipmap.ic_launcher);
+                                                        mListener.updateMenu(user);
+                                                    }
+                                                }
+                                            });
+
+                                        }else{
+                                            Toast.makeText(getActivity(), "Erreur, Avatar inchangé", Toast.LENGTH_LONG).show();
+                                        }
+                                    }
+                                });
+                            }
+
+                        })
+                        .setNegativeButton("Non", null)
+                        .show();
+            }
+        });
         UsernameText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -129,17 +214,26 @@ public class ManageProfilFragment extends Fragment {
                 Layout = dialog.findViewById(R.id.dialog_username_edit);
                 Layout.setVisibility(View.VISIBLE);
                 InputField = dialog.findViewById(R.id.manage_profil_edit_username);
-                InputField.setCompoundDrawables(null, null, null, null);
+                InputField.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
                 final TextView UserErr = dialog.findViewById(R.id.manage_profil_username_err);
+                UserErr.setVisibility(View.INVISIBLE);
                 Button Available = dialog.findViewById(R.id.manage_profil_dispo);
                 Confirm = dialog.findViewById(R.id.manage_profil_username_confirm);
                 InputField.setText(user.getDisplayName());
                 Available.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        UserErr.setTextColor(getResources().getColor(R.color.colorRed));
                         if(!InputField.getEditableText().toString().isEmpty()) {
-                            UserErr.setVisibility(View.INVISIBLE);
-                            AvailableUsername(InputField.getEditableText().toString());
+                            if(InputField.getEditableText().toString().equals(user.getDisplayName())){
+                                UserErr.setText("le nom d'utilisateur est identique");
+                                UserErr.setTextColor(Color.BLACK);
+                                UserErr.setVisibility(View.VISIBLE);
+                            }else{
+                                UserErr.setVisibility(View.INVISIBLE);
+                                AvailableUsername(InputField.getEditableText().toString());
+                            }
+
                         }else{
                             UserErr.setText("Le champ est vide.");
                             UserErr.setVisibility(View.VISIBLE);
@@ -161,8 +255,11 @@ public class ManageProfilFragment extends Fragment {
                 Layout.setVisibility(View.VISIBLE);
                 InputField = dialog.findViewById(R.id.manage_profil_edit_email);
                 InputField.setText(user.getEmail());
+                Cancel = dialog.findViewById(R.id.manage_profil_cancel_email);
                 final TextView EmailErr = dialog.findViewById(R.id.manage_profil_email_err);
+                EmailErr.setVisibility(View.INVISIBLE);
                 Confirm = dialog.findViewById(R.id.manage_profil_email_btn);
+                Cancel.setOnClickListener(CancelClick);
                 Confirm.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -178,21 +275,29 @@ public class ManageProfilFragment extends Fragment {
                                     user.reauthenticate(credential).addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
-                                            user.updateEmail(InputField.getEditableText().toString()).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<Void> task) {
-                                                    if (task.isSuccessful()) {
-                                                        Toast.makeText(getActivity(), "Adresse courriel modifiée avec succès", Toast.LENGTH_LONG).show();
-                                                        EmailErr.setVisibility(View.INVISIBLE);
-                                                        Layout.setVisibility(View.GONE);
-                                                        EmailText.setText(user.getEmail());
-                                                        dialog.dismiss();
-                                                    } else {
-                                                        Toast.makeText(getActivity(), "Erreur, l'adresse courriel n'a pas pu être changé", Toast.LENGTH_LONG).show();
-                                                        EmailErr.setVisibility(View.INVISIBLE);
+                                            if(task.isSuccessful()) {
+                                                user.updateEmail(InputField.getEditableText().toString()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                        if (task.isSuccessful()) {
+                                                            Toast.makeText(getActivity(), "Adresse courriel modifiée avec succès", Toast.LENGTH_LONG).show();
+                                                            EmailErr.setVisibility(View.INVISIBLE);
+                                                            Layout.setVisibility(View.GONE);
+                                                            EmailText.setText(user.getEmail());
+                                                            mListener.updateMenu(user);
+                                                            UserReference.child(FireBaseInteraction.Profil_Keys.COURRIEL).setValue(user.getEmail());
+                                                            dialog.dismiss();
+                                                        } else {
+                                                            Toast.makeText(getActivity(), "Erreur, l'adresse courriel n'a pas pu être changé", Toast.LENGTH_LONG).show();
+
+                                                        }
                                                     }
-                                                }
-                                            });
+                                                });
+                                            }else{
+                                                Toast.makeText(getActivity(), "Erreur, réauthentification échouée", Toast.LENGTH_LONG).show();
+
+                                            }
+
                                         }
                                     });
                                 } else {
@@ -214,10 +319,12 @@ public class ManageProfilFragment extends Fragment {
                 dialog.show();
                 dialog.setTitle("Modifier le mot de passe");
                 Layout = dialog.findViewById(R.id.dialog_pass_edit);
+                Layout.setVisibility(View.VISIBLE);
                 InputField = dialog.findViewById(R.id.manage_profil_edit_pass);
                 Confirm = dialog.findViewById(R.id.manage_profil_pass_btn);
-                Button Cancel = dialog.findViewById(R.id.manage_profil_cancel_pass);
+                Cancel = dialog.findViewById(R.id.manage_profil_cancel_pass);
                 final TextView PassErr = dialog.findViewById(R.id.manage_profil_pass_err);
+                PassErr.setVisibility(View.INVISIBLE);
                 if(PassStrength == null){
                     PassStrength = dialog.findViewById(R.id.manage_profil_pass_strength);
                 }
@@ -228,6 +335,7 @@ public class ManageProfilFragment extends Fragment {
                 if(oldWatcher != null){
                     InputField.removeTextChangedListener(oldWatcher);
                 }
+                Cancel.setOnClickListener(CancelClick);
                 InputField.setTag(PassStrengthWatcher);
                 InputField.addTextChangedListener(PassStrengthWatcher);
                 Confirm.setOnClickListener(new View.OnClickListener() {
@@ -244,19 +352,23 @@ public class ManageProfilFragment extends Fragment {
                                     user.reauthenticate(credential).addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
-                                            user.updatePassword(InputField.getEditableText().toString()).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<Void> task) {
-                                                    if(task.isSuccessful()){
-                                                        mParam1 = InputField.getEditableText().toString();
-                                                        Toast.makeText(getActivity(), "Mot de passe changé", Toast.LENGTH_LONG).show();
-                                                        Layout.setVisibility(View.GONE);
-                                                        dialog.dismiss();
-                                                    }else{
-                                                        Toast.makeText(getActivity(), "Erreur, mot de passe inchangé", Toast.LENGTH_LONG).show();
+                                            if(task.isSuccessful()) {
+                                                user.updatePassword(InputField.getEditableText().toString()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                        if (task.isSuccessful()) {
+                                                            mParam1 = InputField.getEditableText().toString();
+                                                            Toast.makeText(getActivity(), "Mot de passe changé", Toast.LENGTH_LONG).show();
+                                                            Layout.setVisibility(View.GONE);
+                                                            dialog.dismiss();
+                                                        } else {
+                                                            Toast.makeText(getActivity(), "Erreur, mot de passe inchangé", Toast.LENGTH_LONG).show();
+                                                        }
                                                     }
-                                                }
-                                            });
+                                                });
+                                            }else{
+                                                Toast.makeText(getActivity(), "Erreur, réauthentification échouée", Toast.LENGTH_LONG).show();
+                                            }
                                         }
                                     });
 
@@ -280,28 +392,43 @@ public class ManageProfilFragment extends Fragment {
                 dialog.setTitle("Paramètres dangereux");
                 Layout = dialog.findViewById(R.id.dialog_more_options);
                 Layout.setVisibility(View.VISIBLE);
+                Cancel = dialog.findViewById(R.id.manage_profil_cancel_other);
                 Button DeleteAccountBtn = dialog.findViewById(R.id.manage_profil_delete);
+                Cancel.setOnClickListener(CancelClick);
                 DeleteAccountBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Toast.makeText(getActivity(), "Compte supprimé (En fait non)", Toast.LENGTH_LONG).show();
                         credential = EmailAuthProvider.getCredential(user.getEmail(), mParam1);
+                        final String UserId = user.getUid();
                         user.reauthenticate(credential).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
-                                user.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        if (task.isSuccessful()) {
-                                            //TODO: supprimer les données du database, sauf les sondages + supprimmer le fichier avatar
-                                            Toast.makeText(getActivity(), "Compte supprimé avec succès", Toast.LENGTH_LONG).show();
-                                            Layout.setVisibility(View.GONE);
-                                            dialog.dismiss();
-                                            mListener.updateMenu(mAuth.getCurrentUser());
-                                            mListener.changePage(SondageListFragment.newInstance(false));
+                                if(task.isSuccessful()) {
+                                    user.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isSuccessful()) {
+                                                DatabaseReference delProfileRef = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Profil_Keys.STRUCT_NAME).child(UserId);
+
+                                                delProfileRef.removeValue();
+
+                                                if (!user.getPhotoUrl().toString().equals("N")) {
+                                                    StorageReference delAvatarRef = FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.PROFILS_AVATARS + UserId + ".jpg");
+                                                    delAvatarRef.delete();
+                                                }
+                                                Toast.makeText(getActivity(), "Compte supprimé avec succès", Toast.LENGTH_LONG).show();
+                                                Layout.setVisibility(View.GONE);
+                                                dialog.dismiss();
+                                                mListener.updateMenu(mAuth.getCurrentUser());
+                                                mListener.changePage(SondageListFragment.newInstance(false, null), "Sondages");
+                                            } else {
+                                                Toast.makeText(getActivity(), "Erreur, compte non supprimé.", Toast.LENGTH_LONG).show();
+                                            }
                                         }
-                                    }
-                                });
+                                    });
+                                }else{
+                                    Toast.makeText(getActivity(), "Erreur, réauthentification échouée",Toast.LENGTH_LONG).show();
+                                }
                             }
                         });
 
@@ -317,6 +444,98 @@ public class ManageProfilFragment extends Fragment {
             }
         });
         return view;
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
+        if (requestCode == AVATAR_GET && resultCode == Activity.RESULT_OK) {
+            Image = data.getData();
+            try {
+                if(ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, MY_PERMISSION_REQUEST_READ_STORAGE);
+                }else{
+                    MakeImage();
+                    UploadFile(AvatarRef, ImageBitmap, "Envoi de l'avatar");
+                }
+            }catch(Exception e){
+                Log.e("Err", e.getMessage());
+            }
+
+
+        }
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults){
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(requestCode == MY_PERMISSION_REQUEST_READ_STORAGE){
+            if(grantResults.length == 0){
+                try {
+                    ImageBitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), Image);
+                    AvatarPreview.setImageBitmap(ImageBitmap);
+                    AvatarPreview.setVisibility(View.VISIBLE);
+                    UploadFile(AvatarRef, ImageBitmap, "Envoi de l'avatar");
+
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+            }else{//accepte
+                MakeImage();
+                UploadFile(AvatarRef, ImageBitmap, "Envoi de l'avatar");
+            }
+        }
+    }
+    private void MakeImage(){
+        Bitmap TempImageBitmap = TraitementImage.RotateImage(Image, getActivity());
+        ImageBitmap = TraitementImage.createSquaredBitmap(TempImageBitmap, getActivity());
+        AvatarPreview.setImageBitmap(ImageBitmap);
+        AvatarPreview.setVisibility(View.VISIBLE);
+        Toast.makeText(getActivity(), "Le fichier sera envoyé au serveur lorsque le sondage sera créé/modifié",Toast.LENGTH_LONG).show();
+
+    }
+    private void UploadFile(StorageReference storageReference, Bitmap Image, final String FlavorText){
+        progressDialog.setTitle(FlavorText);
+        progressDialog.show();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        Image.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] data = baos.toByteArray();
+        StorageReference ref = storageReference;
+        ref.putBytes(data)
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        progressDialog.setTitle(FlavorText + "Terminé");
+                        UserReference.child(FireBaseInteraction.Profil_Keys.AVATAR).setValue(FireBaseInteraction.Storage_Paths.PROFILS_AVATARS+user.getUid()+".jpg");
+                        UserProfileChangeRequest profileUpdates;
+                        profileUpdates = new UserProfileChangeRequest.Builder()
+                                .setPhotoUri(Uri.parse(FireBaseInteraction.Storage_Paths.PROFILS_AVATARS+user.getUid()+"jpg"))
+                                .build();
+                        user.updateProfile(profileUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if(task.isSuccessful()){
+                                    mListener.updateMenu(user);
+                                    progressDialog.dismiss();
+                                }
+                            }
+                        });
+
+
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        progressDialog.setTitle(FlavorText + "Échoué");
+                        progressDialog.dismiss();
+                    }
+                })
+                .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                        double progress = (100.0*taskSnapshot.getBytesTransferred()/taskSnapshot
+                                .getTotalByteCount());
+                        progressDialog.setMessage("Transfert éffectué à "+(int)progress+"%");
+                    }
+                });
     }
     private TextWatcher PassStrengthWatcher = new TextWatcher() {
         @Override
@@ -372,7 +591,7 @@ public class ManageProfilFragment extends Fragment {
         }
     };
     private void AvailableUsername(final String tempUser){
-        InputField.setCompoundDrawables(null, null, getResources().getDrawable(R.drawable.ic_wait), null);
+        InputField.setCompoundDrawablesWithIntrinsicBounds(null, null, getResources().getDrawable(R.drawable.ic_wait), null);
         ValueEventListener ProfileUsernameVerifier = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -383,13 +602,13 @@ public class ManageProfilFragment extends Fragment {
                     }
                 }
                 if(Found){
-                    InputField.setCompoundDrawables(null, null, getResources().getDrawable(R.drawable.ic_clear_color),null);
+                    InputField.setCompoundDrawablesWithIntrinsicBounds(null, null, getResources().getDrawable(R.drawable.ic_clear_color),null);
                     Confirm.setEnabled(false);
                     Confirm.setText("Annuler");
                     Confirm.setTextColor(getResources().getColor(R.color.colorRed));
                     Confirm.setOnClickListener(CancelClick);
                 }else{
-                    InputField.setCompoundDrawables(null, null, getResources().getDrawable(R.drawable.ic_done_color), null);
+                    InputField.setCompoundDrawablesWithIntrinsicBounds(null, null, getResources().getDrawable(R.drawable.ic_done_color), null);
                     Confirm.setEnabled(true);
                     Confirm.setText("Confirmer");
                     Confirm.setTextColor(getResources().getColor(R.color.colorPrimary));
@@ -423,6 +642,7 @@ public class ManageProfilFragment extends Fragment {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()) {
+                                UserReference.child(FireBaseInteraction.Profil_Keys.USERNAME).setValue(InputField.getEditableText().toString());
                                 UsernameText.setText(InputField.getEditableText().toString());
                                 Toast.makeText(getActivity(), "Nom d'utilisateur changé.", Toast.LENGTH_LONG).show();
                                 Layout.setVisibility(View.GONE);
@@ -463,8 +683,10 @@ public class ManageProfilFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void changePage(Fragment fragment);
+        void changePage(Fragment fragment, String Title);
         void updateMenu(FirebaseUser user);
+    }
+    public String getTitle(){
+        return "Profil | Gérér";
     }
 }

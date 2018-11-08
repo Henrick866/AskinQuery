@@ -3,6 +3,7 @@ package personnal.askinquery;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 public class Profil implements Serializable {
     String ID;
@@ -10,7 +11,8 @@ public class Profil implements Serializable {
     public String Courriel;
     public String Avatar;
     //public Map<String, Object> Auteurs_Suivis_Ref = new HashMap<>(); //liens latent attendant d'être activés
-    ArrayList<String> Auteurs_Suivis;
+    HashMap<String, String> Auteurs_Suivis;
+    //ArrayList<String> Auteurs_Suivis;
     public Profil(){
 
     }
@@ -18,16 +20,18 @@ public class Profil implements Serializable {
         this.Username = Username;
         this.Courriel = Courriel;
         this.Avatar = Avatar;
-        this.Auteurs_Suivis = new ArrayList<>();
+        this.Auteurs_Suivis = new HashMap<String, String>();
     }
     public HashMap<String, Object> toMap(){
         HashMap<String, Object> Map = new HashMap<>();
         Map.put(FireBaseInteraction.Profil_Keys.USERNAME, this.Username);
         Map.put(FireBaseInteraction.Profil_Keys.COURRIEL, this.Courriel);
         Map.put(FireBaseInteraction.Profil_Keys.AVATAR, this.Avatar);
-        HashMap<String, Boolean> MapFollowed = new HashMap<>();
-        for(String a : Auteurs_Suivis){
-            MapFollowed.put(a, true);
+        HashMap<String, String> MapFollowed = new HashMap<>();
+        Iterator it = Auteurs_Suivis.entrySet().iterator();
+        while(it.hasNext()){
+            HashMap.Entry pair = (HashMap.Entry)it.next();
+            MapFollowed.put((String)pair.getKey(), (String)pair.getValue());
         }
         Map.put(FireBaseInteraction.Profil_Keys.AUTEURS_SUIVIS, MapFollowed);
         return Map;

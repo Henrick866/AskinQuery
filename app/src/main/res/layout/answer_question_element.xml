@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/answer_question_texte"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/answer_question_instruct"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Cliquez sur l'image pour lire la vidéo."
+        android:visibility="invisible" />
+
+    <ListView
+        android:id="@+id/answer_question_options"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</LinearLayout>

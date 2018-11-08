@@ -58,15 +58,16 @@
             android:layout_width="wrap_content"
             android:layout_centerInParent="true"
             android:layout_height="wrap_content">
-        <ImageButton
-            android:id="@+id/sondage_edit_question_add_option"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
 
-            android:background="@drawable/button_border"
-            android:scaleType="centerCrop"
-            android:tint="@color/colorPrimary"
-            android:src="@drawable/ic_ajout" />
+            <ImageButton
+                android:id="@+id/sondage_edit_question_add_option"
+                style="@style/buttonImageCustom"
+                android:layout_width="60dp"
+
+                android:layout_height="60dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_ajout"
+                android:tint="@color/colorPrimary" />
     </com.balysv.materialripple.MaterialRippleLayout>
 
     </RelativeLayout>

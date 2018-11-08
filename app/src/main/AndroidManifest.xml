@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -14,8 +15,10 @@
         android:largeHeap="true"
         android:windowSoftInputMode="adjustResize"
         android:theme="@style/AppTheme">
+        <!--TODO:: remettre l'orientation par défaut, je le force en portrait pour les test, question d'éliminer une possibilité d'érreur-->
         <activity
             android:name=".MainActivity"
+            android:screenOrientation="portrait"
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>

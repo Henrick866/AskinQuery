@@ -8,8 +8,6 @@
     android:paddingEnd="7dp"
     android:orientation="vertical"
     tools:context=".CreerProfilFragment">
-
-    <!-- TODO: Update blank fragment layout -->
     <TextView
         android:id="@+id/profil_form_title"
         android:layout_width="match_parent"
@@ -97,16 +95,17 @@
             android:layout_width="wrap_content"
             android:layout_centerInParent="true"
             android:layout_height="wrap_content">
-        <Button
-            android:id="@+id/profil_form_file_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
 
-            android:background="@drawable/button_border"
-            android:drawableTop="@drawable/ic_file_upload_color"
-            android:padding="10dp"
-            android:text="Télécharger"
-            android:textColor="@color/colorPrimary" />
+            <Button
+                android:id="@+id/profil_form_file_btn"
+                style="@style/buttonCustom"
+                android:layout_width="wrap_content"
+
+                android:layout_height="wrap_content"
+                android:drawableTop="@drawable/ic_file_upload_color"
+                android:padding="10dp"
+                android:text="Télécharger"
+                android:textColor="@color/colorPrimary" />
     </com.balysv.materialripple.MaterialRippleLayout>
 
     </RelativeLayout>
@@ -127,10 +126,10 @@
 
         <Button
             android:id="@+id/profil_form_btn_confirm"
-            android:layout_width="match_parent"
+            style="@style/buttonCustom"
 
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/button_border"
             android:text="S'enregistrer"
             android:textColor="@color/colorPrimary" />
     </com.balysv.materialripple.MaterialRippleLayout>

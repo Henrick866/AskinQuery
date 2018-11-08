@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AnswerSondageFragment">
+
+
+    <TextView
+        android:id="@+id/answer_sondage_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Titre Sondage"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+
+    <TextView
+        android:layout_below="@id/answer_sondage_title"
+        android:id="@+id/answer_sondage_auteur"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Auteur"
+        android:textAlignment="center" />
+
+    <ImageView
+        android:layout_below="@id/answer_sondage_auteur"
+        android:id="@+id/answer_sondage_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:maxHeight="100dp"
+        android:layout_gravity="center"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_menu_gallery" />
+
+    <ListView
+        android:id="@+id/answer_sondage_questions"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/answer_sondage_btn_zone"
+        android:layout_below="@id/answer_sondage_image" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:id="@+id/answer_sondage_btn_zone"
+        android:layout_alignParentBottom="true"
+        android:layout_height="wrap_content">
+        <com.balysv.materialripple.MaterialRippleLayout
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/answer_sondage_btn_terminer"
+                android:layout_width="match_parent"
+
+                android:layout_height="match_parent"
+                android:background="@color/transparent"
+                android:text="Terminer"
+                android:textColor="@color/colorPrimaryMedDark" />
+        </com.balysv.materialripple.MaterialRippleLayout>
+
+        <View
+            android:id="@+id/answer_sondage_separateur"
+            android:layout_width="2dp"
+            android:layout_height="match_parent"
+            android:background="@color/LightGrey" />
+
+        <com.balysv.materialripple.MaterialRippleLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:visibility="visible">
+
+            <Button
+                android:id="@+id/answer_sondage_btn_save"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/transparent"
+                android:text="Enregistrer et partir"
+                android:textColor="@color/colorAccentMedDark"
+                android:visibility="visible" />
+        </com.balysv.materialripple.MaterialRippleLayout>
+    </LinearLayout>
+
+</RelativeLayout>

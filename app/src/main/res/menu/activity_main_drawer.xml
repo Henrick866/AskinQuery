@@ -30,6 +30,7 @@
                 android:id="@+id/nav_profil_suivis"
                 android:title="Créateurs suivis"
                 android:icon="@drawable/ic_menu_profil_suivi" />
+            <!--todo: dialog list-->
             <item
                 android:id="@+id/nav_profil_sondages_repondus"
                 android:icon="@drawable/ic_menu_sondages_done"
@@ -41,6 +42,7 @@
             android:id="@+id/nav_recherche"
             android:icon="@drawable/ic_search"
             android:title="Rechercher" />
+        <!--Dialog fiel-->
         <item
             android:id="@+id/nav_sondages"
             android:icon="@drawable/ic_menu_sondages"

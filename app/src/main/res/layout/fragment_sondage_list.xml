@@ -8,20 +8,31 @@
 
     <com.balysv.materialripple.MaterialRippleLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-    <Button
-        android:id="@+id/sondage_ajout_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:layout_marginLeft="5dp"
         android:layout_marginTop="5dp"
         android:layout_marginRight="5dp"
-        android:background="@drawable/button_border"
-        android:shadowColor="@color/LightGrey"
-        android:text="Créer un sondage"
-        android:textColor="@color/colorPrimary" />
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/sondage_ajout_btn"
+            style="@style/buttonCustom"
+            android:layout_width="match_parent"
+
+            android:layout_height="wrap_content"
+            android:shadowColor="@color/LightGrey"
+            android:text="Créer un sondage"
+            android:textColor="@color/colorPrimary" />
+
+
     </com.balysv.materialripple.MaterialRippleLayout>
 
+    <ProgressBar
+        android:id="@id/android:empty"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:indeterminateDrawable="@drawable/progress" />
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -29,11 +40,11 @@
         android:headerDividersEnabled="false"
         android:footerDividersEnabled="false" />
 
-    <TextView
+    <!--<TextView
         android:id="@id/android:empty"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:text="Il n'y a rien ici."
-        android:textAppearance="@style/TextAppearance.AppCompat.Headline"/>
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"/>-->
 
 </LinearLayout>

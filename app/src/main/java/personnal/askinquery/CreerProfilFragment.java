@@ -32,12 +32,17 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
@@ -56,12 +61,10 @@ import java.util.HashMap;
  * create an instance of this fragment.
  */
 public class CreerProfilFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
     private TextView Title, UserErr, EmailErr, PassErr, PassStrengthIndic;
@@ -75,7 +78,6 @@ public class CreerProfilFragment extends Fragment {
     private ProgressDialog progressDialog;
     private static final int MY_PERMISSION_REQUEST_READ_STORAGE = 200;
     private final int GALL_ACTION = 17;
-    private boolean UploadFileFailed;
 
     private OnFragmentInteractionListener mListener;
 
@@ -89,7 +91,6 @@ public class CreerProfilFragment extends Fragment {
      *
      * @return A new instance of fragment CreerProfilFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static CreerProfilFragment newInstance(FirebaseAuth mAuth) {
         CreerProfilFragment fragment = new CreerProfilFragment();
         Bundle args = new Bundle();
@@ -143,7 +144,9 @@ public class CreerProfilFragment extends Fragment {
         }
         //fill content
         if(currentUser != null){
-            PassField.setEnabled(false);
+            if(!currentUser.isAnonymous()) {
+                PassField.setEnabled(false);
+            }
         }
 
         PassField.setTag(passStrengthWatcher);
@@ -230,7 +233,7 @@ public class CreerProfilFragment extends Fragment {
                     ImageBitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), Image);
                     AvatarPreview.setImageBitmap(ImageBitmap);
                     AvatarPreview.setVisibility(View.VISIBLE);
-                    Toast.makeText(getActivity(), "Le fichier sera envoyé au serveur lorsque le sondage sera créé/modifié",Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), "Le fichier sera envoyé au serveur lorsque le compte sera créé",Toast.LENGTH_LONG).show();
                 }catch(Exception e){
                     e.printStackTrace();
                 }
@@ -241,10 +244,10 @@ public class CreerProfilFragment extends Fragment {
     }
     private void MakeImage(){
         Bitmap TempImageBitmap = TraitementImage.RotateImage(Image, getActivity());
-        ImageBitmap = TraitementImage.createSquaredBitmap(TempImageBitmap);
+        ImageBitmap = TraitementImage.createSquaredBitmap(TempImageBitmap, getActivity());
         AvatarPreview.setImageBitmap(ImageBitmap);
         AvatarPreview.setVisibility(View.VISIBLE);
-        Toast.makeText(getActivity(), "Le fichier sera envoyé au serveur lorsque le sondage sera créé/modifié",Toast.LENGTH_LONG).show();
+        Toast.makeText(getActivity(), "Le fichier sera envoyé au serveur lorsque le compte sera créé",Toast.LENGTH_LONG).show();
 
     }
     private void Validation(){
@@ -297,7 +300,7 @@ public class CreerProfilFragment extends Fragment {
             RegisterClient(User, Email, Pass);
         }
     }
-    private void RegisterClient(final String user, final String email, String pass){
+    private void RegisterClient(final String user, final String email, final String pass){
         final StorageReference AvatarRef = FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.PROFILS_AVATARS);
         final DatabaseReference UserDataRef = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Profil_Keys.STRUCT_NAME);
         if(currentUser == null) {
@@ -330,7 +333,7 @@ public class CreerProfilFragment extends Fragment {
                                                 if (task.isSuccessful()) {
                                                     progressDialog.dismiss();
                                                     mListener.updateMenu(currentUser);
-                                                    mListener.changePage(SondageListFragment.newInstance(false));
+                                                    mListener.changePage(SondageListFragment.newInstance(false, null), "Sondages");
                                                 }
                                             }
                                         });
@@ -340,8 +343,64 @@ public class CreerProfilFragment extends Fragment {
                             }
                         }
                     });
+        }else{//totest : Fusion anonyme-compte;
+            if(currentUser.isAnonymous()){//si l'utilisateur est anonyme, on crée un compte et on le lui associe, question de transférer les données
+                            final AuthCredential credential = EmailAuthProvider.getCredential(email, pass);
+                            currentUser.linkWithCredential(credential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                    if (task.isSuccessful()) {
+                                        final String OldUserId = currentUser.getUid();
+                                        currentUser = task.getResult().getUser();
+                                        String avatarPath = "N";
+
+                                        if (ImageBitmap != null) {
+                                            avatarPath = FireBaseInteraction.Storage_Paths.PROFILS_AVATARS + currentUser.getUid() + "jpg";
+                                            UploadFile(AvatarRef.child(currentUser.getUid() + ".jpg"), ImageBitmap, "Envoi de l'avatar");
+                                        }
+
+                                        final UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                                .setDisplayName(user)
+                                                .setPhotoUri(Uri.parse(avatarPath))
+                                                .build();
+                                        Profil p = new Profil(user, email, avatarPath);
+                                        final HashMap<String, Object> map = p.toMap();
+                                        DatabaseReference SondagesDoneListGetter = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Profil_Keys.STRUCT_NAME).child(OldUserId).child(FireBaseInteraction.Profil_Keys.SONDAGES);
+                                        SondagesDoneListGetter.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                map.put(FireBaseInteraction.Profil_Keys.SONDAGES, dataSnapshot.getValue());
+                                                UserDataRef.child(currentUser.getUid()).setValue(map);
+                                                progressDialog.setTitle("Enregistrement du profil");
+                                                currentUser.updateProfile(profileUpdates)
+                                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<Void> task) {
+                                                                if (task.isSuccessful()) {
+                                                                    progressDialog.dismiss();
+                                                                    mListener.updateMenu(currentUser);//switch au nouvel utilisateur;
+                                                                    mListener.changePage(SondageListFragment.newInstance(false, null), "Sondages");
+                                                                }
+                                                            }
+                                                        });
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                            }
+                                        });
+
+
+                                    } else {
+                                        Toast.makeText(getActivity(), "Enregistrement échoué", Toast.LENGTH_LONG).show();
+                                    }
+                                }
+                            });
+            }
         }
     }
+
     private void UploadFile(StorageReference storageReference, Bitmap Image, final String FlavorText){
         progressDialog.setTitle(FlavorText);
         progressDialog.show();
@@ -354,6 +413,7 @@ public class CreerProfilFragment extends Fragment {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                         progressDialog.setTitle(FlavorText + "Terminé");
+                        mListener.updateMenu(currentUser);
 
                     }
                 })
@@ -361,7 +421,6 @@ public class CreerProfilFragment extends Fragment {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         progressDialog.setTitle(FlavorText + "Échoué");
-                        UploadFileFailed = true;
                     }
                 })
                 .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
@@ -401,8 +460,10 @@ public class CreerProfilFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void changePage(Fragment fragment);
+        void changePage(Fragment fragment, String Title);
         void updateMenu(FirebaseUser user);
+    }
+    public String getTitle(){
+        return "Profil | Créer";
     }
 }

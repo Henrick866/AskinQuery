@@ -188,6 +188,7 @@ public class VideoViewOptions extends TextureView implements MediaController.Med
         }
     }
 
+
     public void stopPlayback() {
         if (mMediaPlayer != null) {
             mMediaPlayer.stop();

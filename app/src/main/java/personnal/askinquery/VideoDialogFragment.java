@@ -42,11 +42,9 @@ import java.io.IOException;
  * create an instance of this fragment.
  */
 public class VideoDialogFragment extends DialogFragment {
-    // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    // TODO: Rename and change types of parameters
     private String mParam1;
     private boolean mParam2;
     private MediaController mediaController;
@@ -65,7 +63,6 @@ public class VideoDialogFragment extends DialogFragment {
      * @param param1 Parameter 1.
      * @return A new instance of fragment VideoDialogFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static VideoDialogFragment newInstance(String param1, boolean notOnServer) {
         VideoDialogFragment fragment = new VideoDialogFragment();
         Bundle args = new Bundle();
@@ -186,7 +183,6 @@ public class VideoDialogFragment extends DialogFragment {
         super.onResume();
 
     }
-    // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
@@ -221,7 +217,6 @@ public class VideoDialogFragment extends DialogFragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
     private MediaController.MediaPlayerControl mediaPlayerControl = new MediaController.MediaPlayerControl() {

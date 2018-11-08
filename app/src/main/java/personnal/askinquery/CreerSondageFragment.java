@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Path;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -64,7 +65,6 @@ import java.util.Map;
  * create an instance of this fragment.
  */
 public class CreerSondageFragment extends Fragment implements CreerOptionDialog.OptionDialogListener, Serializable {
-    // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -74,7 +74,6 @@ public class CreerSondageFragment extends Fragment implements CreerOptionDialog.
     private static final int MY_PERMISSION_REQUEST_READ_STORAGE = 200;
     private static final int MEDIA_GALL_OPTION = 5;
 
-    // TODO: Rename and change types of parameters
     private boolean Si_Admin;
     private boolean Si_Edit;
     private Sondage sondage;
@@ -101,7 +100,7 @@ public class CreerSondageFragment extends Fragment implements CreerOptionDialog.
     ProgressDialog progressDialog;
     boolean UploadFileFailed;
     int Rotation;
-    boolean ImageChange = false;
+    boolean ImageChange = false, ImageOnServer = false;
     Uri Image;
     public CreerSondageFragment() {
         // Required empty public constructor
@@ -114,7 +113,6 @@ public class CreerSondageFragment extends Fragment implements CreerOptionDialog.
      *
      * @return A new instance of fragment CreerSondageFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static CreerSondageFragment newInstance(boolean Si_Admin, boolean Si_edit, Profil auteur, Sondage s){
         CreerSondageFragment fragment = new CreerSondageFragment();
         Bundle args = new Bundle();
@@ -175,12 +173,19 @@ public class CreerSondageFragment extends Fragment implements CreerOptionDialog.
         Btn_Cancel_Img = (Button)view.findViewById(R.id.sondage_edit_remove_img);
         AjoutQuestion = (ImageButton)view.findViewById(R.id.sondage_edit_add_question);
         AjoutQuestion.setEnabled(false);
+        /**
+         * simple ajout : IC f -> t
+         * simple supp :
+         * */
         Btn_Cancel_Img.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Image = null;
-                ImagePreview.setImageURI(null);
-                ImagePreview.setVisibility(View.GONE);
+                if(ImageBitmap != null) {
+                    ImageChange = true;
+                    ImageBitmap = null;
+                    ImagePreview.setImageBitmap(null);
+                    ImagePreview.setVisibility(View.GONE);
+                }
             }
         });
         final SimpleDateFormat format = new SimpleDateFormat("dd-MM-yy");
@@ -203,51 +208,20 @@ public class CreerSondageFragment extends Fragment implements CreerOptionDialog.
             DateConfirm.setText(format.format(sondage.date_echeance));
             SiResultPublic.setChecked(sondage.Compil_Public);
             if(!sondage.Chemin_Image.equals("N")) {
+                ImageOnServer = true;
                 StorageReference SondageImgRef = FirebaseStorage.getInstance().getReference().child(sondage.Chemin_Image);
                 SondageImgRef.getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
                     @Override
                     public void onSuccess(byte[] bytes) {
                         Bitmap Image = BitmapFactory.decodeByteArray(bytes,0, bytes.length);
                         ImagePreview.setImageBitmap(Image);
+                        ImagePreview.setVisibility(View.VISIBLE);
                     }
                 });
             }else{
                 ImagePreview.setVisibility(View.GONE);
             }
-            ValueEventListener QuestionListener = new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    String SondageRef = sondage.ID;
-                    for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
-                        String TestRef = (String)dataSnapshot1.child(FireBaseInteraction.Question_Keys.SONDAGE_REF).getValue();
-                        if(TestRef.equals(SondageRef)){
-                            ArrayList<Option> liste_options = new ArrayList<>();
-                            Question q = dataSnapshot1.getValue(Question.class);
-                            q.ID = dataSnapshot1.getKey();
-                            q.notOnServer = false;
-                            for(DataSnapshot dataSnapshot2 : dataSnapshot1.child(FireBaseInteraction.Question_Keys.OPTIONS).getChildren()){
-                                Option o = dataSnapshot2.getValue(Option.class);
-                                o.ID = dataSnapshot2.getKey();
-                                o.Question_parent = q;
-                                o.notOnServer = false;
-                                liste_options.add(o);
-                            }
-                            q.SetOptions(liste_options);
-                            liste_question.add(q);
-                        }
-                    }
-                    QuestionAdapter = new CreerQuestionAdapter(getActivity(), liste_question, creerSondageFragment);
-                    ListeQuestion.setAdapter(QuestionAdapter);
-                    AjoutQuestion.setEnabled(true);
-                }
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            };
-            DatabaseReference QuestionRef = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Question_Keys.STRUCT_NAME);
-            QuestionRef.addListenerForSingleValueEvent(QuestionListener);
         }else{
             //champs date echeance, init à aujourd'hui
             sondage = new Sondage();
@@ -298,6 +272,7 @@ public class CreerSondageFragment extends Fragment implements CreerOptionDialog.
             @Override
             public void onClick(View v) {
                 //à refaire pour envoyer les données sur le firebase
+                //todo: faire du ménage séparer les méthodes
                 Sondage s = new Sondage();
                 s.AuteurRef = profil.ID;
                 s.date_public = Calendar.getInstance().getTime();
@@ -310,16 +285,9 @@ public class CreerSondageFragment extends Fragment implements CreerOptionDialog.
                 s.Titre = TitreSondage.getText().toString();
                 s.Compil_Public = SiResultPublic.isChecked();
                 s.Questions = QuestionAdapter.getQuestions();
-                s.Auteur = profil;
+                s.AuteurRef = profil.ID;
                 if(Si_Edit) {
                     s.ID = sondage.ID;
-                }
-                if(Image != null) {
-                    MimeTypeMap mime = MimeTypeMap.getSingleton();
-                    String Extension = mime.getExtensionFromMimeType(getActivity().getContentResolver().getType(Image));
-                    s.Chemin_Image = FireBaseInteraction.Storage_Paths.SONDAGES_IMAGES + s.ID +"."+ Extension;
-                }else{
-                    s.Chemin_Image = "N";
                 }
                 /*###### TEST on laisse faire les questions, on teste crud et valid du sondage ######*/
                 boolean Valid = true;
@@ -391,12 +359,24 @@ public class CreerSondageFragment extends Fragment implements CreerOptionDialog.
                         s.ID = SondageRef.push().getKey();
                     }
                     MimeTypeMap mime = MimeTypeMap.getSingleton();
-                    if(Image != null) {//si il y a une image
-                        String Extension = mime.getExtensionFromMimeType(getActivity().getContentResolver().getType(Image));
-                        s.Chemin_Image = FireBaseInteraction.Storage_Paths.SONDAGES_IMAGES + s.ID +"."+ Extension;
-                        if(ImageChange) {//et si l'image a changé, téléverse au serveur;
-                            StorageReference SondageImgRef = FirebaseStorage.getInstance().getReference().child(s.Chemin_Image);
+                    if(ImageChange) {//si il y a un changement d'image
+                        StorageReference SondageImgRef = FirebaseStorage.getInstance().getReference();
+                        if(ImageBitmap != null) {//si l'image existe et a changé, remplace ou ajoute
+                            s.Chemin_Image = FireBaseInteraction.Storage_Paths.SONDAGES_IMAGES+s.ID+".jpg";
+                            SondageImgRef = SondageImgRef.child(s.Chemin_Image);
                             UploadFile(SondageImgRef, ImageBitmap, "Envoi de l'image du sondage...");
+                        }else{//si l'image a été supprimé (ne peut être supprimé que si il existait avant)
+                            if(ImageOnServer){//si l'image existait sur le serveur, on supprime
+                                s.Chemin_Image = sondage.Chemin_Image; //si l'image est sur le serveur, on a un chemin
+                                SondageImgRef.child(s.Chemin_Image);
+                                SondageImgRef.delete();
+                            }
+                        }
+                    }else{
+                        if(ImageOnServer){
+                            s.Chemin_Image = FireBaseInteraction.Storage_Paths.SONDAGES_IMAGES+s.ID+".jpg";
+                        }else{
+                            s.Chemin_Image = "N";
                         }
                     }
 
@@ -404,55 +384,83 @@ public class CreerSondageFragment extends Fragment implements CreerOptionDialog.
                     SondageRef = SondageRef.child(s.ID);
                     SondageRef.setValue(Map);
                     //questions
-                    for(Question q : s.Questions){//pour chaque question
+                    for(Question q : s.Questions) {//pour chaque question
                         DatabaseReference QuestionRef = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Question_Keys.STRUCT_NAME);
-                        if(q.notOnServer) {//si il n'est pas sur le serveur (donc nouveau), assigne un id
+                        if (q.notOnServer) {//si il n'est pas sur le serveur (donc nouveau), assigne un id
                             q.ID = QuestionRef.push().getKey();
                         }
                         q.SondageRef = s.ID;//met à jour la référence du sondage de la question
                         QuestionRef = QuestionRef.child(q.ID);
-                        Map<String, Object> QuestionMap = q.Map();
-                        Map<String, Object> OptionsMap = new HashMap<>();
-
-                        for(Option o : q.Options){//pour chaque option
-                            if(o.notOnServer){//si il n'est pas sur le serveur (assigne un id)
-                                o.ID = QuestionRef.child(FireBaseInteraction.Question_Keys.OPTIONS).push().getKey();
-                            }
-                            StorageReference OptionMedRef = FirebaseStorage.getInstance().getReference();
-                            if(q.Type_Question != Question.TYPE_TEXTE){//si ce n'est pas type texte
-                                if(q.Type_Question == Question.TYPE_IMAGE){//si c'est un type image
-                                    if(o.DataChanged) {//si l'image a changé, téléverse
-                                    o.Chemin_Media = FireBaseInteraction.Storage_Paths.OPTIONS_IMAGES + o.ID + ".jpg";
-                                    OptionMedRef = OptionMedRef.child(o.Chemin_Media);
-                                    UploadFile(OptionMedRef, o.ImagePreload, "envoi de " + o.ID + ".jpg");
-                                    }
-                                }if(q.Type_Question == Question.TYPE_VIDEO){//si c'est une vidéo
-                                    if(o.DataChanged) {//si l'option a changé, (changement de vidéo), éléverse le thumbnail et la vidéo
-                                    String Extension = mime.getExtensionFromMimeType(getActivity().getContentResolver().getType(Uri.parse(o.UriVideo)));
-                                    o.Chemin_Media = FireBaseInteraction.Storage_Paths.OPTIONS_VIDEOS + o.ID + "." + Extension;
-                                    OptionMedRef = OptionMedRef.child(o.Chemin_Media);
-                                    UploadFile(OptionMedRef, Uri.parse(o.UriVideo), "envoi de " + o.ID + "." + Extension);
-                                    OptionMedRef = FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.OPTIONS_VIDEOS_THUMBNAILS).child(o.ID + ".jpg");
-                                    UploadFile(OptionMedRef, o.ImagePreload, "envoi de " + o.ID + "." + Extension + " (miniature)");
-                                    }
+                        if (q.toBeDeleted) { //si toBeDeleted == true, il est sur le serveur;
+                            progressDialog.setTitle("Suppresion de la question");
+                            for(Option o : q.Options){
+                                StorageReference OptionsMedDelRef = FirebaseStorage.getInstance().getReference();
+                                //si il est en ligne on supprime et il a un chemin existant
+                                if(q.Type_Question != Question.TYPE_TEXTE){
+                                        OptionsMedDelRef = OptionsMedDelRef.child(o.Chemin_Media);
+                                        OptionsMedDelRef.delete();
                                 }
-                            }else{//si c'est type texte,
-                                o.UriImage = "";
-                                o.UriVideo = "";
-                                o.ImagePreload = null;
-                                o.Chemin_Media = "N";
-                                o.Chemin_Image = "N";
-                                o.Chemin_Video = "N";
                             }
-                            Map<String, Object> OptionMap = o.Map();
-                            OptionsMap.put(o.ID, OptionMap);
+                            QuestionRef.removeValue(); //puisque les options font partie des questions, leurs données sont supprimés
+                        } else {
+                            Map<String, Object> QuestionMap = q.Map();
+                            Map<String, Object> OptionsMap = new HashMap<>();
+
+                            for (Option o : q.Options) {//pour chaque option
+                                if (o.notOnServer) {//si il n'est pas sur le serveur (assigne un id)
+                                    o.ID = QuestionRef.child(FireBaseInteraction.Question_Keys.OPTIONS).push().getKey();
+                                }
+
+                                StorageReference OptionMedRef = FirebaseStorage.getInstance().getReference();
+                                if(o.toBeDeleted){
+                                        progressDialog.setTitle("Suppression de l'option");
+                                        DatabaseReference OptionDataDelRef = FirebaseDatabase.getInstance().getReference()
+                                                                            .child(FireBaseInteraction.Question_Keys.STRUCT_NAME)
+                                                                            .child(q.ID).child(FireBaseInteraction.Question_Keys.OPTIONS)
+                                                                            .child(o.ID);
+                                    if(q.Type_Question != Question.TYPE_TEXTE) {
+                                        OptionMedRef = OptionMedRef.child(o.Chemin_Media);
+                                        OptionMedRef.delete();
+                                    }
+                                    OptionDataDelRef.removeValue();
+                                }else{
+                                    if (q.Type_Question != Question.TYPE_TEXTE) {//si ce n'est pas type texte
+                                        if (q.Type_Question == Question.TYPE_IMAGE) {//si c'est un type image
+                                            if (o.DataChanged) {//si l'image a changé, téléverse
+                                                o.Chemin_Media = FireBaseInteraction.Storage_Paths.OPTIONS_IMAGES + o.ID + ".jpg";
+                                                OptionMedRef = OptionMedRef.child(o.Chemin_Media);
+                                                UploadFile(OptionMedRef, o.ImagePreload, "envoi de " + o.ID + ".jpg");
+                                            }
+                                        }
+                                        if (q.Type_Question == Question.TYPE_VIDEO) {//si c'est une vidéo
+                                            if (o.DataChanged) {//si l'option a changé, (changement de vidéo), éléverse le thumbnail et la vidéo
+                                                String Extension = mime.getExtensionFromMimeType(getActivity().getContentResolver().getType(Uri.parse(o.UriVideo)));
+                                                o.Chemin_Media = FireBaseInteraction.Storage_Paths.OPTIONS_VIDEOS + o.ID + "." + Extension;
+                                                OptionMedRef = OptionMedRef.child(o.Chemin_Media);
+                                                UploadFile(OptionMedRef, Uri.parse(o.UriVideo), "envoi de " + o.ID + "." + Extension);
+                                                OptionMedRef = FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.OPTIONS_VIDEOS_THUMBNAILS).child(o.ID + ".jpg");
+                                                UploadFile(OptionMedRef, o.ImagePreload, "envoi de " + o.ID + "." + Extension + " (miniature)");
+                                            }
+                                        }
+                                    } else {//si c'est type texte,
+                                        o.UriImage = "";
+                                        o.UriVideo = "";
+                                        o.ImagePreload = null;
+                                        o.Chemin_Media = "N";
+                                        o.Chemin_Image = "N";
+                                        o.Chemin_Video = "N";
+                                    }
+                                    Map<String, Object> OptionMap = o.Map();
+                                    OptionsMap.put(o.ID, OptionMap);
+                                }
+                            }
+                            QuestionMap.put(FireBaseInteraction.Question_Keys.OPTIONS, OptionsMap);
+                            QuestionRef.setValue(QuestionMap);
                         }
-                        QuestionMap.put(FireBaseInteraction.Question_Keys.OPTIONS, OptionsMap);
-                        QuestionRef.setValue(QuestionMap);
                     }
                     //QuestionAdapter.notifyDataSetChanged();
                     progressDialog.dismiss();
-                    mListener.changePage(SondageListFragment.newInstance(true));
+                    mListener.changePage(SondageListFragment.newInstance(true, null), "Sondages | Gérer");
                 }else{
                     Toast.makeText(getActivity(), "Le sondage est érroné, veuillez vérifier et corriger les érreurs", Toast.LENGTH_LONG).show();
                 }
@@ -466,6 +474,19 @@ public class CreerSondageFragment extends Fragment implements CreerOptionDialog.
             public void onClick(View v) {
                 Intent i = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(i, PIC_GALL);
+            }
+        });
+        Btn_Cancel_Img.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                ImageChange = true;
+
+                ImagePreview.setVisibility(View.GONE);
+                ImagePreview.setImageBitmap(null);
+                Image = null;
+                ImageBitmap = null;
+
             }
         });
 
@@ -520,6 +541,7 @@ public class CreerSondageFragment extends Fragment implements CreerOptionDialog.
     private void MakeImage(){
         ImageBitmap = TraitementImage.RotateImage(Image, getActivity());
         ImagePreview.setImageBitmap(ImageBitmap);
+        ImageChange = true;
         ImagePreview.setVisibility(View.VISIBLE);
         Toast.makeText(getActivity(), "Le fichier sera envoyé au serveur lorsque le sondage sera créé/modifié",Toast.LENGTH_LONG).show();
     }
@@ -717,16 +739,9 @@ public class CreerSondageFragment extends Fragment implements CreerOptionDialog.
         if(UploadFileFailed){
             Toast.makeText(getActivity(), "L'envoi de vidéos ou d'images au serveur a échoué.", Toast.LENGTH_LONG);
         }else{
-            mListener.changePage(SondageListFragment.newInstance(true));
+            mListener.changePage(SondageListFragment.newInstance(true, null), "Sondages | Gérer");
         }
 
-    }
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            //mListener.onFragmentInteraction(uri);
-
-        }
     }
 
     public void addQuestion(Question q){
@@ -776,8 +791,9 @@ public class CreerSondageFragment extends Fragment implements CreerOptionDialog.
      */
 
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void changePage(Fragment fragment);
-        //void onFragmentInteraction(Uri uri);
+        void changePage(Fragment fragment, String Title);
+    }
+    public String getTitle(){
+        return Si_Edit?"Sondage | Modifier":"Sondage | Créer";
     }
 }
