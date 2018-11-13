@@ -43,7 +43,7 @@
                 android:layout_gravity="center_horizontal"
                 android:padding="10dp"
                 android:text="Vérifier la disponibilité"
-                android:textColor="@color/colorPrimary" />
+                android:textColor="@color/colorSecondaryMedDark" />
         </com.balysv.materialripple.MaterialRippleLayout>
 
         <com.balysv.materialripple.MaterialRippleLayout
@@ -58,8 +58,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:padding="10dp"
-                android:text="Confirmer"
-                android:textColor="@color/colorPrimary" />
+                android:text="Confirmer" />
         </com.balysv.materialripple.MaterialRippleLayout>
     </LinearLayout>
 
@@ -98,8 +97,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:padding="10dp"
-                android:text="Confirmer"
-                android:textColor="@color/colorPrimary" />
+                android:text="Confirmer" />
         </com.balysv.materialripple.MaterialRippleLayout>
 
         <com.balysv.materialripple.MaterialRippleLayout
@@ -169,8 +167,7 @@
 
                 android:layout_gravity="center_horizontal"
                 android:padding="10dp"
-                android:text="Changer de mot de passe"
-                android:textColor="@color/colorPrimary" />
+                android:text="Changer de mot de passe" />
         </com.balysv.materialripple.MaterialRippleLayout>
 
         <com.balysv.materialripple.MaterialRippleLayout
@@ -203,6 +200,7 @@
 
             <Button
                 android:id="@+id/manage_profil_delete"
+                style="@style/buttonNoBorderCustom"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"

@@ -12,6 +12,7 @@ public class Profil implements Serializable {
     public String Avatar;
     //public Map<String, Object> Auteurs_Suivis_Ref = new HashMap<>(); //liens latent attendant d'être activés
     HashMap<String, String> Auteurs_Suivis;
+    HashMap<String, Object> Sondages_Faits;
     //ArrayList<String> Auteurs_Suivis;
     public Profil(){
 

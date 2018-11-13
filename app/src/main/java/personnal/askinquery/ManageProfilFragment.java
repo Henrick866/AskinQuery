@@ -133,6 +133,7 @@ public class ManageProfilFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        mListener.ChangeTitle("Profil | Gestion");
         user = mAuth.getCurrentUser();
         progressDialog = new ProgressDialog(getActivity());
         View view = inflater.inflate(R.layout.fragment_manage_profil, container, false);
@@ -420,7 +421,7 @@ public class ManageProfilFragment extends Fragment {
                                                 Layout.setVisibility(View.GONE);
                                                 dialog.dismiss();
                                                 mListener.updateMenu(mAuth.getCurrentUser());
-                                                mListener.changePage(SondageListFragment.newInstance(false, null), "Sondages");
+                                                mListener.changePage(SondageListFragment.newInstance(false, null));
                                             } else {
                                                 Toast.makeText(getActivity(), "Erreur, compte non supprimé.", Toast.LENGTH_LONG).show();
                                             }
@@ -683,7 +684,8 @@ public class ManageProfilFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        void changePage(Fragment fragment, String Title);
+        void changePage(Fragment fragment);
+        void ChangeTitle(String newTitle);
         void updateMenu(FirebaseUser user);
     }
     public String getTitle(){

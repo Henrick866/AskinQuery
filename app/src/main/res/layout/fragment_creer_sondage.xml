@@ -21,8 +21,7 @@
             android:drawableEnd="@drawable/ic_done_color"
             android:paddingStart="20dp"
             android:paddingEnd="10dp"
-            android:text="Terminer"
-            android:textColor="@color/colorPrimary" />
+            android:text="Terminer" />
     </com.balysv.materialripple.MaterialRippleLayout>
 
     <TextView
@@ -76,6 +75,7 @@
                             android:orientation="vertical">
 
                             <TextView
+                                android:id="@+id/sondage_edit_title_form"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:text="Créer un sondage"
@@ -91,20 +91,20 @@
                                 android:inputType="textPersonName" />
 
                             <TextView
-                                android:layout_marginTop="5dp"
                                 android:id="@+id/sondage_edit_titre_error"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:layout_marginTop="5dp"
                                 android:text="TextView"
                                 android:textAppearance="@style/TextAppearance.AppCompat"
                                 android:textColor="@color/colorRed"
                                 android:visibility="invisible" />
 
                             <TextView
-                                android:layout_marginTop="5dp"
                                 android:id="@+id/textView3"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:layout_marginTop="5dp"
                                 android:text="Date d'échéance du sondage"
                                 android:textAlignment="center"
                                 android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
@@ -117,100 +117,105 @@
                                 android:spinnersShown="false" />
 
                             <TextView
-                                android:layout_marginTop="5dp"
                                 android:id="@+id/sondage_edit_date_error"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:layout_marginTop="5dp"
                                 android:textColor="@color/colorRed"
                                 android:visibility="invisible" />
 
                             <TextView
-                                android:layout_marginTop="5dp"
                                 android:id="@+id/textView5"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:layout_marginTop="5dp"
                                 android:text="Date sélectionnée :"
                                 android:textAlignment="center"
                                 android:textAppearance="@style/TextAppearance.AppCompat.Headline"
                                 android:textSize="18sp" />
 
                             <TextView
-                                android:layout_marginTop="5dp"
                                 android:id="@+id/sondage_edit_date_confirm"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:layout_marginTop="5dp"
                                 android:text="TextView"
                                 android:textAlignment="center"
                                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                                 android:textColor="@color/colorPrimaryDark" />
 
                             <CheckBox
-                                android:layout_marginTop="5dp"
                                 android:id="@+id/sondage_edit_public_results"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="10dp"
+                                android:layout_marginTop="5dp"
                                 android:layout_marginRight="10dp"
                                 android:text="Résultats publiques" />
 
                             <TextView
-                                android:layout_marginTop="5dp"
                                 android:id="@+id/textView6"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:layout_marginTop="5dp"
                                 android:text="Téléverser une image"
                                 android:textAlignment="center"
                                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                                 android:textSize="18sp" />
 
                             <LinearLayout
-                                android:layout_marginTop="5dp"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
+                                android:layout_marginTop="5dp"
                                 android:orientation="horizontal">
+
                                 <com.balysv.materialripple.MaterialRippleLayout
                                     android:layout_width="match_parent"
-                                    android:layout_weight="1"
-                                    android:layout_height="wrap_content">
-                                <Button
-                                    android:id="@+id/sondage_edit_upload_img"
-                                    android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:background="@color/transparent"
-                                    android:drawableTop="@drawable/ic_file_upload_color"
-                                    android:text="Téléverser"
-                                    android:textColor="@color/colorPrimary" />
+                                    android:layout_weight="1">
+
+                                    <Button
+                                        android:id="@+id/sondage_edit_upload_img"
+                                        style="@style/buttonNoBorderCustom"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:background="@color/transparent"
+                                        android:drawableTop="@drawable/ic_file_upload_color"
+                                        android:text="Téléverser" />
                                 </com.balysv.materialripple.MaterialRippleLayout>
+
                                 <View
                                     android:layout_width="2dp"
                                     android:layout_height="match_parent"
-                                    android:background="@color/LightGrey"
-                                    />
+                                    android:background="@color/LightGrey" />
+
                                 <com.balysv.materialripple.MaterialRippleLayout
                                     android:layout_width="match_parent"
-                                    android:layout_weight="1"
-                                    android:layout_height="wrap_content">
-                                <Button
-                                    android:id="@+id/sondage_edit_remove_img"
-                                    android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:background="@color/transparent"
-                                    android:drawableTop="@drawable/ic_clear_color"
-                                    android:text="Retirer l'image"
-                                    android:textColor="@color/colorRed" />
+                                    android:layout_weight="1">
+
+                                    <Button
+                                        android:id="@+id/sondage_edit_remove_img"
+                                        style="@style/buttonNoBorderCustom"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:background="@color/transparent"
+                                        android:drawableTop="@drawable/ic_clear_color"
+                                        android:text="Retirer l'image"
+                                        android:textColor="@color/colorRed" />
                                 </com.balysv.materialripple.MaterialRippleLayout>
                             </LinearLayout>
 
                             <ImageView
-                                android:layout_marginTop="5dp"
                                 android:id="@+id/sondage_edit_image_preview"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:layout_marginTop="5dp"
                                 android:adjustViewBounds="true"
-                                android:maxHeight="100dp"
-                                android:visibility="gone"
                                 android:cropToPadding="false"
-                                android:src="@drawable/ic_menu_gallery" />
+                                android:maxHeight="100dp"
+                                android:src="@drawable/ic_menu_gallery"
+                                android:visibility="gone" />
                         </LinearLayout>
                     </ScrollView>
 
@@ -226,10 +231,11 @@
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
+
                         <com.balysv.materialripple.MaterialRippleLayout
                             android:layout_width="wrap_content"
-                            android:layout_centerInParent="true"
-                            android:layout_height="wrap_content">
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true">
 
                             <ImageButton
                                 android:id="@+id/sondage_edit_add_question"
@@ -238,9 +244,8 @@
 
                                 android:layout_height="50dp"
                                 android:scaleType="fitCenter"
-                                android:src="@drawable/ic_ajout"
-                                android:tint="@color/colorPrimary" />
-                    </com.balysv.materialripple.MaterialRippleLayout>
+                                android:src="@drawable/ic_ajout" />
+                        </com.balysv.materialripple.MaterialRippleLayout>
 
                     </RelativeLayout>
 

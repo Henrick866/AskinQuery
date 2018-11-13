@@ -16,14 +16,18 @@ public class FireBaseInteraction {
     public FireBaseInteraction(){
     }
     public static class Storage_Paths{
-        final static String PUBLICATION_VIDEOS = "Media/Publications/Videos/";
-        final static String PUBLICATION_IMAGES = "Media/Publications/Images/";
         final static String SONDAGES_IMAGES = "Media/Sondages/Thumbnails/";
         final static String OPTIONS_IMAGES = "Media/Sondages/Options/Images/";
         final static String OPTIONS_VIDEOS = "Media/Sondages/Options/Videos/";
         final static String OPTIONS_VIDEOS_THUMBNAILS = "Media/Sondages/Options/Videos/Thumbnails/";
+        final static String PUBLICATION_VIDEOS_THUMBNAILS = "Media/Publications/Videos/Thumbnails/";
+        final static String PUBLICATION_VIDEOS = "Media/Publications/Videos/";
+        final static String PUBLICATION_IMAGES = "Media/Publications/Images/";
         final static String PROFILS_AVATARS = "Media/Profils/";
+        final static String IMAGES_APPS = "Media/ImagesApp/";
+        final static String LOGO = "Media/ImagesApp/AppLogo.jpg";
     }
+
     public static class Sondage_Keys{
         final static String STRUCT_NAME = "Sondages";
         final static String TITRE = "Titre";
@@ -57,7 +61,10 @@ public class FireBaseInteraction {
         final static String STRUCT_NAME = "Publications";
         final static String TITRE = "Titre";
         final static String TEXTE = "Texte";
-        final static String AUTEUR = "Auteur";
+        final static String AUTEUR = "AuteurRef";
         final static String MEDIA = "Media";
+        final static String SONDAGE = "SondageRef";
+        final static String TYPE_MEDIA = "Type";
+        final static String DATE_PUBLIC = "date_public";
     }
 }

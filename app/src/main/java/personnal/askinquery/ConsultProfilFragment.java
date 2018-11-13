@@ -89,32 +89,18 @@ public class ConsultProfilFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
         AbonnementBtn = view.findViewById(R.id.profil_check_abonnement);
+        mListener.ChangeTitle("Profil | Consulter");
         if(user != null){
             if(!user.isAnonymous()) {
+                profilUser = mListener.getUtilisateur_Connecte();
                 profilUserRef = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Profil_Keys.STRUCT_NAME).child(user.getUid());
-                profilUserRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        profilUser = dataSnapshot.getValue(Profil.class);
-                        profilUser.ID = dataSnapshot.getKey();
-                        HashMap<String, String> suivisList = new HashMap<>();
-                        for (DataSnapshot dataSnapshot1 : dataSnapshot.child(FireBaseInteraction.Profil_Keys.AUTEURS_SUIVIS).getChildren()) {
-                            suivisList.put(dataSnapshot1.getKey(), dataSnapshot1.getValue().toString());
-                        }
-                        profilUser.Auteurs_Suivis = suivisList;
-                        AbonnementBtn.setEnabled(true);
-                        if (profilUser.Auteurs_Suivis.containsKey(mProfil.ID)) {
-                            AbonnementBtn.setText("Se désabonner");
-                        } else {
-                            AbonnementBtn.setText("S'abonner");
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                });
+                if(profilUser.Auteurs_Suivis.containsKey(mProfil.ID)){
+                    AbonnementBtn.setText("Se Désabonner");
+                    AbonnementBtn.setEnabled(true);
+                }else{
+                    AbonnementBtn.setEnabled(true);
+                    AbonnementBtn.setText("S'abonner");
+                }
             }else{
                 AbonnementBtn.setEnabled(false);
             }
@@ -137,12 +123,18 @@ public class ConsultProfilFragment extends Fragment {
             });
         }
         ListPublications = view.findViewById(R.id.profil_check_publications);
+        ListPublications.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mListener.changePage(PublicationListFragment.newInstance(false, mProfil.ID));
+            }
+        });
         //todo: ajouter la liste des publications
         ListSondages = view.findViewById(R.id.profil_check_sondages);
         ListSondages.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mListener.changePage(SondageListFragment.newInstance(false, mProfil.ID),"Sondages | "+mProfil.Username);
+                mListener.changePage(SondageListFragment.newInstance(false, mProfil.ID));
             }
         });
 
@@ -160,6 +152,10 @@ public class ConsultProfilFragment extends Fragment {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 if(task.isSuccessful()){
+
+                                    Profil utilConn = mListener.getUtilisateur_Connecte();
+                                    utilConn.Auteurs_Suivis.remove(mProfil.ID);
+                                    mListener.setUtilisateur_Connecte(utilConn);
                                     Toast.makeText(getActivity(), "Désabonnement confirmé", Toast.LENGTH_LONG).show();
                                     AbonnementBtn.setText("S'abonner");
                                 }else{
@@ -173,6 +169,10 @@ public class ConsultProfilFragment extends Fragment {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 if(task.isSuccessful()){
+
+                                    Profil utilConn = mListener.getUtilisateur_Connecte();
+                                    utilConn.Auteurs_Suivis.put(mProfil.ID, mProfil.Username);
+                                    mListener.setUtilisateur_Connecte(utilConn);
                                     Toast.makeText(getActivity(), "Abonnement confirmé", Toast.LENGTH_LONG).show();
                                     AbonnementBtn.setText("Se Désabonner");
 
@@ -218,6 +218,9 @@ public class ConsultProfilFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        void changePage(Fragment fragment, String Title);
+        void changePage(Fragment fragment);
+        Profil getUtilisateur_Connecte();
+        void ChangeTitle(String newTitle);
+        void setUtilisateur_Connecte(Profil utilisateur_connecte);
     }
 }

@@ -48,8 +48,7 @@
             style="@style/buttonCustom"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Se connecter"
-            android:textColor="@color/colorPrimary" />
+            android:text="Se connecter" />
     </com.balysv.materialripple.MaterialRippleLayout>
     <com.balysv.materialripple.MaterialRippleLayout
         android:layout_width="match_parent"
@@ -61,8 +60,7 @@
             style="@style/buttonCustom"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Créer un compte"
-            android:textColor="@color/colorPrimary" />
+            android:text="Créer un compte" />
     </com.balysv.materialripple.MaterialRippleLayout>
 
 </LinearLayout>

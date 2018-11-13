@@ -39,6 +39,12 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.internal.Util;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -52,8 +58,10 @@ public class MainActivity extends AppCompatActivity
         ManageProfilFragment.OnFragmentInteractionListener,
         ConsultProfilFragment.OnFragmentInteractionListener,
         AnswerOptionAdapter.AdaptListener,
-        AnswerSondageFragment.OnFragmentInteractionListener
-        //PublicationAdapter.AdaptListener
+        AnswerSondageFragment.OnFragmentInteractionListener,
+        PublicationListFragment.OnFragmentInteractionListener,
+        PublicationAdapter.AdaptListener,
+        CreatePostFragment.OnFragmentInteractionListener
 {
     FragmentManager fragmentManager;
     FragmentTransaction fragmentTransaction;
@@ -64,8 +72,8 @@ public class MainActivity extends AppCompatActivity
     private ImageView MenuUserAvatar;
     private NavigationView navigationView;
     private MenuItem Connected, NotConnected;
-    private Profil UtilisateurConnecte;
     private Menu menu;
+    private Profil Utilisateur_Connecte;
     private FirebaseUser user;
 
     @Override
@@ -101,7 +109,36 @@ public class MainActivity extends AppCompatActivity
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
         updateMenu(user);
-        changePage(SondageListFragment.newInstance(false, null), "Sondages");
+        if(user != null) {
+            final boolean isAnonyme = user.isAnonymous();
+            DatabaseReference UtilRef = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Profil_Keys.STRUCT_NAME).child(user.getUid());
+            UtilRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    Utilisateur_Connecte = dataSnapshot.getValue(Profil.class);
+                    HashMap<String, Object> MapSondagesDone = new HashMap<>();
+                    for (DataSnapshot dataSnapshot1 : dataSnapshot.child(FireBaseInteraction.Profil_Keys.SONDAGES).getChildren()) {
+                        MapSondagesDone.put(dataSnapshot1.getKey(), dataSnapshot1.getValue());
+                    }
+                    if (!isAnonyme) {
+                        HashMap<String, String> MapAbonn = new HashMap<>();
+                        for (DataSnapshot dataSnapshot1 : dataSnapshot.child(FireBaseInteraction.Profil_Keys.AUTEURS_SUIVIS).getChildren()) {
+                            MapAbonn.put(dataSnapshot1.getKey(), (String) dataSnapshot1.getValue());
+                        }
+                        Utilisateur_Connecte.Auteurs_Suivis = MapAbonn;
+                    }
+                    Utilisateur_Connecte.Sondages_Faits = MapSondagesDone;
+                    changePage(SondageListFragment.newInstance(false, null));
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }else{
+            changePage(SondageListFragment.newInstance(false, null));
+        }
 
         //changePage(BlankFragment.newInstance("",""));
     }
@@ -136,7 +173,7 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.action_settings) {
             return true;
         }else if(id == R.id.action_home){
-            changePage(SondageListFragment.newInstance(false, null),"Sondages");
+            changePage(SondageListFragment.newInstance(false, null));
         }
 
         return super.onOptionsItemSelected(item);
@@ -149,9 +186,9 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_profil_connexion) {
-            changePage(LoginFragment.newInstance(), "Connexion");
+            changePage(LoginFragment.newInstance());
         } else if (id == R.id.nav_profil_creation) {
-            changePage(CreerProfilFragment.newInstance(mAuth), "Profil | Créer");
+            changePage(CreerProfilFragment.newInstance(mAuth));
         } else if (id == R.id.nav_profil_consulter) {
             if(user != null) {
                 LayoutInflater li = LayoutInflater.from(this);
@@ -175,7 +212,7 @@ public class MainActivity extends AppCompatActivity
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if(task.isSuccessful()){
-                                                    changePage(ManageProfilFragment.newInstance(userInput.getEditableText().toString()),"Profil | Gérer");
+                                                    changePage(ManageProfilFragment.newInstance(userInput.getEditableText().toString()));
                                                     Toast.makeText(getApplicationContext(), "Vous êtes bien "+user.getDisplayName(), Toast.LENGTH_LONG).show();
                                                     dialog.dismiss();
                                                 }else{
@@ -194,15 +231,46 @@ public class MainActivity extends AppCompatActivity
             }
 
         } else if (id == R.id.nav_profil_sondages_manage) {
-            changePage(SondageListFragment.newInstance(true, null),"Sondages | Gérer");
+            changePage(SondageListFragment.newInstance(true, null));
         } else if (id == R.id.nav_profil_communaute) {
-
+            changePage(PublicationListFragment.newInstance(false, null));
+        } else if (id == R.id.nav_profil_publication_manage) {
+            changePage(PublicationListFragment.newInstance(true, null));
         } else if (id == R.id.nav_profil_suivis) {
+            final ArrayList<String> AuteursId = new ArrayList<>(), AuteursNom = new ArrayList<>();
+            for(HashMap.Entry<String, String> cursor : Utilisateur_Connecte.Auteurs_Suivis.entrySet()) {
+                AuteursId.add(cursor.getKey());
+                AuteursNom.add(cursor.getValue());
+            }
+            String[] ListeString = new String[AuteursId.size()];
+            AlertDialog.Builder b = new AlertDialog.Builder(this);
+            b.setTitle("Choisissez le profil que vous voulez consulter");
+            b.setItems(AuteursNom.toArray(ListeString), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(final DialogInterface dialogInterface, int i) {
+                    final int index = i;
+                    DatabaseReference profilRef = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Profil_Keys.STRUCT_NAME).child(AuteursId.get(i));
+                    profilRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            Profil p = dataSnapshot.getValue(Profil.class);
+                            p.ID = dataSnapshot.getKey();
+                            changePage(ConsultProfilFragment.newInstance(p));
+                            dialogInterface.dismiss();
+                        }
 
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                            dialogInterface.dismiss();
+                        }
+                    });
+
+                }
+            }).show();
         }else if(id == R.id.nav_sondages){
-            changePage(SondageListFragment.newInstance(false, null), "Sondages");
+            changePage(SondageListFragment.newInstance(false, null));
         }else if(id == R.id.nav_profil_sondages_repondus){
-            changePage(SondageListFragment.newInstance(false, null, true), "Sondages répondus");
+            changePage(SondageListFragment.newInstance(false, null, true));
         }
 
 
@@ -213,23 +281,22 @@ public class MainActivity extends AppCompatActivity
     private void logInOut(){
         if(user == null){
             drawer.closeDrawer(GravityCompat.START);
-            changePage(LoginFragment.newInstance(), "Connexion");
+            changePage(LoginFragment.newInstance());
         }else{
             if(!user.isAnonymous()) {
                 drawer.closeDrawer(GravityCompat.START);
                 mAuth.signOut();
                 user = mAuth.getCurrentUser();
                 updateMenu(user);
-                changePage(SondageListFragment.newInstance(false, null), "Sondages");
+                changePage(SondageListFragment.newInstance(false, null));
             }else{
                 drawer.closeDrawer(GravityCompat.START);
-                changePage(LoginFragment.newInstance(), "Connexion");
+                changePage(LoginFragment.newInstance());
             }
         }
     }
 
-    public void changePage(Fragment fragment, String Title){
-        this.getSupportActionBar().setTitle(Title);
+    public void changePage(Fragment fragment){
         fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.Fragment_Container, fragment);
         fragmentTransaction.addToBackStack(null);
@@ -239,6 +306,7 @@ public class MainActivity extends AppCompatActivity
         return fragmentManager;
     }
     public void updateMenu(FirebaseUser user){
+        FirebaseUser oldUser = this.user;
         this.user = user;
         if(user == null){
             MenuUserAvatar.setImageDrawable(getResources().getDrawable(R.drawable.ic_menu_profil_connecter));
@@ -248,6 +316,7 @@ public class MainActivity extends AppCompatActivity
             NotConnected.setVisible(true);
             ConnectLink.setText(R.string.Connexion);
         }else{
+
             if(user.isAnonymous()){
                 MenuUserAvatar.setImageDrawable(getResources().getDrawable(R.drawable.ic_menu_profil_connecter));
                 MenuUsername.setText("Non connecté.");
@@ -258,6 +327,7 @@ public class MainActivity extends AppCompatActivity
             }else {
                 MenuUserEmail.setText(user.getEmail());
                 MenuUsername.setText(user.getDisplayName());
+
                 if (user.getPhotoUrl() != null) {
                     if (user.getPhotoUrl().toString().equals("N")) {//pas d'image
                         MenuUserAvatar.setImageResource(R.mipmap.ic_launcher);
@@ -279,8 +349,17 @@ public class MainActivity extends AppCompatActivity
         }
 
     }
+    public Profil getUtilisateur_Connecte(){
+        return Utilisateur_Connecte;
+    }
+    public void setUtilisateur_Connecte(Profil utilisateur_Connecte){
+        this.Utilisateur_Connecte = utilisateur_Connecte;
+    }
     public FirebaseUser getUser(){
         return user;
+    }
+    public void ChangeTitle(String newTitle){
+        this.getSupportActionBar().setTitle(newTitle);
     }
 
 }

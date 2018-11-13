@@ -16,16 +16,16 @@
             android:layout_weight="1"
             android:layout_height="wrap_content">
 
-        <Button
-            android:id="@+id/option_edit_done_btn"
-            android:padding="10dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            <Button
+                android:id="@+id/option_edit_done_btn"
+                style="@style/buttonNoBorderCustom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
 
-            android:background="@color/transparent"
-            android:drawableStart="@drawable/ic_done_color"
-            android:text="Terminer"
-            android:textColor="@color/colorPrimary" />
+                android:background="@color/transparent"
+                android:drawableStart="@drawable/ic_done_color"
+                android:padding="10dp"
+                android:text="Terminer" />
     </com.balysv.materialripple.MaterialRippleLayout>
         <View
             android:layout_width="2dp"
@@ -66,8 +66,7 @@
 
                 android:layout_height="60dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/ic_ajout"
-                android:tint="@color/colorPrimary" />
+                android:src="@drawable/ic_ajout" />
     </com.balysv.materialripple.MaterialRippleLayout>
 
     </RelativeLayout>

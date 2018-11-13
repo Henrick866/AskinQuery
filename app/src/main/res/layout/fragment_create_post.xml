@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+<LinearLayout
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+    android:paddingStart="7dp"
+    android:paddingEnd="7dp"
+    android:orientation="vertical"
+    tools:context=".CreatePostFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+    <TextView
+        android:id="@+id/publication_edit_title_form"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Créer une publication "
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+
+    <EditText
+        android:id="@+id/publication_edit_titre_field"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:ems="10"
+        android:hint="Titre"
+        android:inputType="textPersonName" />
+
+    <TextView
+        android:id="@+id/publication_edit_titre_err"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="TextView"
+        android:textAlignment="textEnd"
+        android:textAppearance="@style/TextAppearance.AppCompat"
+        android:textColor="@color/colorRed"
+        android:visibility="invisible" />
+
+    <EditText
+        android:id="@+id/publication_edit_contenu_field"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:ems="10"
+        android:hint="Contenu de la publication"
+        android:inputType="textMultiLine" />
+
+    <TextView
+        android:id="@+id/publication_edit_contenu_err"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="TextView"
+        android:textAlignment="textEnd"
+        android:textAppearance="@style/TextAppearance.AppCompat"
+        android:textColor="@color/colorRed"
+        android:visibility="invisible" />
+
+    <TextView
+        android:layout_marginTop="5dp"
+        android:id="@+id/textView11"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Choisir un média ou un sondage à publier"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_marginTop="5dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <com.balysv.materialripple.MaterialRippleLayout
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:layout_height="wrap_content">
+        <Button
+            android:id="@+id/publication_edit_imgUpBtn"
+            style="@style/buttonNoBorderCustom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Image" />
+        </com.balysv.materialripple.MaterialRippleLayout>
+
+        <View
+            android:layout_width="2dp"
+            android:layout_height="match_parent"
+            android:background="@color/LightGrey" />
+        <com.balysv.materialripple.MaterialRippleLayout
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:layout_height="wrap_content">
+        <Button
+            android:id="@+id/publication_edit_vidUpBtn"
+            style="@style/buttonNoBorderCustom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Vidéo" />
+        </com.balysv.materialripple.MaterialRippleLayout>
+
+        <View
+            android:layout_width="2dp"
+            android:layout_height="match_parent"
+            android:background="@color/LightGrey" />
+        <com.balysv.materialripple.MaterialRippleLayout
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:layout_height="wrap_content">
+        <Button
+            android:id="@+id/publication_edit_pollLinkBtn"
+            style="@style/buttonNoBorderCustom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:enabled="false"
+            android:text="Sondage" />
+        </com.balysv.materialripple.MaterialRippleLayout>
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/publication_edit_media_preview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="5dp"
+        android:maxHeight="200dp"
+        android:adjustViewBounds="true"
+        android:cropToPadding="false"
+        android:src="@drawable/ic_menu_gallery"
+        android:visibility="gone" />
+
+    <com.balysv.materialripple.MaterialRippleLayout
+        android:layout_width="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_height="wrap_content">
+    <Button
+        android:id="@+id/publication_edit_mediaRmvBtn"
+        style="@style/buttonCustom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="Retirer"
+        android:textColor="@color/colorRed"
+        android:visibility="gone" />
+    </com.balysv.materialripple.MaterialRippleLayout>
+
+    <com.balysv.materialripple.MaterialRippleLayout
+        android:layout_width="match_parent"
+        android:layout_marginTop="5dp"
+        android:layout_height="wrap_content">
+    <Button
+        android:id="@+id/publication_edit_done_btn"
+        style="@style/buttonCustom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Publier" />
+    </com.balysv.materialripple.MaterialRippleLayout>
+
+</LinearLayout>
+    </ScrollView>
+</LinearLayout>

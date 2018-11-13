@@ -60,8 +60,7 @@
             android:layout_centerVertical="true"
             android:drawableTop="@drawable/ic_file_upload_color"
             android:padding="10dp"
-            android:text="Télécharger"
-            android:textColor="@color/colorPrimary" />
+            android:text="Télécharger" />
 
 
 

@@ -122,7 +122,7 @@ public class SondageListAnsweredFragment extends ListFragment { //je ne voulais 
                         }
                     }
                 }
-                adapter = new SondageAdapter(getActivity(), SondageList, Si_Gestion_Sond, Filter!=null, null);
+                adapter = new SondageAdapter(getActivity(), SondageList, Si_Gestion_Sond, Filter!=null);
                 setListAdapter(adapter);
                 ChargeSondages(ListeRepondus);
                 progressDialog.dismiss();

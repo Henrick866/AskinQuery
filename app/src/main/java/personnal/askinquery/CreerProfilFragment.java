@@ -111,6 +111,7 @@ public class CreerProfilFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        mListener.ChangeTitle("Profil | Créer");
         View view = inflater.inflate(R.layout.fragment_profil, container, false);
         Title = view.findViewById(R.id.profil_form_title);
         UserErr = view.findViewById(R.id.profil_form_username_err);
@@ -314,7 +315,7 @@ public class CreerProfilFragment extends Fragment {
 
                                 UserProfileChangeRequest profileUpdates;
                                 if(ImageBitmap != null ){
-                                    avatarPath = FireBaseInteraction.Storage_Paths.PROFILS_AVATARS+currentUser.getUid()+"jpg";
+                                    avatarPath = FireBaseInteraction.Storage_Paths.PROFILS_AVATARS+currentUser.getUid()+".jpg";
                                     UploadFile(AvatarRef.child(currentUser.getUid()+".jpg"), ImageBitmap, "Envoi de l'avatar");
                                 }
 
@@ -333,7 +334,7 @@ public class CreerProfilFragment extends Fragment {
                                                 if (task.isSuccessful()) {
                                                     progressDialog.dismiss();
                                                     mListener.updateMenu(currentUser);
-                                                    mListener.changePage(SondageListFragment.newInstance(false, null), "Sondages");
+                                                    mListener.changePage(SondageListFragment.newInstance(false, null));
                                                 }
                                             }
                                         });
@@ -355,7 +356,7 @@ public class CreerProfilFragment extends Fragment {
                                         String avatarPath = "N";
 
                                         if (ImageBitmap != null) {
-                                            avatarPath = FireBaseInteraction.Storage_Paths.PROFILS_AVATARS + currentUser.getUid() + "jpg";
+                                            avatarPath = FireBaseInteraction.Storage_Paths.PROFILS_AVATARS + currentUser.getUid() + ".jpg";
                                             UploadFile(AvatarRef.child(currentUser.getUid() + ".jpg"), ImageBitmap, "Envoi de l'avatar");
                                         }
 
@@ -379,7 +380,7 @@ public class CreerProfilFragment extends Fragment {
                                                                 if (task.isSuccessful()) {
                                                                     progressDialog.dismiss();
                                                                     mListener.updateMenu(currentUser);//switch au nouvel utilisateur;
-                                                                    mListener.changePage(SondageListFragment.newInstance(false, null), "Sondages");
+                                                                    mListener.changePage(SondageListFragment.newInstance(false, null));
                                                                 }
                                                             }
                                                         });
@@ -460,7 +461,8 @@ public class CreerProfilFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        void changePage(Fragment fragment, String Title);
+        void changePage(Fragment fragment);
+        void ChangeTitle(String newTitle);
         void updateMenu(FirebaseUser user);
     }
     public String getTitle(){

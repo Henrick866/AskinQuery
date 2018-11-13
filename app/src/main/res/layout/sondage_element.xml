@@ -106,42 +106,46 @@
             android:layout_width="match_parent"
             android:layout_weight="1"
             android:layout_height="match_parent">
-        <ImageButton
-            android:id="@+id/sondage_elem_edit_btn"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/transparent"
-            android:scaleType="fitCenter"
-            android:tint="@color/colorPrimary"
-            android:src="@drawable/ic_edit" />
+
+            <ImageButton
+                android:id="@+id/sondage_elem_edit_btn"
+                style="@style/buttonImageCustom"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/transparent"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_edit" />
         </com.balysv.materialripple.MaterialRippleLayout>
         <View android:layout_width="2dp" android:layout_height="match_parent" android:background="@color/LightGrey"/>
         <com.balysv.materialripple.MaterialRippleLayout
             android:layout_width="match_parent"
             android:layout_weight="1"
             android:layout_height="match_parent">
-        <ImageButton
-            android:id="@+id/sondage_elem_stats_btn"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/transparent"
-            android:scaleType="fitCenter"
-            android:tint="@color/colorPrimary"
-            android:src="@drawable/ic_stats" />
+
+            <ImageButton
+                android:id="@+id/sondage_elem_stats_btn"
+                style="@style/buttonImageCustom"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/transparent"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_stats" />
         </com.balysv.materialripple.MaterialRippleLayout>
         <View android:layout_width="2dp" android:layout_height="match_parent" android:background="@color/LightGrey"/>
         <com.balysv.materialripple.MaterialRippleLayout
             android:layout_width="match_parent"
             android:layout_weight="1"
             android:layout_height="match_parent">
-        <ImageButton
-            android:id="@+id/sondage_elem_delete_btn"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/transparent"
-            android:scaleType="fitCenter"
-            android:tint="@color/colorRed"
-            android:src="@drawable/ic_delete" />
+
+            <ImageButton
+                android:id="@+id/sondage_elem_delete_btn"
+                style="@style/buttonImageCustom"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/transparent"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_delete"
+                android:tint="@color/colorRed" />
         </com.balysv.materialripple.MaterialRippleLayout>
 
     </LinearLayout>
@@ -164,8 +168,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
                 android:text="Commencer"
-                android:textAlignment="center"
-                android:textColor="@color/colorPrimary" />
+                android:textAlignment="center" />
         </com.balysv.materialripple.MaterialRippleLayout>
     </RelativeLayout>
 

@@ -4,6 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingEnd="7dp"
+    android:paddingStart="7dp"
     tools:context=".AnswerSondageFragment">
 
 
@@ -52,12 +54,12 @@
 
             <Button
                 android:id="@+id/answer_sondage_btn_terminer"
-                android:layout_width="match_parent"
+                style="@style/buttonNoBorderCustom"
 
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/transparent"
-                android:text="Terminer"
-                android:textColor="@color/colorPrimaryMedDark" />
+                android:text="Terminer" />
         </com.balysv.materialripple.MaterialRippleLayout>
 
         <View
@@ -74,6 +76,7 @@
 
             <Button
                 android:id="@+id/answer_sondage_btn_save"
+                style="@style/buttonNoBorderCustom"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/transparent"

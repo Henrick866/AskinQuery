@@ -13,7 +13,7 @@
 
         <Button
             android:id="@+id/VideoCloseBtn"
-            style="@style/buttonCustom"
+            style="@style/buttonNoBorderCustom"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:drawableEnd="@drawable/ic_clear_color"

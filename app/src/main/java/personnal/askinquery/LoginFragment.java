@@ -66,6 +66,7 @@ public class LoginFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        mListener.ChangeTitle("Profil | Connexion");
         View view = inflater.inflate(R.layout.fragment_login, container, false);
         EmailField = view.findViewById(R.id.login_email);
         PassField = view.findViewById(R.id.login_pass);
@@ -75,7 +76,7 @@ public class LoginFragment extends Fragment {
         CreateBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mListener.changePage(CreerProfilFragment.newInstance(mAuth), "Profil | Créer");
+                mListener.changePage(CreerProfilFragment.newInstance(mAuth));
             }
         });
         LoginBtn.setOnClickListener(new View.OnClickListener() {
@@ -90,7 +91,7 @@ public class LoginFragment extends Fragment {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()){
                             mListener.updateMenu(mAuth.getCurrentUser());
-                            mListener.changePage(SondageListFragment.newInstance(false, null), "Sondages");
+                            mListener.changePage(SondageListFragment.newInstance(false, null));
                         }else{
                             LoginErr.setText("Courriel ou mot de passe érronné.");
                             LoginErr.setVisibility(View.VISIBLE);
@@ -131,7 +132,8 @@ public class LoginFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        void changePage(Fragment fragment, String Title);
+        void changePage(Fragment fragment);
+        void ChangeTitle(String newTitle);
         void updateMenu(FirebaseUser profil);
     }
     public String getTitle(){

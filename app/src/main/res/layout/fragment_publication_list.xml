@@ -1,28 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingStart="7dp"
+    android:paddingEnd="7dp"
+    tools:context=".PublicationListFragment">
 
-    android:orientation="vertical">
-    <!--tools:context="personnal.askinquery.SondageListFragment" xmlns:tools="http://schemas.android.com/tools"-->
-
+    <!-- TODO: Update blank fragment layout -->
     <com.balysv.materialripple.MaterialRippleLayout
         android:layout_width="match_parent"
-        android:layout_marginLeft="5dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginRight="5dp"
+        android:layout_marginBottom="5dp"
         android:layout_height="wrap_content">
-
-        <Button
-            android:id="@+id/sondage_ajout_btn"
-            style="@style/buttonCustom"
-            android:layout_width="match_parent"
-
-            android:layout_height="wrap_content"
-            android:shadowColor="@color/LightGrey"
-            android:text="Créer un sondage" />
-
-
+    <Button
+        android:id="@+id/pub_list_add_btn"
+        style="@style/buttonCustom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Publier quelque chose" />
     </com.balysv.materialripple.MaterialRippleLayout>
 
     <ProgressBar
@@ -38,12 +34,5 @@
         android:id="@id/android:list"
         android:headerDividersEnabled="false"
         android:footerDividersEnabled="false" />
-
-    <!--<TextView
-        android:id="@id/android:empty"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:text="Il n'y a rien ici."
-        android:textAppearance="@style/TextAppearance.AppCompat.Headline"/>-->
 
 </LinearLayout>

@@ -89,7 +89,25 @@ public class SondageListFragment extends ListFragment {
             Answered = getArguments().getBoolean(mParam3);
         }
         Loading_DONE = false;
+        if(Si_Gestion_Sond){
+            mListener.ChangeTitle("Sondages | Gestion");
+        }else if(Filter!=null){
+            FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Profil_Keys.STRUCT_NAME).child(Filter).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    Profil p = dataSnapshot.getValue(Profil.class);
+                    mListener.ChangeTitle("Sondages | "+p.Username);
+                }
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
 
+                }
+            });
+        }else if(Answered){
+            mListener.ChangeTitle("Sondages | Répondus");
+        }else{
+            mListener.ChangeTitle("Sondages");
+        }
         progressDialog = new ProgressDialog(getActivity());
         progressDialog.setTitle("Chargement des sondages...");
         mAuth = FirebaseAuth.getInstance();
@@ -111,7 +129,7 @@ public class SondageListFragment extends ListFragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_sondage_list, container, false);
-        final Button btn_Ajout = (Button)view.findViewById(R.id.sondage_ajout_btn);
+        final Button btn_Ajout = view.findViewById(R.id.sondage_ajout_btn);
 
         SondageList = new ArrayList<>();
         if(!Si_Gestion_Sond){
@@ -121,15 +139,15 @@ public class SondageListFragment extends ListFragment {
             btn_Ajout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                     mListener.changePage(CreerSondageFragment.newInstance(true, false, Utilisateur, null), "Sondage | Créer");
+                     mListener.changePage(CreerSondageFragment.newInstance(true, false, Utilisateur, null));
                 }
             });
         }
         //progressDialog.show();
+        final Profil UtilConn = mListener.getUtilisateur_Connecte();
         ValueEventListener SondageListListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                    final HashMap<String, Sondage> SondagesMap = new HashMap<>();
                 for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
                     Sondage S = dataSnapshot1.getValue(Sondage.class);
                     if(Si_Gestion_Sond){ //si on gere les sondages, on ne retire que ceux qui nous intéresse
@@ -142,45 +160,23 @@ public class SondageListFragment extends ListFragment {
                             if(S.AuteurRef.equals(Filter)){
                                 S.ID = dataSnapshot1.getKey();
                                 SondageList.add(S);
-
                             }
                         }else{
-                            S.ID = dataSnapshot1.getKey();
-                            SondageList.add(S);
-                            SondagesMap.put(S.ID, S);
+                            if(Answered){
+                                if(UtilConn.Sondages_Faits.containsKey(dataSnapshot1.getKey())) {
+                                    S.ID = dataSnapshot1.getKey();
+                                    SondageList.add(S);
+                                }
+                            }else {
+                                S.ID = dataSnapshot1.getKey();
+                                SondageList.add(S);
+                            }
                         }
                     }
                     //À supprimer
                 }
-                if(user != null) {//qu'il soit anonyme ou non
-                    DatabaseReference SaveRef = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Profil_Keys.STRUCT_NAME).child(user.getUid()).child(FireBaseInteraction.Profil_Keys.SONDAGES);
-                    SaveRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            HashMap<String, Object> MapSondages = new HashMap<>();
-                            ArrayList<Sondage> ListeSondage2 = new ArrayList<>();
-                            for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
-                                MapSondages.put(dataSnapshot1.getKey(), dataSnapshot1.getValue());
-                                if(Answered){
-                                    ListeSondage2.add(SondagesMap.get(dataSnapshot1.getKey()));
-                                }
-                            }
-                            if(Answered){
-                                SondageList = ListeSondage2;
-                            }
-                            SondageAdapter adapter = new SondageAdapter(getActivity(), SondageList, Si_Gestion_Sond, Filter!=null, MapSondages);
-                            setListAdapter(adapter);
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                        }
-                    });
-                }else{
-                    SondageAdapter adapter = new SondageAdapter(getActivity(), SondageList, Si_Gestion_Sond, Filter!=null, null);
+                    SondageAdapter adapter = new SondageAdapter(getActivity(), SondageList, Si_Gestion_Sond, Filter!=null);
                     setListAdapter(adapter);
-                }
                 //progressDialog.dismiss();
             }
 
@@ -222,7 +218,9 @@ public class SondageListFragment extends ListFragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        void changePage(Fragment fragment, String Title);
+        void changePage(Fragment fragment);
+        void ChangeTitle(String newTitle);
+        Profil getUtilisateur_Connecte();
 
     }
 }

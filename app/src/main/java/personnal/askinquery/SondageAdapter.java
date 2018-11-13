@@ -23,6 +23,7 @@ import android.widget.TextView;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserInfo;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -50,14 +51,14 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
     private static AdaptListener adaptListener;
     private SondageAdapter sondageAdapter;
     private boolean Si_Filter;
-    private HashMap<String, Object> MapSave;
+    private HashMap<String, Bitmap> BitmapMap;
 
-    public SondageAdapter(Context context, ArrayList<Sondage> sondages, boolean Si_Admin, boolean Si_Filter, HashMap<String, Object> mapSaved){
+    public SondageAdapter(Context context, ArrayList<Sondage> sondages, boolean Si_Admin, boolean Si_Filter){
         super(context, 0, sondages);
         si_Admin = Si_Admin;
         this.Si_Filter = Si_Filter;
         c = context;
-        MapSave = mapSaved;
+        BitmapMap = new HashMap<>();
         mInflater = LayoutInflater.from(context);
         sondageAdapter = this;
     }
@@ -83,48 +84,40 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
 
             }
         });
+        if(((AdaptListener)c).getUser() == null){
+            holder.zone_Admin.setVisibility(View.GONE);
+        }else{
+            if(((AdaptListener)c).getUser().getUid().equals(sondage.AuteurRef)){
+                holder.btn_commencer.setVisibility(View.GONE);
+            }else{
+                holder.zone_Admin.setVisibility(View.GONE);
+            }
+        }
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if(user != null){//si il est connecté (anonymement ou non)
-            if(!user.getUid().equals(sondage.AuteurRef)){//si son id ne correspond pas à celui de l'auteurRef (cette valeur est déja initialisé au moment de la création de cet objet)
-                                                            //nb : un utilisateur anonyme NE PEUT PAS créér un formulaire, donc si cette condition est fausse, l'utilisateur a un compte non anonyme.
-                    holder.zone_Admin.setVisibility(View.GONE);
-                if(((AdaptListener)c).getUser() != null) {//couvre anonyme et inscrit, code pour déterminer le bouton principal.
-                    //todo:: prechargez la liste des sondages terminés dans listsondagefragment
-
-                    if(MapSave.get(sondage.ID) != null){
-                        Object Value = MapSave.get(sondage.ID);
-                        if(Value instanceof Boolean){
-                            boolean b = (boolean)Value;
-                            if(b){
-                                Calendar calendar = Calendar.getInstance();
-                                if(sondage.date_echeance.before(calendar.getTime())){
-                                    if(sondage.Compil_Public){
-                                        holder.btn_commencer.setTextColor(getContext().getResources().getColor(R.color.colorSecondaryMedDark));
-                                        holder.btn_commencer.setText("Consulter les résultats");
-                                        holder.btn_commencer.setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View view) {
-                                                ((AdaptListener)c).changePage(AnswerSondageFragment.newInstance(sondage, true, Si_Filter?sondage.Auteur.ID:null, si_Admin), "Sondage | Résultats");
-                                            }
-                                        });
-                                    }else{
-                                        holder.btn_commencer.setEnabled(false);
-                                        holder.btn_commencer.setTextColor(getContext().getResources().getColor(R.color.colorAccentMedDark));
-                                        holder.btn_commencer.setText("Sondage Terminé");
-                                    }
-
-                                }else{
-                                    holder.btn_commencer.setEnabled(false);
-                                    holder.btn_commencer.setTextColor(getContext().getResources().getColor(R.color.colorAccentMedDark));
-                                    holder.btn_commencer.setText("Sondage Répondu");
-                                }
-                            }
-                        }else{
+        if(sondage.date_echeance.after(Calendar.getInstance().getTime())){//on ne peut pas répondre apres la date;
+            if(user != null){//si il est connecté quand le sondage est en cours
+                Profil UtilConn = ((AdaptListener)c).getUtilisateur_Connecte();
+                if(UtilConn.Sondages_Faits.isEmpty()){//si c'est la première fois et que le sondage est en coursm il réponds
+                    holder.btn_commencer.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            ((AdaptListener) c).changePage(AnswerSondageFragment.newInstance(sondage, false, Si_Filter?sondage.Auteur.ID:null, si_Admin));
+                        }
+                    });
+                }else{//si ce n'est pas la première fois;
+                    if(UtilConn.Sondages_Faits.containsKey(sondage.ID)) {
+                        if (UtilConn.Sondages_Faits.get(sondage.ID) instanceof Boolean) {//si il a terminé, le sondage a été répondu
+                            //ne peut plus répondre
+                            holder.btn_commencer.setEnabled(false);
+                            holder.btn_commencer.setTextColor(getContext().getResources().getColor(R.color.colorAccentMedDark));
+                            holder.btn_commencer.setText("Sondage Répondu");
+                        } else {//si il a sauvegardé, on réponds avec sauvegarde;
+                            //sauvegarde
                             holder.btn_commencer.setText("Continuer");
                             holder.btn_commencer.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    ((AdaptListener) c).changePage(AnswerSondageFragment.newInstance(sondage, false, Si_Filter?sondage.Auteur.ID:null, si_Admin), "Sondage | Répondre");
+                                    ((AdaptListener) c).changePage(AnswerSondageFragment.newInstance(sondage, false, Si_Filter ? sondage.Auteur.ID : null, si_Admin));
                                 }
                             });
                         }
@@ -132,43 +125,74 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
                         holder.btn_commencer.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                ((AdaptListener) c).changePage(AnswerSondageFragment.newInstance(sondage, false, Si_Filter?sondage.Auteur.ID:null, si_Admin), "Sondage | Répondre");
+                                ((AdaptListener) c).changePage(AnswerSondageFragment.newInstance(sondage, false, Si_Filter?sondage.Auteur.ID:null, si_Admin));
                             }
                         });
                     }
-                }else {
-                    holder.btn_commencer.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            ((AdaptListener) c).changePage(AnswerSondageFragment.newInstance(sondage, false, Si_Filter?sondage.Auteur.ID:null, si_Admin), "Sondage | Répondre");
-                        }
-                    });
                 }
-            }else{
-                holder.btnVote.setVisibility(View.GONE);
-                holder.btn_plainte.setVisibility(View.GONE);
-                holder.AuteurNom.setVisibility(View.GONE);
+
+            }else{//si l'util n'est pas connecté quand le sondage est en cours, il réponds
+                holder.btn_commencer.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ((AdaptListener) c).changePage(AnswerSondageFragment.newInstance(sondage, false, Si_Filter?sondage.Auteur.ID:null, si_Admin));
+                    }
+                });
             }
-        }else{
-            holder.zone_Admin.setVisibility(View.GONE);
-            holder.btn_commencer.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ((AdaptListener) c).changePage(AnswerSondageFragment.newInstance(sondage, false, Si_Filter?sondage.Auteur.ID:null, si_Admin), "Sondage | Répondre");
-                }
-            });
+        }else{//si le sondage est terminé
+            if(user != null){//si l'util est connecté
+                Profil UtilConn = ((AdaptListener)c).getUtilisateur_Connecte();
+                    if(UtilConn.Sondages_Faits.containsKey(sondage.ID)) {
+                        if (UtilConn.Sondages_Faits.get(sondage.ID) instanceof Boolean) {//si la réponse est terminée..
+                            //peut consulter
+                            if (sondage.Compil_Public) {//si la compilation est publique
+                                holder.btn_commencer.setTextColor(getContext().getResources().getColor(R.color.colorSecondaryMedDark));
+                                holder.btn_commencer.setText("Consulter les résultats");
+                                holder.btn_commencer.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        ((AdaptListener) c).changePage(AnswerSondageFragment.newInstance(sondage, true, Si_Filter ? sondage.Auteur.ID : null, si_Admin));
+                                    }
+                                });
+                            } else {
+                                holder.btn_commencer.setEnabled(false);
+                                holder.btn_commencer.setTextColor(getContext().getResources().getColor(R.color.colorAccentMedDark));
+                                holder.btn_commencer.setText("Sondage Répondu");
+                            }
+                        } else {
+                            //ne peut pas consulter
+                            holder.btn_commencer.setEnabled(false);
+                            holder.btn_commencer.setTextColor(getContext().getResources().getColor(R.color.colorAccentMedDark));
+                            holder.btn_commencer.setText("Sondage Terminé");
+                        }
+                    }else{
+                        holder.btn_commencer.setEnabled(false);
+                        holder.btn_commencer.setTextColor(getContext().getResources().getColor(R.color.colorAccentMedDark));
+                        holder.btn_commencer.setText("Sondage Terminé");
+                    }
+            }else{//si il n'est pas connecté et que le sondage est terminé, trop tard
+                //nope
+                holder.btn_commencer.setEnabled(false);
+                holder.btn_commencer.setTextColor(getContext().getResources().getColor(R.color.colorAccentMedDark));
+                holder.btn_commencer.setText("Sondage Terminé");
+            }
         }
         if(sondage.Chemin_Image.equals("N")){
             holder.Image.setVisibility(View.GONE);
         }else{
-            StorageReference SondageImgRef = FirebaseStorage.getInstance().getReference().child(sondage.Chemin_Image);
-            SondageImgRef.getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-                @Override
-                public void onSuccess(byte[] bytes) {
-                    Bitmap Image = BitmapFactory.decodeByteArray(bytes,0, bytes.length);
-                    holder.Image.setImageBitmap(Image);
+                if (BitmapMap.get(sondage.ID) != null) {
+                    holder.Image.setImageBitmap(BitmapMap.get(sondage.ID));
+                } else {
+                    StorageReference SondageImgRef = FirebaseStorage.getInstance().getReference().child(sondage.Chemin_Image);
+                    SondageImgRef.getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                        @Override
+                        public void onSuccess(byte[] bytes) {
+                            Bitmap Image = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                            BitmapMap.put(sondage.ID, Image);
+                            holder.Image.setImageBitmap(Image);
+                        }
+                    });
                 }
-            });
         }
         holder.Titre.setText(sondage.Titre);
         SimpleDateFormat format = new SimpleDateFormat("dd-MM-yy");
@@ -185,20 +209,20 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
                 holder.AuteurNom.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        ((AdaptListener)c).changePage(ConsultProfilFragment.newInstance(sondage.Auteur), "Profil | Consulter");
+                        ((AdaptListener)c).changePage(ConsultProfilFragment.newInstance(sondage.Auteur));
                     }
                 });
                 holder.id_Auteur.setText(sondage.Auteur.ID);
                 holder.btn_modifier.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        ((AdaptListener)c).changePage(CreerSondageFragment.newInstance(true, true, sondage.Auteur, sondage), "Sondage | Modifier");
+                        ((AdaptListener)c).changePage(CreerSondageFragment.newInstance(true, true, sondage.Auteur, sondage));
                     }
                 });
                 holder.btn_Statistiques.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        ((AdaptListener)c).changePage(AnswerSondageFragment.newInstance(sondage, true, Si_Filter?sondage.Auteur.ID:null, si_Admin), "Sondage | Résultats");
+                        ((AdaptListener)c).changePage(AnswerSondageFragment.newInstance(sondage, true, Si_Filter?sondage.Auteur.ID:null, si_Admin));
                     }
                 });
                 holder.btn_supprimer.setOnClickListener(new View.OnClickListener() {
@@ -233,23 +257,23 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
         TextView id_Auteur;
         ImageView Image;
         public ViewHolder(View view){
-            AuteurNom = (TextView)view.findViewById(R.id.sondage_elem_nom_auteur);
-            btn_plainte = (ImageButton)view.findViewById(R.id.sondage_elem_plainte_btn);
-            zone_Admin = (LinearLayout)view.findViewById(R.id.sondage_elem_zone_admin);
-            btn_commencer = (Button)view.findViewById(R.id.sondage_elem_start_btn);
+            AuteurNom = view.findViewById(R.id.sondage_elem_nom_auteur);
+            btn_plainte = view.findViewById(R.id.sondage_elem_plainte_btn);
+            zone_Admin = view.findViewById(R.id.sondage_elem_zone_admin);
+            btn_commencer = view.findViewById(R.id.sondage_elem_start_btn);
 
-            btnVote = (RelativeLayout)view.findViewById(R.id.btn_vote_layout);
+            btnVote = view.findViewById(R.id.btn_vote_layout);
 
-            btn_modifier = (ImageButton)view.findViewById(R.id.sondage_elem_edit_btn);
-            btn_Statistiques = (ImageButton)view.findViewById(R.id.sondage_elem_stats_btn);
-            btn_supprimer = (ImageButton)view.findViewById(R.id.sondage_elem_delete_btn);
+            btn_modifier = view.findViewById(R.id.sondage_elem_edit_btn);
+            btn_Statistiques = view.findViewById(R.id.sondage_elem_stats_btn);
+            btn_supprimer = view.findViewById(R.id.sondage_elem_delete_btn);
 
-            Titre = (TextView)view.findViewById(R.id.sondage_elem_titre);
-            DateDebut = (TextView)view.findViewById(R.id.sondage_elem_date_debut);
-            DateFin = (TextView)view.findViewById(R.id.sondage_elem_date_fin);
-            id_Sondage = (TextView)view.findViewById(R.id.sondage_elem_id);
-            id_Auteur = (TextView)view.findViewById(R.id.sondage_elem_id_auteur);
-            Image = (ImageView)view.findViewById(R.id.sondage_elem_image);
+            Titre = view.findViewById(R.id.sondage_elem_titre);
+            DateDebut = view.findViewById(R.id.sondage_elem_date_debut);
+            DateFin = view.findViewById(R.id.sondage_elem_date_fin);
+            id_Sondage = view.findViewById(R.id.sondage_elem_id);
+            id_Auteur = view.findViewById(R.id.sondage_elem_id_auteur);
+            Image = view.findViewById(R.id.sondage_elem_image);
         }
     }
     private void Confirm(final Sondage s){
@@ -321,12 +345,14 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
         SondageRef.removeValue();
         progressDialog.setTitle("Sondage supprimé.");
         progressDialog.dismiss();
+        sondageAdapter.remove(s);
         sondageAdapter.notifyDataSetChanged();
 
     }
     public interface AdaptListener{
-        void changePage(Fragment fragment, String Title);
+        void changePage(Fragment fragment);
         FirebaseUser getUser();
+        Profil getUtilisateur_Connecte();
     }
 }
 

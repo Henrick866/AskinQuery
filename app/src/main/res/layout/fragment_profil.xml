@@ -88,6 +88,12 @@
         android:layout_marginBottom="5dp"
         android:textSize="18sp" />
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Préférablement une image carrée"
+        android:textAlignment="center" />
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -104,8 +110,7 @@
                 android:layout_height="wrap_content"
                 android:drawableTop="@drawable/ic_file_upload_color"
                 android:padding="10dp"
-                android:text="Télécharger"
-                android:textColor="@color/colorPrimary" />
+                android:text="Télécharger" />
     </com.balysv.materialripple.MaterialRippleLayout>
 
     </RelativeLayout>
@@ -130,8 +135,7 @@
 
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="S'enregistrer"
-            android:textColor="@color/colorPrimary" />
+            android:text="S'enregistrer" />
     </com.balysv.materialripple.MaterialRippleLayout>
 
 </LinearLayout>

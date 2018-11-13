@@ -81,27 +81,22 @@ public class CreerSondageFragment extends Fragment implements CreerOptionDialog.
     private OnFragmentInteractionListener mListener;
     private Option tempOption;
     private String CheminImage;
-    EditText TitreSondage;
-    DatePicker DateEcheance;
-    TextView DateConfirm;
-    ImageButton AjoutQuestion;
-    ListView ListeQuestion;
-    Button Btn_Terminer;
-    Button Btn_Upload;
-    Button Btn_Cancel_Img;
-    ArrayList<Question> liste_question;
-    Bitmap ImageBitmap;
-    CreerQuestionAdapter QuestionAdapter;
-    ImageView ImagePreview;
-    CheckBox SiResultPublic;
-    TextView TitreError;
+    private EditText TitreSondage;
+    private DatePicker DateEcheance;
+    private ImageButton AjoutQuestion;
+    private ListView ListeQuestion;
+    private Button Btn_Terminer, Btn_Upload, Btn_Cancel_Img;
+    private ArrayList<Question> liste_question;
+    private Bitmap ImageBitmap;
+    private CreerQuestionAdapter QuestionAdapter;
+    private ImageView ImagePreview;
+    private CheckBox SiResultPublic;
     TextView QuestionsError;
-    TextView DateError;
-    ProgressDialog progressDialog;
-    boolean UploadFileFailed;
-    int Rotation;
-    boolean ImageChange = false, ImageOnServer = false;
-    Uri Image;
+    private TextView TitreError, DateError, DateConfirm, TitreFormulaire;
+    private  ProgressDialog progressDialog;
+    private  boolean UploadFileFailed;
+    private  boolean ImageChange = false, ImageOnServer = false;
+    private  Uri Image;
     public CreerSondageFragment() {
         // Required empty public constructor
     }
@@ -139,6 +134,7 @@ public class CreerSondageFragment extends Fragment implements CreerOptionDialog.
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+
         View view = inflater.inflate(R.layout.fragment_creer_sondage, container, false);
         final TabHost host = (TabHost)view.findViewById(R.id.TabHost);
         host.setup();
@@ -156,22 +152,23 @@ public class CreerSondageFragment extends Fragment implements CreerOptionDialog.
         host.addTab(spec);
 
         liste_question = new ArrayList<>();
-        TitreSondage = (EditText)view.findViewById(R.id.sondage_edit_titre);
-        DateEcheance = (DatePicker)view.findViewById(R.id.sondage_edit_date);
-        TitreError = (TextView)view.findViewById(R.id.sondage_edit_titre_error);
+        TitreSondage = view.findViewById(R.id.sondage_edit_titre);
+        DateEcheance = view.findViewById(R.id.sondage_edit_date);
+        TitreError = view.findViewById(R.id.sondage_edit_titre_error);
         Calendar c = Calendar.getInstance();
         DateError = view.findViewById(R.id.sondage_edit_date_error);
         QuestionsError = view.findViewById(R.id.sondage_edit_questions_error);
         DateEcheance.setMinDate(c.getTimeInMillis());
-        DateConfirm = (TextView)view.findViewById(R.id.sondage_edit_date_confirm);
-        ImagePreview = (ImageView)view.findViewById(R.id.sondage_edit_image_preview);
-        ListeQuestion = (ListView)view.findViewById(R.id.sondage_edit_questions_list);
+        DateConfirm = view.findViewById(R.id.sondage_edit_date_confirm);
+        ImagePreview = view.findViewById(R.id.sondage_edit_image_preview);
+        ListeQuestion = view.findViewById(R.id.sondage_edit_questions_list);
         ListeQuestion.setDescendantFocusability(ViewGroup.FOCUS_BEFORE_DESCENDANTS);
-        Btn_Terminer = (Button)view.findViewById(R.id.sondage_edit_done);
-        Btn_Upload = (Button)view.findViewById(R.id.sondage_edit_upload_img);
-        SiResultPublic = (CheckBox)view.findViewById(R.id.sondage_edit_public_results);
-        Btn_Cancel_Img = (Button)view.findViewById(R.id.sondage_edit_remove_img);
-        AjoutQuestion = (ImageButton)view.findViewById(R.id.sondage_edit_add_question);
+        Btn_Terminer = view.findViewById(R.id.sondage_edit_done);
+        Btn_Upload = view.findViewById(R.id.sondage_edit_upload_img);
+        SiResultPublic = view.findViewById(R.id.sondage_edit_public_results);
+        Btn_Cancel_Img = view.findViewById(R.id.sondage_edit_remove_img);
+        AjoutQuestion = view.findViewById(R.id.sondage_edit_add_question);
+        TitreFormulaire = view.findViewById(R.id.sondage_edit_title_form);
         AjoutQuestion.setEnabled(false);
         /**
          * simple ajout : IC f -> t
@@ -191,7 +188,10 @@ public class CreerSondageFragment extends Fragment implements CreerOptionDialog.
         final SimpleDateFormat format = new SimpleDateFormat("dd-MM-yy");
         final CreerSondageFragment creerSondageFragment = this;
         //Initialisation des champs;
+        mListener.ChangeTitle("Sondage | Créer");
         if(Si_Edit){
+            mListener.ChangeTitle("Sondage | Modifier");
+            TitreFormulaire.setText("Modifier un sondage");
             //date echance, init à l'ancienne date.
             TitreSondage.setText(sondage.Titre);
             Calendar c1 = Calendar.getInstance();
@@ -426,16 +426,18 @@ public class CreerSondageFragment extends Fragment implements CreerOptionDialog.
                                 }else{
                                     if (q.Type_Question != Question.TYPE_TEXTE) {//si ce n'est pas type texte
                                         if (q.Type_Question == Question.TYPE_IMAGE) {//si c'est un type image
+                                            o.Chemin_Media = FireBaseInteraction.Storage_Paths.OPTIONS_IMAGES + o.ID + ".jpg";
                                             if (o.DataChanged) {//si l'image a changé, téléverse
-                                                o.Chemin_Media = FireBaseInteraction.Storage_Paths.OPTIONS_IMAGES + o.ID + ".jpg";
+
                                                 OptionMedRef = OptionMedRef.child(o.Chemin_Media);
                                                 UploadFile(OptionMedRef, o.ImagePreload, "envoi de " + o.ID + ".jpg");
                                             }
                                         }
                                         if (q.Type_Question == Question.TYPE_VIDEO) {//si c'est une vidéo
+                                            String Extension = mime.getExtensionFromMimeType(getActivity().getContentResolver().getType(Uri.parse(o.UriVideo)));
+                                            o.Chemin_Media = FireBaseInteraction.Storage_Paths.OPTIONS_VIDEOS + o.ID + "." + Extension;
                                             if (o.DataChanged) {//si l'option a changé, (changement de vidéo), éléverse le thumbnail et la vidéo
-                                                String Extension = mime.getExtensionFromMimeType(getActivity().getContentResolver().getType(Uri.parse(o.UriVideo)));
-                                                o.Chemin_Media = FireBaseInteraction.Storage_Paths.OPTIONS_VIDEOS + o.ID + "." + Extension;
+
                                                 OptionMedRef = OptionMedRef.child(o.Chemin_Media);
                                                 UploadFile(OptionMedRef, Uri.parse(o.UriVideo), "envoi de " + o.ID + "." + Extension);
                                                 OptionMedRef = FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.OPTIONS_VIDEOS_THUMBNAILS).child(o.ID + ".jpg");
@@ -460,7 +462,7 @@ public class CreerSondageFragment extends Fragment implements CreerOptionDialog.
                     }
                     //QuestionAdapter.notifyDataSetChanged();
                     progressDialog.dismiss();
-                    mListener.changePage(SondageListFragment.newInstance(true, null), "Sondages | Gérer");
+                    mListener.changePage(SondageListFragment.newInstance(true, null));
                 }else{
                     Toast.makeText(getActivity(), "Le sondage est érroné, veuillez vérifier et corriger les érreurs", Toast.LENGTH_LONG).show();
                 }
@@ -739,7 +741,7 @@ public class CreerSondageFragment extends Fragment implements CreerOptionDialog.
         if(UploadFileFailed){
             Toast.makeText(getActivity(), "L'envoi de vidéos ou d'images au serveur a échoué.", Toast.LENGTH_LONG);
         }else{
-            mListener.changePage(SondageListFragment.newInstance(true, null), "Sondages | Gérer");
+            mListener.changePage(SondageListFragment.newInstance(true, null));
         }
 
     }
@@ -791,7 +793,8 @@ public class CreerSondageFragment extends Fragment implements CreerOptionDialog.
      */
 
     public interface OnFragmentInteractionListener {
-        void changePage(Fragment fragment, String Title);
+        void changePage(Fragment fragment);
+        void ChangeTitle(String newTitle);
     }
     public String getTitle(){
         return Si_Edit?"Sondage | Modifier":"Sondage | Créer";

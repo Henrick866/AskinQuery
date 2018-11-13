@@ -24,7 +24,11 @@
                 android:icon="@drawable/ic_menu_sondages" />
             <item
                 android:id="@+id/nav_profil_communaute"
-                android:title="Votre communauté"
+                android:title="Publications"
+                android:icon="@drawable/ic_menu_communaute" />
+            <item
+                android:id="@+id/nav_profil_publication_manage"
+                android:title="Vos publications"
                 android:icon="@drawable/ic_menu_communaute" />
             <item
                 android:id="@+id/nav_profil_suivis"
