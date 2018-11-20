@@ -94,7 +94,7 @@ public class AnswerQuestionAdapter extends ArrayAdapter<Question> implements Ans
             final int index = i;
             StorageReference ImageRef = FirebaseStorage.getInstance().getReference();
             if(question.Type_Question == Question.TYPE_IMAGE){
-                ImageRef = ImageRef.child(liste_options.get(i).Chemin_Media);
+                ImageRef = ImageRef.child(FireBaseInteraction.Storage_Paths.OPTIONS_IMAGES_THUMBNAILS).child(liste_options.get(i).ID+".jpg");
 
             }else{
                 ImageRef = ImageRef.child(FireBaseInteraction.Storage_Paths.OPTIONS_VIDEOS_THUMBNAILS).child(liste_options.get(i).ID+".jpg");
@@ -111,6 +111,11 @@ public class AnswerQuestionAdapter extends ArrayAdapter<Question> implements Ans
         }
         }
         if(question.Type_Question == Question.TYPE_VIDEO){
+            holder.TexteInstruct.setText("Appuyez sur l'image pour lire la vidéo");
+            holder.TexteInstruct.setVisibility(View.VISIBLE);
+        }
+        if(question.Type_Question == Question.TYPE_IMAGE){
+            holder.TexteInstruct.setText("Appuyez sur l'image pour la voir en grand format");
             holder.TexteInstruct.setVisibility(View.VISIBLE);
         }
 

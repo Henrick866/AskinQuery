@@ -12,13 +12,14 @@
         android:layout_marginBottom="10dp">
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab_flag_account"
+            android:id="@+id/profil_check_flag_account"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end|top"
             android:layout_margin="16dp"
             android:src="@drawable/ic_flag_white"
-            app:backgroundTint="@color/colorRed" />
+            android:tint="@color/colorRed"
+            app:backgroundTint="@color/transparent" />
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

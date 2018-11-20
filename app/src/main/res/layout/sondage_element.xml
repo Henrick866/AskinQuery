@@ -5,6 +5,8 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:paddingStart="7dp"
     android:paddingEnd="7dp"
+    android:layout_marginTop="5dp"
+    android:layout_marginBottom="5dp"
     android:layout_height="wrap_content">
 
     <LinearLayout
@@ -79,19 +81,30 @@
                     android:layout_width="40dp"
                     android:layout_height="40dp"
 
-                    android:background="@color/common_google_signin_btn_text_light_disabled"
+                    android:background="@drawable/round_btn"
                     android:src="@drawable/ic_flag"
                     android:tint="@color/colorRed" />
             </com.balysv.materialripple.MaterialRippleLayout>
         </RelativeLayout>
     </LinearLayout>
 
+    <ProgressBar
+        android:id="@+id/sondage_elem_progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:indeterminate="true"
+        android:indeterminateDrawable="@drawable/progress"/>
+
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:srcCompat="@android:drawable/ic_menu_gallery"
         android:id="@+id/sondage_elem_image"
+        android:visibility="gone"
         android:maxHeight="100dp"
+        android:adjustViewBounds="true"
+        android:cropToPadding="false"
         android:layout_marginTop="5dp"
         android:layout_gravity="center"
         android:scaleType="fitCenter" />
@@ -99,19 +112,19 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:id="@+id/sondage_elem_zone_admin">
         <com.balysv.materialripple.MaterialRippleLayout
             android:layout_width="match_parent"
             android:layout_weight="1"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
 
             <ImageButton
                 android:id="@+id/sondage_elem_edit_btn"
                 style="@style/buttonImageCustom"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="40dp"
                 android:background="@color/transparent"
                 android:scaleType="fitCenter"
                 android:src="@drawable/ic_edit" />
@@ -120,13 +133,13 @@
         <com.balysv.materialripple.MaterialRippleLayout
             android:layout_width="match_parent"
             android:layout_weight="1"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
 
             <ImageButton
                 android:id="@+id/sondage_elem_stats_btn"
                 style="@style/buttonImageCustom"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="40dp"
                 android:background="@color/transparent"
                 android:scaleType="fitCenter"
                 android:src="@drawable/ic_stats" />
@@ -135,13 +148,13 @@
         <com.balysv.materialripple.MaterialRippleLayout
             android:layout_width="match_parent"
             android:layout_weight="1"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
 
             <ImageButton
                 android:id="@+id/sondage_elem_delete_btn"
                 style="@style/buttonImageCustom"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="40dp"
                 android:background="@color/transparent"
                 android:scaleType="fitCenter"
                 android:src="@drawable/ic_delete"

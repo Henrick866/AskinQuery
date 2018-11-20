@@ -61,6 +61,7 @@ import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 
 /**
@@ -80,7 +81,7 @@ public class ManageProfilFragment extends Fragment {
 
     private String mParam1;
     private String mParam2;
-    private TextView UsernameText, EmailText, PassText, OtherText, DeleteAvatar, ChangeAvatar;
+    private TextView UsernameText, EmailText, PassText, OtherText, DeleteAvatar, ChangeAvatar, Abonnements;
     private ImageView AvatarPreview;
     private Dialog dialog;
     private FirebaseAuth mAuth;
@@ -444,6 +445,42 @@ public class ManageProfilFragment extends Fragment {
                 dialog.dismiss();
             }
         });
+        Abonnements = view.findViewById(R.id.profil_manage_followed);
+        Abonnements.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Profil p = mListener.getUtilisateur_Connecte();
+                final ArrayList<String> ListeAbonnementID = new ArrayList<>(), ListeAbonnementNom = new ArrayList<>();
+                for(HashMap.Entry<String, String> cursor : p.Auteurs_Suivis.entrySet()) {
+                    ListeAbonnementID.add(cursor.getKey());
+                    ListeAbonnementNom.add(cursor.getValue());
+                }
+                String[] StringArray = new String[p.Auteurs_Suivis.size()];
+                AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
+                b.setTitle("Quel est le profil que vous voulez consulter?");
+                b.setItems(ListeAbonnementNom.toArray(StringArray), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(final DialogInterface dialogInterface, int i) {
+                        DatabaseReference profilRef = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Profil_Keys.STRUCT_NAME).child(ListeAbonnementID.get(i));
+                        profilRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                Profil p = dataSnapshot.getValue(Profil.class);
+                                p.ID = dataSnapshot.getKey();
+                                mListener.changePage(ConsultProfilFragment.newInstance(p));
+                                dialogInterface.dismiss();
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                                dialogInterface.dismiss();
+                            }
+                        });
+                    }
+                });
+                b.show();
+            }
+        });
         return view;
     }
     @Override
@@ -687,6 +724,8 @@ public class ManageProfilFragment extends Fragment {
         void changePage(Fragment fragment);
         void ChangeTitle(String newTitle);
         void updateMenu(FirebaseUser user);
+        Profil getUtilisateur_Connecte();
+        void setUtilisateur_Connecte(Profil utilisateur_Connecte);
     }
     public String getTitle(){
         return "Profil | Gérér";

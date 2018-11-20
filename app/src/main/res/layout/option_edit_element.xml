@@ -4,6 +4,7 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:paddingEnd="7dp"
     android:paddingStart="7dp"
+    android:layout_marginTop="5dp"
     android:layout_height="wrap_content">
 
     <LinearLayout
@@ -18,17 +19,21 @@
             android:id="@+id/sondage_edit_option_num"
             android:textAppearance="@style/TextAppearance.AppCompat.Headline"
             android:layout_weight="1" />
-
+        <com.balysv.materialripple.MaterialRippleLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
         <ImageButton
             android:id="@+id/sondage_edit_option_delete"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:background="@color/common_google_signin_btn_text_light_disabled"
+            android:background="@drawable/round_btn"
             android:src="@drawable/ic_delete"
             android:tint="@color/colorRed" />
+        </com.balysv.materialripple.MaterialRippleLayout>
     </LinearLayout>
 
     <EditText
+        android:layout_marginTop="5dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textPersonName"
@@ -37,6 +42,7 @@
         android:hint="Réponse" />
 
     <TextView
+        android:layout_marginTop="5dp"
         android:text="TextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -46,21 +52,25 @@
         android:textColor="@color/colorRed" />
 
     <RelativeLayout
+        android:layout_marginTop="5dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/sondage_edit_option_upload">
-
+        <com.balysv.materialripple.MaterialRippleLayout
+            android:layout_width="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:layout_height="wrap_content">
         <Button
 
             android:id="@+id/sondage_edit_option_upload_btn"
             style="@style/buttonCustom"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
             android:drawableTop="@drawable/ic_file_upload_color"
             android:padding="10dp"
             android:text="Télécharger" />
+    </com.balysv.materialripple.MaterialRippleLayout>
 
 
 
@@ -68,6 +78,7 @@
 
     <TextView
         android:text="TextView"
+        android:layout_marginTop="5dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/option_edit_media_error"
@@ -75,17 +86,36 @@
         android:textAppearance="@style/TextAppearance.AppCompat"
         android:textColor="@color/colorRed" />
 
+    <TextView
+        android:layout_marginTop="5dp"
+        android:id="@+id/option_edit_instruct"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        android:textAlignment="center" />
+    <ProgressBar
+        android:id="@+id/sondage_edit_option_progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:indeterminateDrawable="@drawable/progress"/>
+    <com.balysv.materialripple.MaterialRippleLayout
+        android:layout_width="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="5dp"
+        android:layout_height="wrap_content">
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:srcCompat="@drawable/ic_menu_gallery"
-        android:layout_gravity="center"
         android:adjustViewBounds="true"
         android:cropToPadding="false"
+        android:visibility="gone"
         android:maxHeight="100dp"
         android:scaleType="fitCenter"
         android:layout_weight="1"
         android:id="@+id/sondage_edit_option_image_preview" />
+    </com.balysv.materialripple.MaterialRippleLayout>
 
 
 </LinearLayout>

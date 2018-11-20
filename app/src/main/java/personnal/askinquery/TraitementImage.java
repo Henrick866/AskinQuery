@@ -10,6 +10,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.DisplayMetrics;
@@ -70,5 +71,14 @@ public class TraitementImage {
         canvas.drawBitmap(srcBmp, (px - srcBmp.getWidth()) / 2, (px - srcBmp.getHeight()) / 2, null);
 
         return dstBmp;
+    }
+    public static Bitmap CreateThumbnail(Bitmap srcBmp, Context context, int DstHeight){
+        int oHeight = srcBmp.getHeight(), oWidth = srcBmp.getWidth();
+        Resources resources = context.getResources();
+        DisplayMetrics metrics = resources.getDisplayMetrics();
+        float dHeight = DstHeight * ((float)metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+        int dWidth = Math.round((dHeight * oWidth) / oHeight);
+        Bitmap newBitmap = Bitmap.createScaledBitmap(srcBmp, dWidth, Math.round(dHeight), false);
+        return newBitmap;
     }
 }

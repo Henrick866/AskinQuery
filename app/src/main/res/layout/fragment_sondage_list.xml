@@ -31,11 +31,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:indeterminate="true"
+        android:visibility="gone"
         android:indeterminateDrawable="@drawable/progress" />
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@id/android:list"
+        android:visibility="gone"
         android:headerDividersEnabled="false"
         android:footerDividersEnabled="false" />
 

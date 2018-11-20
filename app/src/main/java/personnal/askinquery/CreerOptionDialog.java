@@ -77,6 +77,7 @@ public class CreerOptionDialog extends DialogFragment implements CreerOptionAdap
     private OnFragmentInteractionListener mListener;
     OptionDialogListener optionDialogListener;
     int QuestionPosition;
+    String PathImage;
     public CreerOptionDialog() {
         // Required empty public constructor
     }
@@ -241,9 +242,8 @@ public class CreerOptionDialog extends DialogFragment implements CreerOptionAdap
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data){
         if(requestCode == MEDIA_GALL_OPTION && resultCode == Activity.RESULT_OK){
-
+            Image = data.getData();
             if(mParam1.Options.get(this.optionPosition).Question_parent.Type_Question == Question.TYPE_IMAGE){
-                Image = data.getData();
                 if(ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
                     ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, MY_PERMISSION_REQUEST_READ_STORAGE);
                 }else{
@@ -297,7 +297,7 @@ public class CreerOptionDialog extends DialogFragment implements CreerOptionAdap
             if(o.ImagePreload == null){
                 if(!o.notOnServer){ //si il est sur le serveur et que l'image == null ET que le type est bon (condition avant l'appel de la methode).
                     if(mParam1.Type_Question == Question.TYPE_IMAGE) {
-                        OptionMedRef = FirebaseStorage.getInstance().getReference().child(o.Chemin_Media);
+                        OptionMedRef = FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.OPTIONS_IMAGES_THUMBNAILS).child(o.ID+".jpg");
                     }else{//le type TEXTE est déjà préfiltré lors de l'appel
                         OptionMedRef = FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.OPTIONS_VIDEOS_THUMBNAILS).child(o.ID+".jpg");
                     }
@@ -317,11 +317,13 @@ public class CreerOptionDialog extends DialogFragment implements CreerOptionAdap
 
     }
     private void MakeImage(){
+
         ImageBitmap = TraitementImage.RotateImage(Image, getActivity());
         //Image = TraitementImage.ConvertBitmapToUri(ImageBitmap, getActivity());
         mParam1.Options.get(this.optionPosition).Chemin_Media = "N";
         //mParam1.Options.get(this.optionPosition).UriImage = Image.toString();
-        mParam1.Options.get(this.optionPosition).ImagePreload = ImageBitmap;
+        mParam1.Options.get(this.optionPosition).ImagePreload = TraitementImage.CreateThumbnail(ImageBitmap, getActivity(), 512);
+        mParam1.Options.get(this.optionPosition).ImageFull = ImageBitmap;
         Image = null;
         ImageBitmap = null;
         mParam1.Options.get(this.optionPosition).DataChanged = true;

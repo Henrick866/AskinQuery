@@ -23,6 +23,7 @@ public class Sondage implements Serializable {
     public String Titre;
     Profil Auteur;
     public boolean Compil_Public;
+    public boolean Publied;
     public String Chemin_Image;
     ArrayList<Question> Questions;
     Date date_echeance;
@@ -31,7 +32,7 @@ public class Sondage implements Serializable {
     public Sondage(){
 
     }
-    public Sondage(String AuteurRef, long Date_Public, long Date_Echeance, boolean Compil_Public, String Titre, String Chemin_Image){
+    public Sondage(String AuteurRef, long Date_Public, long Date_Echeance, boolean Compil_Public, String Titre, String Chemin_Image, boolean Publied){
 
         this.Date_Public = Date_Public;
         this.Date_Echeance = Date_Echeance;
@@ -39,6 +40,7 @@ public class Sondage implements Serializable {
         this.AuteurRef = AuteurRef;
         this.Compil_Public = Compil_Public;
         this.Chemin_Image = Chemin_Image;
+        this.Publied = Publied;
 
 
 
@@ -74,6 +76,7 @@ public class Sondage implements Serializable {
         newMap.put(FireBaseInteraction.Sondage_Keys.TITRE, Titre);
         newMap.put(FireBaseInteraction.Sondage_Keys.CHEMIN_IMAGE, Chemin_Image);
         newMap.put(FireBaseInteraction.Sondage_Keys.COMPIL_PUBLIC, Compil_Public);
+        newMap.put(FireBaseInteraction.Sondage_Keys.PUBLIED, Publied);
         return newMap;
     }
 }

@@ -45,7 +45,7 @@ public class Option implements Serializable
         public String Chemin_Media;
         String Chemin_Video, Chemin_Image;
         String UriVideo, UriImage;
-        transient Bitmap ImagePreload;
+        transient Bitmap ImagePreload, ImageFull;
         public int Score;
         boolean notOnServer, toBeDeleted = false, repondu = false /*utilisé pour reprendre un sondage plus tard*/, DataChanged = false;
     public Option(){

@@ -5,6 +5,7 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -37,6 +38,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.internal.Util;
@@ -75,6 +77,7 @@ public class MainActivity extends AppCompatActivity
     private Menu menu;
     private Profil Utilisateur_Connecte;
     private FirebaseUser user;
+    private Fragment fragmentToLoad;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,6 +112,45 @@ public class MainActivity extends AppCompatActivity
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
         updateMenu(user);
+
+        Intent intent = getIntent();
+        if(intent != null){//si on a recu une notification, on est connecté.
+            if(intent.getStringExtra("FragmentName")!=null) {
+                if (intent.getStringExtra("FragmentName").equals("NewPoll")) {
+                    String IdSondage = intent.getStringExtra("SondageID");
+                    FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Sondage_Keys.STRUCT_NAME).child(IdSondage).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            Sondage s = dataSnapshot.getValue(Sondage.class);
+                            s.ID = dataSnapshot.getKey();
+                            fragmentToLoad = AnswerSondageFragment.newInstance(s, false, null, false);
+                            LoadUser();
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+                if (intent.getStringExtra("FragmentName").equals("PubList")) {
+                    String IdAuteur = intent.getStringExtra("AuthorID");
+                    fragmentToLoad = PublicationListFragment.newInstance(false, IdAuteur);
+                    LoadUser();
+                }
+            }else{
+                fragmentToLoad = SondageListFragment.newInstance(false, null);
+                LoadUser();
+            }
+        }else{
+            fragmentToLoad = SondageListFragment.newInstance(false, null);
+            LoadUser();
+        }
+
+
+        //changePage(BlankFragment.newInstance("",""));
+    }
+    private void LoadUser(){
         if(user != null) {
             final boolean isAnonyme = user.isAnonymous();
             DatabaseReference UtilRef = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Profil_Keys.STRUCT_NAME).child(user.getUid());
@@ -128,7 +170,7 @@ public class MainActivity extends AppCompatActivity
                         Utilisateur_Connecte.Auteurs_Suivis = MapAbonn;
                     }
                     Utilisateur_Connecte.Sondages_Faits = MapSondagesDone;
-                    changePage(SondageListFragment.newInstance(false, null));
+                    changePage(fragmentToLoad);
                 }
 
                 @Override
@@ -139,8 +181,6 @@ public class MainActivity extends AppCompatActivity
         }else{
             changePage(SondageListFragment.newInstance(false, null));
         }
-
-        //changePage(BlankFragment.newInstance("",""));
     }
 
     @Override
@@ -283,11 +323,14 @@ public class MainActivity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
             changePage(LoginFragment.newInstance());
         }else{
-            if(!user.isAnonymous()) {
+            if(!user.isAnonymous()) {//on unregister
                 drawer.closeDrawer(GravityCompat.START);
                 mAuth.signOut();
                 user = mAuth.getCurrentUser();
                 updateMenu(user);
+                /*for(HashMap.Entry<String, String> cursor : Utilisateur_Connecte.Auteurs_Suivis.entrySet()) {//pour désactiver les notifications qui ne sont plus ciblés vers cet appareil
+                    FirebaseMessaging.getInstance().unsubscribeFromTopic(cursor.getKey());
+                }*/
                 changePage(SondageListFragment.newInstance(false, null));
             }else{
                 drawer.closeDrawer(GravityCompat.START);

@@ -1,6 +1,7 @@
 package personnal.askinquery;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -25,6 +26,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -101,15 +103,18 @@ public class CreerOptionAdapter extends ArrayAdapter<Option> {
                     if (OptionData.get(POSITION).ImagePreload == null) {//si l'image bitmap n'existe pas
                         Log.e("Test", "Dud");
                         holder.ImagePreview.setVisibility(View.GONE);
+                        holder.Loading.setVisibility(View.GONE);
                         holder.MediaError.setVisibility(View.VISIBLE);
                         holder.MediaError.setText("Aucune image/vidéo sélectionnée, veuillez en choisir une.");
                     } else {//si bitmap existe
-
+                        holder.Loading.setVisibility(View.GONE);
                         holder.ImagePreview.setImageBitmap(OptionData.get(POSITION).ImagePreload);
                         holder.ImagePreview.setVisibility(View.VISIBLE);
                         holder.MediaError.setVisibility(View.INVISIBLE);
                         Log.e("Test", "Loaded");
                         if (Type == Question.TYPE_VIDEO) {// + si c'est une vidéo, mets un clicklistener sur l'image qui ouvre un dialog
+                            holder.Instruct.setText("Appuyez sur l'image pour lire la vidéo");
+                            holder.Instruct.setVisibility(View.VISIBLE);
                             holder.ImagePreview.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
@@ -124,32 +129,82 @@ public class CreerOptionAdapter extends ArrayAdapter<Option> {
                                     creerOptionDialog.show(ft, "fragment_video_dialog");
                                 }
                             });
+                        }else{
+                            holder.Instruct.setText("Appuyez sur l'image pour voir l'image en grand format");
+                            holder.Instruct.setVisibility(View.VISIBLE);
+                            holder.ImagePreview.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    Dialog dialog = new Dialog(c);
+                                    dialog.setContentView(R.layout.image_dialog);
+                                    dialog.show();
+                                    final ImageView Image = dialog.findViewById(R.id.image_dialog_imageview);
+                                    final ProgressBar progressBar = dialog.findViewById(R.id.image_dialog_progressBar);
+                                    Image.setImageBitmap(OptionData.get(POSITION).ImageFull);
+                                    progressBar.setVisibility(View.GONE);
+                                    Image.setVisibility(View.VISIBLE);
+
+                                }
+                            });
                         }
                     }
                 } else {
-                    holder.ImagePreview.setImageBitmap(OptionData.get(POSITION).ImagePreload);
-                    holder.ImagePreview.setVisibility(View.VISIBLE);
-                    holder.MediaError.setVisibility(View.INVISIBLE);
-                    if (Type == Question.TYPE_VIDEO) {// + si c'est une vidéo, mets un clicklistener sur l'image qui ouvre un dialog
-                        holder.ImagePreview.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                FragmentManager fm = adaptListener.getFragmentManagerQ();
-                                FragmentTransaction ft = fm.beginTransaction();
-                                Fragment prev = fm.findFragmentByTag("fragment_video_dialog");
-                                if (prev != null) {
-                                    ft.remove(prev);
+                    if(OptionData.get(POSITION).ImagePreload == null) {
+                        holder.Loading.setVisibility(View.VISIBLE);
+                        holder.ImagePreview.setVisibility(View.GONE);
+                    }else {
+                        holder.Loading.setVisibility(View.GONE);
+                        holder.ImagePreview.setImageBitmap(OptionData.get(POSITION).ImagePreload);
+                        holder.ImagePreview.setVisibility(View.VISIBLE);
+                        holder.MediaError.setVisibility(View.INVISIBLE);
+                        if (Type == Question.TYPE_VIDEO) {// + si c'est une vidéo, mets un clicklistener sur l'image qui ouvre un dialog
+                            holder.Instruct.setText("Appuyez sur l'image pour lire la vidéo");
+                            holder.Instruct.setVisibility(View.VISIBLE);
+                            holder.ImagePreview.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    FragmentManager fm = adaptListener.getFragmentManagerQ();
+                                    FragmentTransaction ft = fm.beginTransaction();
+                                    Fragment prev = fm.findFragmentByTag("fragment_video_dialog");
+                                    if (prev != null) {
+                                        ft.remove(prev);
+                                    }
+                                    ft.addToBackStack(null);
+                                    VideoDialogFragment creerOptionDialog = VideoDialogFragment.newInstance(OptionData.get(POSITION).Chemin_Media, OptionData.get(POSITION).notOnServer);
+                                    creerOptionDialog.show(ft, "fragment_video_dialog");
                                 }
-                                ft.addToBackStack(null);
-                                VideoDialogFragment creerOptionDialog = VideoDialogFragment.newInstance(OptionData.get(POSITION).Chemin_Media, OptionData.get(POSITION).notOnServer);
-                                creerOptionDialog.show(ft, "fragment_video_dialog");
-                            }
-                        });
+                            });
+                        }else{
+                            holder.Instruct.setText("Appuyez sur l'image pour voir l'image en grand format");
+                            holder.Instruct.setVisibility(View.VISIBLE);
+                            holder.ImagePreview.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    Dialog dialog = new Dialog(c);
+                                    dialog.setContentView(R.layout.image_dialog);
+                                    dialog.show();
+                                    final ImageView Image = dialog.findViewById(R.id.image_dialog_imageview);
+                                    final ProgressBar progressBar = dialog.findViewById(R.id.image_dialog_progressBar);
+                                    StorageReference FullImgRef = FirebaseStorage.getInstance().getReference().child(OptionData.get(POSITION).Chemin_Media);
+                                    FullImgRef.getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                                        @Override
+                                        public void onSuccess(byte[] bytes) {
+                                            Bitmap b = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                                            Image.setImageBitmap(b);
+                                            progressBar.setVisibility(View.GONE);
+                                            Image.setVisibility(View.VISIBLE);
+                                        }
+                                    });
+                                }
+                            });
+                        }
                     }
                 }
             } else {
                 holder.ZoneUpload.setVisibility(View.GONE);
+                holder.Instruct.setVisibility(View.GONE);
                 holder.MediaError.setVisibility(View.GONE);
+                holder.Loading.setVisibility(View.GONE);
                 holder.ImagePreview.setVisibility(View.GONE);
             }
             final CreerOptionAdapter adapter = this;
@@ -243,7 +298,7 @@ public class CreerOptionAdapter extends ArrayAdapter<Option> {
     }
 
     static class ViewHolder{
-        TextView OptionNum;
+        TextView OptionNum, Instruct;
         TextView TexteError;
         TextView MediaError;
         RelativeLayout ZoneUpload;
@@ -252,16 +307,20 @@ public class CreerOptionAdapter extends ArrayAdapter<Option> {
         ImageView ImagePreview;
         Button btnUpload;
         File VideoFile;
+        ProgressBar Loading;
         Bitmap Image;
         public ViewHolder(View view, int position){
-            OptionNum = (TextView)view.findViewById(R.id.sondage_edit_option_num);
-            ZoneUpload = (RelativeLayout)view.findViewById(R.id.sondage_edit_option_upload);
-            btnDelete = (ImageButton)view.findViewById(R.id.sondage_edit_option_delete);
-            TexteReponse = (EditText)view.findViewById(R.id.sondage_edit_option_texte);
-            btnUpload = (Button)view.findViewById(R.id.sondage_edit_option_upload_btn);
-            ImagePreview = (ImageView)view.findViewById(R.id.sondage_edit_option_image_preview);
-            TexteError = (TextView)view.findViewById(R.id.option_edit_texte_error);
-            MediaError = (TextView)view.findViewById(R.id.option_edit_media_error);
+            OptionNum = view.findViewById(R.id.sondage_edit_option_num);
+            ZoneUpload = view.findViewById(R.id.sondage_edit_option_upload);
+            btnDelete = view.findViewById(R.id.sondage_edit_option_delete);
+            TexteReponse = view.findViewById(R.id.sondage_edit_option_texte);
+            btnUpload = view.findViewById(R.id.sondage_edit_option_upload_btn);
+            ImagePreview = view.findViewById(R.id.sondage_edit_option_image_preview);
+            TexteError = view.findViewById(R.id.option_edit_texte_error);
+            MediaError = view.findViewById(R.id.option_edit_media_error);
+            Loading = view.findViewById(R.id.sondage_edit_option_progress);
+            Instruct = view.findViewById(R.id.option_edit_instruct);
+
 
         }
     }

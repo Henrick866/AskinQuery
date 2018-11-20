@@ -1,7 +1,9 @@
 package personnal.askinquery;
 
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
@@ -12,10 +14,21 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
+import java.util.HashMap;
 
 
 /**
@@ -33,8 +46,7 @@ public class LoginFragment extends Fragment {
     private TextView LoginErr;
     private Button LoginBtn, CreateBtn;
     private FirebaseAuth mAuth;
-    private FirebaseUser user;
-
+    private FirebaseUser user, OldUser;
     private OnFragmentInteractionListener mListener;
 
     public LoginFragment() {
@@ -64,7 +76,7 @@ public class LoginFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+                             final Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         mListener.ChangeTitle("Profil | Connexion");
         View view = inflater.inflate(R.layout.fragment_login, container, false);
@@ -82,6 +94,14 @@ public class LoginFragment extends Fragment {
         LoginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+
+                OldUser = null;
+                if(user != null){
+                    if(user.isAnonymous()){
+                        OldUser = user;
+                    }
+                }
                 //todo :: sync les données?
                 //todo:: demander la syncronisation
                 //todo: via les transactions, vérifiez si le sondage a été répondu par les deux parties, si oui, décrémentez les scores
@@ -90,8 +110,7 @@ public class LoginFragment extends Fragment {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()){
-                            mListener.updateMenu(mAuth.getCurrentUser());
-                            mListener.changePage(SondageListFragment.newInstance(false, null));
+                            SyncSubscribe();
                         }else{
                             LoginErr.setText("Courriel ou mot de passe érronné.");
                             LoginErr.setVisibility(View.VISIBLE);
@@ -102,6 +121,34 @@ public class LoginFragment extends Fragment {
             }
         });
         return view;
+    }
+    private void SyncSubscribe(){
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Profil_Keys.STRUCT_NAME).child(mAuth.getCurrentUser().getUid());                            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Profil p = dataSnapshot.getValue(Profil.class);
+                HashMap<String, String> AuteursAbo = new HashMap<>();
+                for(DataSnapshot dataSnapshot1 : dataSnapshot.child(FireBaseInteraction.Profil_Keys.AUTEURS_SUIVIS).getChildren()){
+                    AuteursAbo.put(dataSnapshot1.getKey(), (String)dataSnapshot1.getValue());
+                    String Key = dataSnapshot1.getKey();
+                    FirebaseMessaging.getInstance().subscribeToTopic(Key);
+                }
+                HashMap<String,Object> SondagesDone = new HashMap<>();
+                for(DataSnapshot dataSnapshot1 : dataSnapshot.child(FireBaseInteraction.Profil_Keys.SONDAGES).getChildren()){
+                    SondagesDone.put(dataSnapshot1.getKey(), dataSnapshot1.getValue());
+                }
+                p.Auteurs_Suivis = AuteursAbo;
+                p.Sondages_Faits = SondagesDone;
+                mListener.setUtilisateur_Connecte(p);
+                mListener.updateMenu(mAuth.getCurrentUser());
+                mListener.changePage(SondageListFragment.newInstance(false, null));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     @Override
@@ -134,6 +181,8 @@ public class LoginFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         void changePage(Fragment fragment);
         void ChangeTitle(String newTitle);
+        Profil getUtilisateur_Connecte();
+        void setUtilisateur_Connecte(Profil utilisateur_Connecte);
         void updateMenu(FirebaseUser profil);
     }
     public String getTitle(){

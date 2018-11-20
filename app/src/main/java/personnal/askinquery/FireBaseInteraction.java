@@ -17,12 +17,15 @@ public class FireBaseInteraction {
     }
     public static class Storage_Paths{
         final static String SONDAGES_IMAGES = "Media/Sondages/Thumbnails/";
+        final static String SONDAGES_IMAGES_THUMBNAILS = "Media/Sondages/Thumbnails/Small/";
         final static String OPTIONS_IMAGES = "Media/Sondages/Options/Images/";
+        final static String OPTIONS_IMAGES_THUMBNAILS = "Media/Sondages/Options/Images/Thumbnails/";
         final static String OPTIONS_VIDEOS = "Media/Sondages/Options/Videos/";
         final static String OPTIONS_VIDEOS_THUMBNAILS = "Media/Sondages/Options/Videos/Thumbnails/";
         final static String PUBLICATION_VIDEOS_THUMBNAILS = "Media/Publications/Videos/Thumbnails/";
         final static String PUBLICATION_VIDEOS = "Media/Publications/Videos/";
         final static String PUBLICATION_IMAGES = "Media/Publications/Images/";
+        final static String PUBLICATION_IMAGES_THUMBNAILS = "Media/Publications/Images/Thumbnails/";
         final static String PROFILS_AVATARS = "Media/Profils/";
         final static String IMAGES_APPS = "Media/ImagesApp/";
         final static String LOGO = "Media/ImagesApp/AppLogo.jpg";
@@ -36,6 +39,7 @@ public class FireBaseInteraction {
         final static String COMPIL_PUBLIC = "Compil_Public";
         final static String CHEMIN_IMAGE = "Chemin_Image";
         final static String AUTEUR_REF = "AuteurRef";
+        final static String PUBLIED = "Publied";
     }
     public static class Question_Keys{
         final static String STRUCT_NAME = "Questions";
@@ -66,5 +70,12 @@ public class FireBaseInteraction {
         final static String SONDAGE = "SondageRef";
         final static String TYPE_MEDIA = "Type";
         final static String DATE_PUBLIC = "date_public";
+    }
+    public static class Plainte_Keys{
+        final static String STRUCT_NAME = "Plaintes";
+        final static String RAISON = "Raison";
+        final static String CIBLE = "Cible";
+        final static String TYPE = "Type";
+        final static String DATE = "Date";
     }
 }

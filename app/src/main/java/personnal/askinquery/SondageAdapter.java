@@ -1,9 +1,12 @@
 package personnal.askinquery;
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -17,10 +20,15 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
@@ -29,6 +37,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.functions.FirebaseFunctions;
+import com.google.firebase.functions.FirebaseFunctionsException;
+import com.google.firebase.functions.HttpsCallableResult;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -39,6 +50,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Created by Henrick on 2018-09-20.
@@ -52,6 +64,7 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
     private SondageAdapter sondageAdapter;
     private boolean Si_Filter;
     private HashMap<String, Bitmap> BitmapMap;
+    private FirebaseFunctions mFunctions;
 
     public SondageAdapter(Context context, ArrayList<Sondage> sondages, boolean Si_Admin, boolean Si_Filter){
         super(context, 0, sondages);
@@ -59,6 +72,7 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
         this.Si_Filter = Si_Filter;
         c = context;
         BitmapMap = new HashMap<>();
+        mFunctions = FirebaseFunctions.getInstance();
         mInflater = LayoutInflater.from(context);
         sondageAdapter = this;
     }
@@ -81,7 +95,16 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
         holder.btn_plainte.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                FragmentManager fm = ((AdaptListener)c).getFragmentManagerQ();
+                FragmentTransaction ft = fm.beginTransaction();
+                android.app.Fragment prev = fm.findFragmentByTag("fragment_dialog_plainte");
+                if (prev != null) {
+                    ft.remove(prev);
+                }
+                ft.addToBackStack(null);
+                //la vidéo n'est pas en ligne;
+                DialogPlainteFragment plainteFragment = DialogPlainteFragment.newInstance(sondage.ID, Plainte.TYPE_SONDAGE);
+                plainteFragment.show(ft, "fragment_dialog_plainte");
             }
         });
         if(((AdaptListener)c).getUser() == null){
@@ -89,6 +112,10 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
         }else{
             if(((AdaptListener)c).getUser().getUid().equals(sondage.AuteurRef)){
                 holder.btn_commencer.setVisibility(View.GONE);
+                if(!sondage.Publied){
+                    holder.btn_Statistiques.setImageDrawable(c.getResources().getDrawable(R.drawable.ic_publish));
+                }
+
             }else{
                 holder.zone_Admin.setVisibility(View.GONE);
             }
@@ -180,16 +207,21 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
         if(sondage.Chemin_Image.equals("N")){
             holder.Image.setVisibility(View.GONE);
         }else{
+            holder.Loading.setVisibility(View.VISIBLE);
                 if (BitmapMap.get(sondage.ID) != null) {
                     holder.Image.setImageBitmap(BitmapMap.get(sondage.ID));
+                    holder.Loading.setVisibility(View.GONE);
+                    holder.Image.setVisibility(View.VISIBLE);
                 } else {
-                    StorageReference SondageImgRef = FirebaseStorage.getInstance().getReference().child(sondage.Chemin_Image);
+                    StorageReference SondageImgRef = FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.SONDAGES_IMAGES_THUMBNAILS).child(sondage.ID+".jpg");
                     SondageImgRef.getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
                         @Override
                         public void onSuccess(byte[] bytes) {
                             Bitmap Image = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                             BitmapMap.put(sondage.ID, Image);
                             holder.Image.setImageBitmap(Image);
+                            holder.Loading.setVisibility(View.GONE);
+                            holder.Image.setVisibility(View.VISIBLE);
                         }
                     });
                 }
@@ -213,18 +245,84 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
                     }
                 });
                 holder.id_Auteur.setText(sondage.Auteur.ID);
-                holder.btn_modifier.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        ((AdaptListener)c).changePage(CreerSondageFragment.newInstance(true, true, sondage.Auteur, sondage));
-                    }
-                });
-                holder.btn_Statistiques.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        ((AdaptListener)c).changePage(AnswerSondageFragment.newInstance(sondage, true, Si_Filter?sondage.Auteur.ID:null, si_Admin));
-                    }
-                });
+                if(sondage.Publied){
+                    holder.btn_modifier.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Toast.makeText(c, "Le sondage est publié, impossible de modifier pour ne pas fausser les résultats", Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }else{
+                    holder.btn_modifier.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            ((AdaptListener) c).changePage(CreerSondageFragment.newInstance(true, sondage));
+                        }
+                    });
+                }
+                if(sondage.Publied) {
+                    holder.btn_Statistiques.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            ((AdaptListener) c).changePage(AnswerSondageFragment.newInstance(sondage, true, Si_Filter ? sondage.Auteur.ID : null, si_Admin));
+                        }
+                    });
+                }else{
+                    holder.btn_Statistiques.setImageDrawable(c.getResources().getDrawable(R.drawable.ic_publish));
+                    holder.btn_Statistiques.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            new AlertDialog.Builder(c)
+                                    .setIcon(android.R.drawable.ic_dialog_alert)
+                                    .setTitle("Publier le sondage")
+                                    .setMessage("Voulez-vous rendre le sondage public? Sachez que vous ne pourrez plus le modifier si il est public.")
+                                    .setPositiveButton("Oui", new DialogInterface.OnClickListener()
+                                    {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Sondage_Keys.STRUCT_NAME).child(sondage.ID).child(FireBaseInteraction.Sondage_Keys.PUBLIED).setValue(true).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    if(task.isSuccessful()){
+                                                        PublishPoll(sondage)
+                                                                .addOnCompleteListener(new OnCompleteListener<String>() {
+                                                                    @Override
+                                                                    public void onComplete(@NonNull Task<String> task) {
+                                                                        if (!task.isSuccessful()) {
+                                                                            Exception e = task.getException();
+                                                                            if (e instanceof FirebaseFunctionsException) {
+                                                                                FirebaseFunctionsException ffe = (FirebaseFunctionsException) e;
+                                                                                FirebaseFunctionsException.Code code = ffe.getCode();
+                                                                                Object details = ffe.getDetails();
+                                                                            }
+
+                                                                            // ...
+                                                                        }
+
+                                                                        // ...
+                                                                    }
+                                                                });
+                                                        Toast.makeText(c, "Le sondage a été publié", Toast.LENGTH_LONG).show();
+                                                        holder.btn_Statistiques.setImageDrawable(c.getResources().getDrawable(R.drawable.ic_stats));
+                                                        holder.btn_Statistiques.setOnClickListener(new View.OnClickListener() {
+                                                            @Override
+                                                            public void onClick(View view) {
+                                                                ((AdaptListener) c).changePage(AnswerSondageFragment.newInstance(sondage, true, Si_Filter ? sondage.Auteur.ID : null, si_Admin));
+                                                            }
+                                                        });
+                                                        sondage.Publied = true;
+                                                        holder.btn_modifier.setEnabled(false);
+                                                    }
+                                                }
+                                            });
+                                        }
+
+                                    })
+                                    .setNegativeButton("Non", null)
+                                    .show();
+                        }
+                    });
+                }
                 holder.btn_supprimer.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -241,6 +339,27 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
         AuteurRef.addListenerForSingleValueEvent(auteurListener);
         return view;
     }
+    private Task<String> PublishPoll(Sondage S) {
+        // Create the arguments to the callable function.
+        Map<String, Object> data = new HashMap<>();
+        data.put("AuteurRef", S.AuteurRef);
+        data.put("UserName", S.Auteur.Username);
+        data.put("ID", S.ID);
+
+        return mFunctions
+                .getHttpsCallable("publishPoll")
+                .call(data)
+                .continueWith(new Continuation<HttpsCallableResult, String>() {
+                    @Override
+                    public String then(@NonNull Task<HttpsCallableResult> task) throws Exception {
+                        // This continuation runs on either success or failure, but if the task
+                        // has failed then getResult() will throw an Exception which will be
+                        // propagated down.
+                        String result = (String) task.getResult().getData();
+                        return result;
+                    }
+                });
+    }
     private class ViewHolder{
         TextView AuteurNom;
         ImageButton btn_plainte;
@@ -256,12 +375,13 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
         TextView id_Sondage;
         TextView id_Auteur;
         ImageView Image;
+        ProgressBar Loading;
         public ViewHolder(View view){
             AuteurNom = view.findViewById(R.id.sondage_elem_nom_auteur);
             btn_plainte = view.findViewById(R.id.sondage_elem_plainte_btn);
             zone_Admin = view.findViewById(R.id.sondage_elem_zone_admin);
             btn_commencer = view.findViewById(R.id.sondage_elem_start_btn);
-
+            Loading = view.findViewById(R.id.sondage_elem_progress);
             btnVote = view.findViewById(R.id.btn_vote_layout);
 
             btn_modifier = view.findViewById(R.id.sondage_elem_edit_btn);
@@ -332,6 +452,13 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
             DatabaseReference QuestionRef = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Question_Keys.STRUCT_NAME).child(q.ID);
             if(q.Type_Question != Question.TYPE_TEXTE) {
                 for (Option o : q.Options){
+                    String ThumbPath;
+                    if(q.Type_Question == Question.TYPE_IMAGE){
+                        ThumbPath = FireBaseInteraction.Storage_Paths.OPTIONS_IMAGES_THUMBNAILS;
+                    }else{
+                        ThumbPath = FireBaseInteraction.Storage_Paths.OPTIONS_VIDEOS_THUMBNAILS;
+                    }
+                    FirebaseStorage.getInstance().getReference().child(ThumbPath).child(o.ID+".jpg").delete();
                     StorageReference OptionMediaRef = FirebaseStorage.getInstance().getReference().child(o.Chemin_Media);
                     OptionMediaRef.delete();
                 }
@@ -341,6 +468,7 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
         if(!s.Chemin_Image.equals("N")){
             SondageMediaRef.child(s.Chemin_Image);
             SondageMediaRef.delete();
+            FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.SONDAGES_IMAGES_THUMBNAILS).child(s.ID+".jpg").delete();
         }
         SondageRef.removeValue();
         progressDialog.setTitle("Sondage supprimé.");
@@ -351,6 +479,7 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
     }
     public interface AdaptListener{
         void changePage(Fragment fragment);
+        FragmentManager getFragmentManagerQ();
         FirebaseUser getUser();
         Profil getUtilisateur_Connecte();
     }

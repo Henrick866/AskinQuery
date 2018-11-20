@@ -8,21 +8,48 @@
     android:paddingStart="7dp"
     android:weightSum="1"
     tools:context="personnal.askinquery.CreerSondageFragment">
-    <com.balysv.materialripple.MaterialRippleLayout
+    <LinearLayout
+        android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:layout_marginTop="7dp"
-        android:layout_height="wrap_content">
-
-        <Button
-            android:id="@+id/sondage_edit_done"
-            style="@style/buttonCustom"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal">
+        <com.balysv.materialripple.MaterialRippleLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:drawableEnd="@drawable/ic_done_color"
-            android:paddingStart="20dp"
-            android:paddingEnd="10dp"
-            android:text="Terminer" />
-    </com.balysv.materialripple.MaterialRippleLayout>
+            android:layout_weight="1"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/sondage_edit_done"
+                style="@style/buttonNoBorderCustom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableEnd="@drawable/ic_publish_color"
+                android:paddingStart="20dp"
+                android:paddingEnd="10dp"
+                android:text="Publier" />
+        </com.balysv.materialripple.MaterialRippleLayout>
+        <View
+            android:layout_width="2dp"
+            android:layout_height="match_parent"
+            android:background="@color/LightGrey" />
+        <com.balysv.materialripple.MaterialRippleLayout
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/sondage_edit_save"
+                style="@style/buttonNoBorderCustom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableEnd="@drawable/ic_save_color"
+                android:paddingStart="20dp"
+                android:paddingEnd="10dp"
+                android:text="Enregistrer" />
+        </com.balysv.materialripple.MaterialRippleLayout>
+
+    </LinearLayout>
+
 
     <TextView
         android:id="@+id/sondage_edit_questions_error"
@@ -235,6 +262,7 @@
                         <com.balysv.materialripple.MaterialRippleLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
                             android:layout_centerInParent="true">
 
                             <ImageButton
@@ -248,7 +276,14 @@
                         </com.balysv.materialripple.MaterialRippleLayout>
 
                     </RelativeLayout>
-
+                    <ProgressBar
+                        android:id="@+id/sondage_edit_questions_load"
+                        style="?android:attr/progressBarStyle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:indeterminate="true"
+                        android:visibility="visible"
+                        android:indeterminateDrawable="@drawable/progress" />
                     <ListView
                         android:id="@+id/sondage_edit_questions_list"
                         android:layout_width="match_parent"

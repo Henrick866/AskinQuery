@@ -12,15 +12,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -42,7 +48,7 @@ public class PublicationListFragment extends ListFragment {
     private String Filtre;
     private FirebaseAuth mAuth;
     private FirebaseUser user;
-    private ArrayList<String> ListeAuteurs_Abo;
+    private FirebaseMultiQuery firebaseMultiQuery;
     private OnFragmentInteractionListener mListener;
 
     public PublicationListFragment() {
@@ -76,7 +82,87 @@ public class PublicationListFragment extends ListFragment {
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
     }
+    @Override
+    public void onStart(){
+        super.onStart();
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Publications_Keys.STRUCT_NAME);
+        Query query;
+        if(Filtre != null) {//si filtré
+            query = databaseReference.orderByChild(FireBaseInteraction.Publications_Keys.AUTEUR).equalTo(Filtre);
+            query.addListenerForSingleValueEvent(LoadPubs);
+        }else{//sinon
+            if(Si_Gestion){//si on gère
+                query = databaseReference.orderByChild(FireBaseInteraction.Publications_Keys.AUTEUR).equalTo(user.getUid());
+                query.addListenerForSingleValueEvent(LoadPubs);
+            }else{//standard
+                ArrayList<DatabaseReference> ListDataRef = new ArrayList<>();
+                Profil p = mListener.getUtilisateur_Connecte();
+                for(HashMap.Entry<String, String> cursor : p.Auteurs_Suivis.entrySet()) {
+                    ListDataRef.add(databaseReference.orderByChild(FireBaseInteraction.Publications_Keys.AUTEUR).equalTo(cursor.getKey()).getRef());
+                }
+                ListDataRef.add(databaseReference.orderByChild(FireBaseInteraction.Publications_Keys.AUTEUR).equalTo(user.getUid()).getRef());
+                firebaseMultiQuery = new FirebaseMultiQuery(ListDataRef);
+                final Task<Map<DatabaseReference, DataSnapshot>> allLoad = firebaseMultiQuery.start();
+                allLoad.addOnCompleteListener(getActivity(), new AllOnCompleteListener());
+            }
 
+        }
+
+    }
+    @Override
+    public void onStop(){
+        super.onStop();
+        if(firebaseMultiQuery != null) {
+            firebaseMultiQuery.stop();
+        }
+
+    }
+    private ValueEventListener LoadPubs = new ValueEventListener() {
+        @Override
+        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            ArrayList<Publication> PublicationList = new ArrayList<>();
+            for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
+                Publication P = dataSnapshot1.getValue(Publication.class);
+                P.ID = dataSnapshot1.getKey();
+                P.Date_Public = new Date(P.date_public);
+                PublicationList.add(P);
+            }
+
+            PublicationAdapter adapter = new PublicationAdapter(getActivity(), PublicationList, Si_Gestion);
+            setListAdapter(adapter);
+        }
+
+        @Override
+        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+        }
+    };
+    private class AllOnCompleteListener implements OnCompleteListener<Map<DatabaseReference, DataSnapshot>> {
+        @Override
+        public void onComplete(@NonNull Task<Map<DatabaseReference, DataSnapshot>> task) {
+            ArrayList<Publication> PublicationList = new ArrayList<>();
+            if (task.isSuccessful()) {
+                final Map<DatabaseReference, DataSnapshot> result = task.getResult();
+
+                for(Map.Entry<DatabaseReference, DataSnapshot> cursor : result.entrySet()) {//j'itère toutes les listes
+                    DataSnapshot dataSnapshot1 = cursor.getValue();//une sous-liste
+                    for(DataSnapshot dataSnapshot2 : dataSnapshot1.getChildren()){
+                        Publication P = dataSnapshot2.getValue(Publication.class);
+                        P.ID = dataSnapshot2.getKey();
+                        P.Date_Public = new Date(P.date_public);
+                        PublicationList.add(P);
+                    }
+                }
+                // Look up DataSnapshot objects using the same DatabaseReferences you passed into FirebaseMultiQuery
+            }
+            else {
+                // log the error or whatever you need to do
+            }
+            // Do stuff with views
+            PublicationAdapter adapter = new PublicationAdapter(getActivity(), PublicationList, Si_Gestion);
+            setListAdapter(adapter);
+        }
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -99,7 +185,6 @@ public class PublicationListFragment extends ListFragment {
         }else{
             mListener.ChangeTitle("Publications");
         }
-        ListeAuteurs_Abo = new ArrayList<>();
         View view = inflater.inflate(R.layout.fragment_publication_list, container, false);
         final Button AddBtn = view.findViewById(R.id.pub_list_add_btn);
         if(Si_Gestion){
@@ -113,16 +198,7 @@ public class PublicationListFragment extends ListFragment {
         }else{
             AddBtn.setVisibility(View.GONE);
         }
-        if(Filtre != null) {//si filtré
-            LoadPubFiltre();
-        }else{//sinon
-            if(Si_Gestion){//si on gère
-                LoadGestionFiltre();
-            }else{//standard
-                LoadAllRelated();
-            }
 
-        }
 
         return view;
     }
@@ -137,6 +213,7 @@ public class PublicationListFragment extends ListFragment {
                     String AuteurID = (String)dataSnapshot1.child(FireBaseInteraction.Publications_Keys.AUTEUR).getValue();
                     if(AuteurID == Filtre) {
                         Publication p = dataSnapshot1.getValue(Publication.class);
+                        p.Date_Public = new Date(p.date_public);
                         p.ID = dataSnapshot1.getKey();
                         ListePubs.add(p);
                     }
@@ -161,6 +238,7 @@ public class PublicationListFragment extends ListFragment {
                     String AuteurID = (String)dataSnapshot1.child(FireBaseInteraction.Publications_Keys.AUTEUR).getValue();
                     if(AuteurID.equals(user.getUid())) {
                         Publication p = dataSnapshot1.getValue(Publication.class);
+                        p.Date_Public = new Date(p.date_public);
                         p.ID = dataSnapshot1.getKey();
                         ListePubs.add(p);
                     }
@@ -176,14 +254,8 @@ public class PublicationListFragment extends ListFragment {
         });
     }
     public void LoadAllRelated(){
-        //etape 1, charger la liste des abonnements
-        DatabaseReference AbonnRef = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Profil_Keys.STRUCT_NAME).child(user.getUid()).child(FireBaseInteraction.Profil_Keys.AUTEURS_SUIVIS);
-        AbonnRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
-                    ListeAuteurs_Abo.add(dataSnapshot1.getKey());
-                }
+        //etape 1, charger la liste des abonnement
+        final Profil p = mListener.getUtilisateur_Connecte();
                 DatabaseReference PublicRef = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Publications_Keys.STRUCT_NAME);
                 PublicRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -191,9 +263,10 @@ public class PublicationListFragment extends ListFragment {
                         ArrayList<Publication> ListePubs = new ArrayList<>();
                         for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
                             String AuteurID = (String)dataSnapshot1.child(FireBaseInteraction.Publications_Keys.AUTEUR).getValue();
-                            if(ListeAuteurs_Abo.contains(AuteurID) || AuteurID.equals(user.getUid())){
+                            if(p.Auteurs_Suivis.containsKey(AuteurID) || AuteurID.equals(user.getUid())){
                                 Publication p = dataSnapshot1.getValue(Publication.class);
                                 p.ID = dataSnapshot1.getKey();
+                                p.Date_Public = new Date(p.date_public);
                                 ListePubs.add(p);
                             }
                         }
@@ -206,13 +279,6 @@ public class PublicationListFragment extends ListFragment {
 
                     }
                 });
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
     }
 
     @Override
@@ -246,5 +312,6 @@ public class PublicationListFragment extends ListFragment {
         // TODO: Update argument type and name
         void changePage(Fragment fragment);
         void ChangeTitle(String newTitle);
+        Profil getUtilisateur_Connecte();
     }
 }

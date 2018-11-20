@@ -1,6 +1,8 @@
 package personnal.askinquery;
 
 import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -26,6 +28,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -90,6 +93,22 @@ public class ConsultProfilFragment extends Fragment {
         user = mAuth.getCurrentUser();
         AbonnementBtn = view.findViewById(R.id.profil_check_abonnement);
         mListener.ChangeTitle("Profil | Consulter");
+        Fab = view.findViewById(R.id.profil_check_flag_account);
+        Fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FragmentManager fm = mListener.getFragmentManagerQ();
+                FragmentTransaction ft = fm.beginTransaction();
+                android.app.Fragment prev = fm.findFragmentByTag("fragment_dialog_plainte");
+                if (prev != null) {
+                    ft.remove(prev);
+                }
+                ft.addToBackStack(null);
+                //la vidéo n'est pas en ligne;
+                DialogPlainteFragment plainteFragment = DialogPlainteFragment.newInstance(mProfil.ID, Plainte.TYPE_PROFIL);
+                plainteFragment.show(ft, "fragment_dialog_plainte");
+            }
+        });
         if(user != null){
             if(!user.isAnonymous()) {
                 profilUser = mListener.getUtilisateur_Connecte();
@@ -158,6 +177,7 @@ public class ConsultProfilFragment extends Fragment {
                                     mListener.setUtilisateur_Connecte(utilConn);
                                     Toast.makeText(getActivity(), "Désabonnement confirmé", Toast.LENGTH_LONG).show();
                                     AbonnementBtn.setText("S'abonner");
+                                    FirebaseMessaging.getInstance().unsubscribeFromTopic(mProfil.ID);
                                 }else{
                                     Toast.makeText(getActivity(), "Erreur, désabonnement échoué", Toast.LENGTH_LONG).show();
                                 }
@@ -175,6 +195,7 @@ public class ConsultProfilFragment extends Fragment {
                                     mListener.setUtilisateur_Connecte(utilConn);
                                     Toast.makeText(getActivity(), "Abonnement confirmé", Toast.LENGTH_LONG).show();
                                     AbonnementBtn.setText("Se Désabonner");
+                                    FirebaseMessaging.getInstance().subscribeToTopic(mProfil.ID);
 
                                 }else{
                                     Toast.makeText(getActivity(), "Erreur, Abonnement échoué", Toast.LENGTH_LONG).show();
@@ -220,6 +241,7 @@ public class ConsultProfilFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         void changePage(Fragment fragment);
         Profil getUtilisateur_Connecte();
+        FragmentManager getFragmentManagerQ();
         void ChangeTitle(String newTitle);
         void setUtilisateur_Connecte(Profil utilisateur_connecte);
     }
