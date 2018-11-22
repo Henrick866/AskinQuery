@@ -16,15 +16,14 @@
         <EditText
             android:id="@+id/manage_profil_edit_username"
             android:layout_width="match_parent"
+            android:hint="@string/Username_Field_Hint"
             android:layout_height="wrap_content"
-            android:inputType="text"
-            android:text="Username" />
+            android:inputType="text" />
 
         <TextView
             android:id="@+id/manage_profil_username_err"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Erreur Nom User"
             android:textAppearance="@style/TextAppearance.AppCompat"
             android:textColor="@color/colorRed"
             android:visibility="invisible" />
@@ -42,7 +41,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:padding="10dp"
-                android:text="Vérifier la disponibilité"
+                android:text="@string/Username_Check"
                 android:textColor="@color/colorSecondaryMedDark" />
         </com.balysv.materialripple.MaterialRippleLayout>
 
@@ -58,7 +57,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:padding="10dp"
-                android:text="Confirmer" />
+                android:text="@string/Mng_Profil_Confirm" />
         </com.balysv.materialripple.MaterialRippleLayout>
     </LinearLayout>
 
@@ -74,13 +73,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textEmailAddress"
-            android:text="Email" />
+            android:hint="@string/Email_Field_Hint"/>
 
         <TextView
             android:id="@+id/manage_profil_email_err"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Lorem Ipsum"
             android:textAppearance="@style/TextAppearance.AppCompat"
             android:textColor="@color/colorRed"
             android:visibility="invisible" />
@@ -97,7 +95,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:padding="10dp"
-                android:text="Confirmer" />
+                android:text="@string/Mng_Profil_Confirm" />
         </com.balysv.materialripple.MaterialRippleLayout>
 
         <com.balysv.materialripple.MaterialRippleLayout
@@ -112,7 +110,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:padding="10dp"
-                android:text="Fermer"
+                android:text="@string/Mng_Profil_Cancel"
                 android:textColor="@color/colorRed" />
         </com.balysv.materialripple.MaterialRippleLayout>
     </LinearLayout>
@@ -129,7 +127,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textPassword"
-            android:text="Mot de passe" />
+            android:hint="@string/Pass_Field_Hint"/>
 
         <ProgressBar
             android:id="@+id/manage_profil_pass_strength"
@@ -149,7 +147,6 @@
             android:id="@+id/manage_profil_pass_err"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Erreur Nom User"
             android:textAppearance="@style/TextAppearance.AppCompat"
             android:textColor="@color/colorRed"
             android:visibility="invisible" />
@@ -167,7 +164,7 @@
 
                 android:layout_gravity="center_horizontal"
                 android:padding="10dp"
-                android:text="Changer de mot de passe" />
+                android:text="@string/Mng_Profil_Confirm" />
         </com.balysv.materialripple.MaterialRippleLayout>
 
         <com.balysv.materialripple.MaterialRippleLayout
@@ -182,7 +179,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:padding="10dp"
-                android:text="Fermer"
+                android:text="@string/Mng_Profil_Cancel"
                 android:textColor="@color/colorRed" />
         </com.balysv.materialripple.MaterialRippleLayout>
     </LinearLayout>
@@ -206,7 +203,7 @@
                 android:layout_gravity="center_horizontal"
                 android:background="@color/transparent"
                 android:padding="10dp"
-                android:text="Supprimer le compte"
+                android:text="@string/Mng_Profil_Delete"
                 android:textColor="@color/colorRed" />
         </com.balysv.materialripple.MaterialRippleLayout>
 
@@ -241,7 +238,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:padding="10dp"
-                android:text="Fermer"
+                android:text="@string/Close_Dialog"
                 android:textColor="@color/colorRed" />
         </com.balysv.materialripple.MaterialRippleLayout>
 

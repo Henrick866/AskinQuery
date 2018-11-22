@@ -11,7 +11,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Connexion"
+        android:text="@string/Login_Title"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
 
@@ -20,7 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:hint="Courriel"
+        android:hint="@string/Email_Field_Hint"
         android:inputType="textEmailAddress" />
 
     <EditText
@@ -28,14 +28,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:hint="Mot de passe"
+        android:hint="@string/Pass_Field_Hint"
         android:inputType="textPassword" />
 
     <TextView
         android:id="@+id/login_err"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="TextView"
         android:textColor="@color/colorRed"
         android:visibility="invisible" />
     <com.balysv.materialripple.MaterialRippleLayout
@@ -48,7 +47,7 @@
             style="@style/buttonCustom"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Se connecter" />
+            android:text="@string/Btn_Login" />
     </com.balysv.materialripple.MaterialRippleLayout>
     <com.balysv.materialripple.MaterialRippleLayout
         android:layout_width="match_parent"
@@ -60,7 +59,7 @@
             style="@style/buttonCustom"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Créer un compte" />
+            android:text="@string/Login_Btn_Create" />
     </com.balysv.materialripple.MaterialRippleLayout>
 
 </LinearLayout>

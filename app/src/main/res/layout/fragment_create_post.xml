@@ -9,7 +9,7 @@
         android:layout_height="wrap_content">
 <LinearLayout
 android:layout_width="match_parent"
-android:layout_height="match_parent"
+android:layout_height="wrap_content"
     android:paddingStart="7dp"
     android:paddingEnd="7dp"
     android:orientation="vertical"
@@ -20,7 +20,7 @@ android:layout_height="match_parent"
         android:id="@+id/publication_edit_title_form"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Créer une publication "
+        android:text="@string/Post_Form_Title_New"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
 
@@ -30,7 +30,7 @@ android:layout_height="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:ems="10"
-        android:hint="Titre"
+        android:hint="@string/Post_Form_Title_Field_Hint"
         android:inputType="textPersonName" />
 
     <TextView
@@ -38,7 +38,6 @@ android:layout_height="match_parent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
-        android:text="TextView"
         android:textAlignment="textEnd"
         android:textAppearance="@style/TextAppearance.AppCompat"
         android:textColor="@color/colorRed"
@@ -50,7 +49,7 @@ android:layout_height="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:ems="10"
-        android:hint="Contenu de la publication"
+        android:hint="@string/Post_Form_Content_Field_Hint"
         android:inputType="textMultiLine" />
 
     <TextView
@@ -58,7 +57,6 @@ android:layout_height="match_parent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
-        android:text="TextView"
         android:textAlignment="textEnd"
         android:textAppearance="@style/TextAppearance.AppCompat"
         android:textColor="@color/colorRed"
@@ -66,10 +64,9 @@ android:layout_height="match_parent"
 
     <TextView
         android:layout_marginTop="5dp"
-        android:id="@+id/textView11"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Choisir un média ou un sondage à publier"
+        android:text="@string/Post_Form_Media_Pick"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat" />
 
@@ -87,7 +84,7 @@ android:layout_height="match_parent"
             style="@style/buttonNoBorderCustom"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Image" />
+            android:text="@string/Post_Form_Media_Pick_Img" />
         </com.balysv.materialripple.MaterialRippleLayout>
 
         <View
@@ -103,7 +100,7 @@ android:layout_height="match_parent"
             style="@style/buttonNoBorderCustom"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Vidéo" />
+            android:text="@string/Post_Form_Media_Pick_Vid" />
         </com.balysv.materialripple.MaterialRippleLayout>
 
         <View
@@ -121,21 +118,40 @@ android:layout_height="match_parent"
             android:layout_height="wrap_content"
 
             android:enabled="false"
-            android:text="Sondage" />
+            android:text="@string/Post_Form_Media_Pick_Poll" />
         </com.balysv.materialripple.MaterialRippleLayout>
     </LinearLayout>
 
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_gravity="center_horizontal">
     <ImageView
         android:id="@+id/publication_edit_media_preview"
         android:layout_width="wrap_content"
+        android:contentDescription="@string/Post_Elem_Desc_Media"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="5dp"
-        android:maxHeight="200dp"
+
+        android:maxHeight="128dp"
         android:adjustViewBounds="true"
         android:cropToPadding="false"
         android:src="@drawable/ic_menu_gallery"
         android:visibility="gone" />
+        <ImageView
+            android:layout_width="48dp"
+            android:id="@+id/publication_edit_media_preview_icon"
+            android:contentDescription="@string/Post_Elem_Desc_Media_icon"
+            android:layout_height="48dp"
+            android:tint="@color/colorPrimaryMedLight"
+            android:layout_alignBottom="@id/publication_edit_media_preview"
+            android:layout_alignEnd="@id/publication_edit_media_preview"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="5dp"
+            android:visibility="gone"
+            android:src="@drawable/ic_loupe_black_24dp"/>
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/publication_edit_instruct"
@@ -143,7 +159,6 @@ android:layout_height="match_parent"
         android:layout_marginTop="5dp"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        android:text="TextView"
         android:textAlignment="center" />
 
     <com.balysv.materialripple.MaterialRippleLayout
@@ -156,7 +171,6 @@ android:layout_height="match_parent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="Retirer"
         android:textColor="@color/colorRed"
         android:visibility="gone" />
     </com.balysv.materialripple.MaterialRippleLayout>
@@ -170,7 +184,7 @@ android:layout_height="match_parent"
         style="@style/buttonCustom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Publier" />
+        android:text="@string/Post_Form_Done" />
     </com.balysv.materialripple.MaterialRippleLayout>
 
 </LinearLayout>

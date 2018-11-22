@@ -6,7 +6,6 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -23,17 +22,11 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 
 
 /**
@@ -114,11 +107,11 @@ public class ConsultProfilFragment extends Fragment {
                 profilUser = mListener.getUtilisateur_Connecte();
                 profilUserRef = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Profil_Keys.STRUCT_NAME).child(user.getUid());
                 if(profilUser.Auteurs_Suivis.containsKey(mProfil.ID)){
-                    AbonnementBtn.setText("Se Désabonner");
+                    AbonnementBtn.setText(R.string.Profil_Consult_Unsubscribe);
                     AbonnementBtn.setEnabled(true);
                 }else{
                     AbonnementBtn.setEnabled(true);
-                    AbonnementBtn.setText("S'abonner");
+                    AbonnementBtn.setText(R.string.Profil_Consult_Subscribe);
                 }
             }else{
                 AbonnementBtn.setEnabled(false);
@@ -176,7 +169,7 @@ public class ConsultProfilFragment extends Fragment {
                                     utilConn.Auteurs_Suivis.remove(mProfil.ID);
                                     mListener.setUtilisateur_Connecte(utilConn);
                                     Toast.makeText(getActivity(), "Désabonnement confirmé", Toast.LENGTH_LONG).show();
-                                    AbonnementBtn.setText("S'abonner");
+                                    AbonnementBtn.setText(R.string.Profil_Consult_Subscribe);
                                     FirebaseMessaging.getInstance().unsubscribeFromTopic(mProfil.ID);
                                 }else{
                                     Toast.makeText(getActivity(), "Erreur, désabonnement échoué", Toast.LENGTH_LONG).show();
@@ -194,7 +187,7 @@ public class ConsultProfilFragment extends Fragment {
                                     utilConn.Auteurs_Suivis.put(mProfil.ID, mProfil.Username);
                                     mListener.setUtilisateur_Connecte(utilConn);
                                     Toast.makeText(getActivity(), "Abonnement confirmé", Toast.LENGTH_LONG).show();
-                                    AbonnementBtn.setText("Se Désabonner");
+                                    AbonnementBtn.setText(R.string.Profil_Consult_Unsubscribe);
                                     FirebaseMessaging.getInstance().subscribeToTopic(mProfil.ID);
 
                                 }else{

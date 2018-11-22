@@ -11,6 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -50,6 +52,8 @@ public class PublicationListFragment extends ListFragment {
     private FirebaseUser user;
     private FirebaseMultiQuery firebaseMultiQuery;
     private OnFragmentInteractionListener mListener;
+    private ProgressBar progressBar;
+    private TextView Empty;
 
     public PublicationListFragment() {
         // Required empty public constructor
@@ -79,6 +83,7 @@ public class PublicationListFragment extends ListFragment {
             Si_Gestion = getArguments().getBoolean(ARG_PARAM1);
             Filtre = getArguments().getString(ARG_PARAM2);
         }
+
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
     }
@@ -127,7 +132,10 @@ public class PublicationListFragment extends ListFragment {
                 P.Date_Public = new Date(P.date_public);
                 PublicationList.add(P);
             }
-
+            if(PublicationList.isEmpty()){
+                Empty.setVisibility(View.VISIBLE);
+            }
+            progressBar.setVisibility(View.GONE);
             PublicationAdapter adapter = new PublicationAdapter(getActivity(), PublicationList, Si_Gestion);
             setListAdapter(adapter);
         }
@@ -159,6 +167,10 @@ public class PublicationListFragment extends ListFragment {
                 // log the error or whatever you need to do
             }
             // Do stuff with views
+            if(PublicationList.isEmpty()){
+                Empty.setVisibility(View.VISIBLE);
+            }
+            progressBar.setVisibility(View.GONE);
             PublicationAdapter adapter = new PublicationAdapter(getActivity(), PublicationList, Si_Gestion);
             setListAdapter(adapter);
         }
@@ -167,6 +179,9 @@ public class PublicationListFragment extends ListFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_publication_list, container, false);
+        progressBar = view.findViewById(R.id.pub_list_loader);
+        Empty = view.findViewById(R.id.pub_list_empty);
         if(Si_Gestion){
             mListener.ChangeTitle("Publications | Gestion");
         }else if(Filtre != null){
@@ -185,7 +200,8 @@ public class PublicationListFragment extends ListFragment {
         }else{
             mListener.ChangeTitle("Publications");
         }
-        View view = inflater.inflate(R.layout.fragment_publication_list, container, false);
+
+
         final Button AddBtn = view.findViewById(R.id.pub_list_add_btn);
         if(Si_Gestion){
             AddBtn.setOnClickListener(new View.OnClickListener() {
@@ -211,7 +227,7 @@ public class PublicationListFragment extends ListFragment {
                 ArrayList<Publication> ListePubs = new ArrayList<>();
                 for(DataSnapshot dataSnapshot1: dataSnapshot.getChildren()){
                     String AuteurID = (String)dataSnapshot1.child(FireBaseInteraction.Publications_Keys.AUTEUR).getValue();
-                    if(AuteurID == Filtre) {
+                    if(AuteurID.equals(Filtre)) {
                         Publication p = dataSnapshot1.getValue(Publication.class);
                         p.Date_Public = new Date(p.date_public);
                         p.ID = dataSnapshot1.getKey();

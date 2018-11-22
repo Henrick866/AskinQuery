@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -13,7 +12,6 @@
         android:id="@+id/answer_sondage_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Titre Sondage"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
 
@@ -22,7 +20,6 @@
         android:id="@+id/answer_sondage_auteur"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Auteur"
         android:textAlignment="center" />
 
     <ImageView
@@ -33,6 +30,7 @@
         android:layout_centerInParent="true"
         android:maxHeight="150dp"
         android:layout_gravity="center"
+        android:contentDescription="@string/Sondage_Elem_Img_Desc"
         android:scaleType="fitCenter"
         android:src="@drawable/ic_menu_gallery" />
 
@@ -59,7 +57,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/transparent"
-                android:text="Terminer" />
+                android:text="@string/Poll_Answ_Done" />
         </com.balysv.materialripple.MaterialRippleLayout>
 
         <View
@@ -80,7 +78,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/transparent"
-                android:text="Enregistrer et partir"
+                android:text="@string/Poll_Answ_Save"
                 android:textColor="@color/colorAccentMedDark"
                 android:visibility="visible" />
         </com.balysv.materialripple.MaterialRippleLayout>

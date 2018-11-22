@@ -1,5 +1,4 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -26,7 +25,7 @@
                 android:drawableEnd="@drawable/ic_publish_color"
                 android:paddingStart="20dp"
                 android:paddingEnd="10dp"
-                android:text="Publier" />
+                android:text="@string/Post_Form_Done" />
         </com.balysv.materialripple.MaterialRippleLayout>
         <View
             android:layout_width="2dp"
@@ -45,7 +44,7 @@
                 android:drawableEnd="@drawable/ic_save_color"
                 android:paddingStart="20dp"
                 android:paddingEnd="10dp"
-                android:text="Enregistrer" />
+                android:text="@string/Create_Sondage_Save_Btn" />
         </com.balysv.materialripple.MaterialRippleLayout>
 
     </LinearLayout>
@@ -57,14 +56,6 @@
         android:layout_height="wrap_content"
         android:textColor="@color/colorRed"
         android:visibility="invisible" />
-
-    <!--<TextView
-        android:id="@+id/textView2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Attention, le processus peut prendre du temps dû à l'envoi de nombreux fichiers au serveur"
-        android:textAlignment="center"
-        android:textAppearance="@style/TextAppearance.AppCompat" />-->
 
     <TabHost
         android:id="@+id/TabHost"
@@ -105,7 +96,7 @@
                                 android:id="@+id/sondage_edit_title_form"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="Créer un sondage"
+                                android:text="@string/Create_Sondage_Poll_Title_View_New"
                                 android:textAlignment="center"
                                 android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
 
@@ -114,7 +105,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:ems="10"
-                                android:hint="Titre"
+                                android:hint="@string/Post_Form_Title_Field_Hint"
                                 android:inputType="textPersonName" />
 
                             <TextView
@@ -122,25 +113,23 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="5dp"
-                                android:text="TextView"
                                 android:textAppearance="@style/TextAppearance.AppCompat"
                                 android:textColor="@color/colorRed"
                                 android:visibility="invisible" />
 
                             <TextView
-                                android:id="@+id/textView3"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="5dp"
-                                android:text="Date d'échéance du sondage"
+                                android:text="@string/Create_Sondage_Poll_End_Date_Tag"
                                 android:textAlignment="center"
                                 android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
 
                             <DatePicker
                                 android:id="@+id/sondage_edit_date"
-                                android:layout_width="match_parent"
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:datePickerMode="spinner"
+                                android:layout_gravity="center_horizontal"
                                 android:spinnersShown="false" />
 
                             <TextView
@@ -152,11 +141,10 @@
                                 android:visibility="invisible" />
 
                             <TextView
-                                android:id="@+id/textView5"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="5dp"
-                                android:text="Date sélectionnée :"
+                                android:text="@string/Create_Sondage_Poll_End_Date_Preview_Tag"
                                 android:textAlignment="center"
                                 android:textAppearance="@style/TextAppearance.AppCompat.Headline"
                                 android:textSize="18sp" />
@@ -166,7 +154,6 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="5dp"
-                                android:text="TextView"
                                 android:textAlignment="center"
                                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                                 android:textColor="@color/colorPrimaryDark" />
@@ -178,14 +165,13 @@
                                 android:layout_marginLeft="10dp"
                                 android:layout_marginTop="5dp"
                                 android:layout_marginRight="10dp"
-                                android:text="Résultats publiques" />
+                                android:text="@string/Create_Sondage_Poll_Public_Results_Tag" />
 
                             <TextView
-                                android:id="@+id/textView6"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="5dp"
-                                android:text="Téléverser une image"
+                                android:text="@string/Create_Sondage_Poll_Img_Btn"
                                 android:textAlignment="center"
                                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                                 android:textSize="18sp" />
@@ -208,7 +194,7 @@
                                         android:layout_height="wrap_content"
                                         android:background="@color/transparent"
                                         android:drawableTop="@drawable/ic_file_upload_color"
-                                        android:text="Téléverser" />
+                                        android:text="@string/Create_Option_Elem_BtnUpload" />
                                 </com.balysv.materialripple.MaterialRippleLayout>
 
                                 <View
@@ -228,7 +214,7 @@
                                         android:layout_height="wrap_content"
                                         android:background="@color/transparent"
                                         android:drawableTop="@drawable/ic_clear_color"
-                                        android:text="Retirer l'image"
+                                        android:text="@string/Post_Form_Media_Remove_Img"
                                         android:textColor="@color/colorRed" />
                                 </com.balysv.materialripple.MaterialRippleLayout>
                             </LinearLayout>
@@ -237,10 +223,11 @@
                                 android:id="@+id/sondage_edit_image_preview"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:contentDescription="@string/Sondage_Elem_Img_Desc"
                                 android:layout_marginTop="5dp"
                                 android:adjustViewBounds="true"
                                 android:cropToPadding="false"
-                                android:maxHeight="100dp"
+                                android:maxHeight="150dp"
                                 android:src="@drawable/ic_menu_gallery"
                                 android:visibility="gone" />
                         </LinearLayout>
@@ -269,7 +256,7 @@
                                 android:id="@+id/sondage_edit_add_question"
                                 style="@style/buttonImageCustom"
                                 android:layout_width="50dp"
-
+                                android:contentDescription="@string/Create_Question_Elem_Add_Btn"
                                 android:layout_height="50dp"
                                 android:scaleType="fitCenter"
                                 android:src="@drawable/ic_ajout" />

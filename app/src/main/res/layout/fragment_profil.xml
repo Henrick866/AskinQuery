@@ -12,7 +12,7 @@
         android:id="@+id/profil_form_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Creer un compte."
+        android:text="@string/Profil_Create_Title"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
 
@@ -21,30 +21,39 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:hint="Nom d'utilisateur"
+        android:hint="@string/Username_Field_Hint"
         android:inputType="textPersonName" />
 
     <TextView
         android:id="@+id/profil_form_username_err"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Erreur Nom User"
         android:visibility="invisible"
         android:textColor="@color/colorRed" />
+
+    <Button
+        android:id="@+id/profil_form_available_btn"
+        style="@style/buttonCustom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_gravity="center"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:text="@string/Username_Check" />
 
     <EditText
         android:id="@+id/profil_form_email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:hint="Courriel"
+        android:hint="@string/Email_Field_Hint"
         android:inputType="textEmailAddress" />
 
     <TextView
         android:id="@+id/profil_form_email_err"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Erreur Nom User"
         android:visibility="invisible"
         android:textColor="@color/colorRed" />
 
@@ -53,7 +62,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:hint="Mot de passe"
+        android:hint="@string/Pass_Field_Hint"
         android:inputType="textPassword" />
 
     <ProgressBar
@@ -74,25 +83,17 @@
         android:id="@+id/profil_form_pass_err"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Erreur Nom User"
         android:visibility="invisible"
         android:textColor="@color/colorRed" />
 
     <TextView
-        android:id="@+id/textView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Avatar"
+        android:text="@string/Avatar_Title"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:layout_marginBottom="5dp"
         android:textSize="18sp" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Préférablement une image carrée"
-        android:textAlignment="center" />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -110,7 +111,7 @@
                 android:layout_height="wrap_content"
                 android:drawableTop="@drawable/ic_file_upload_color"
                 android:padding="10dp"
-                android:text="Télécharger" />
+                android:text="@string/Avatar_Download" />
     </com.balysv.materialripple.MaterialRippleLayout>
 
     </RelativeLayout>
@@ -135,7 +136,7 @@
 
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="S'enregistrer" />
+            android:text="@string/Profil_Create_Btn" />
     </com.balysv.materialripple.MaterialRippleLayout>
 
 </LinearLayout>

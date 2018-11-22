@@ -114,6 +114,12 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
                 holder.btn_commencer.setVisibility(View.GONE);
                 if(!sondage.Publied){
                     holder.btn_Statistiques.setImageDrawable(c.getResources().getDrawable(R.drawable.ic_publish));
+                    holder.BtnStatText.setText(R.string.Sondage_Elem_BtnPublish_Desc);
+                    holder.btn_Statistiques.setContentDescription(c.getString(R.string.Sondage_Elem_BtnPublish_Desc));
+                }else{
+                    holder.btn_modifier.setEnabled(false);
+                    holder.BtnEditText.setText(R.string.Sondage_Elem_BtnEdit_Desc_Disabled);
+                    holder.btn_modifier.setContentDescription(c.getString(R.string.Sondage_Elem_BtnEdit_Desc_Disabled));
                 }
 
             }else{
@@ -137,10 +143,10 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
                             //ne peut plus répondre
                             holder.btn_commencer.setEnabled(false);
                             holder.btn_commencer.setTextColor(getContext().getResources().getColor(R.color.colorAccentMedDark));
-                            holder.btn_commencer.setText("Sondage Répondu");
+                            holder.btn_commencer.setText(R.string.Sondage_Elem_Poll_Answered);
                         } else {//si il a sauvegardé, on réponds avec sauvegarde;
                             //sauvegarde
-                            holder.btn_commencer.setText("Continuer");
+                            holder.btn_commencer.setText(R.string.Sondage_Elem_Poll_Saved);
                             holder.btn_commencer.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
@@ -174,7 +180,7 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
                             //peut consulter
                             if (sondage.Compil_Public) {//si la compilation est publique
                                 holder.btn_commencer.setTextColor(getContext().getResources().getColor(R.color.colorSecondaryMedDark));
-                                holder.btn_commencer.setText("Consulter les résultats");
+                                holder.btn_commencer.setText(R.string.Sondage_Elem_Poll_Results);
                                 holder.btn_commencer.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) {
@@ -184,24 +190,24 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
                             } else {
                                 holder.btn_commencer.setEnabled(false);
                                 holder.btn_commencer.setTextColor(getContext().getResources().getColor(R.color.colorAccentMedDark));
-                                holder.btn_commencer.setText("Sondage Répondu");
+                                holder.btn_commencer.setText(R.string.Sondage_Elem_Poll_Answered);
                             }
                         } else {
                             //ne peut pas consulter
                             holder.btn_commencer.setEnabled(false);
                             holder.btn_commencer.setTextColor(getContext().getResources().getColor(R.color.colorAccentMedDark));
-                            holder.btn_commencer.setText("Sondage Terminé");
+                            holder.btn_commencer.setText(R.string.Sondage_Elem_Poll_Done);
                         }
                     }else{
                         holder.btn_commencer.setEnabled(false);
                         holder.btn_commencer.setTextColor(getContext().getResources().getColor(R.color.colorAccentMedDark));
-                        holder.btn_commencer.setText("Sondage Terminé");
+                        holder.btn_commencer.setText(R.string.Sondage_Elem_Poll_Done);
                     }
             }else{//si il n'est pas connecté et que le sondage est terminé, trop tard
                 //nope
                 holder.btn_commencer.setEnabled(false);
                 holder.btn_commencer.setTextColor(getContext().getResources().getColor(R.color.colorAccentMedDark));
-                holder.btn_commencer.setText("Sondage Terminé");
+                holder.btn_commencer.setText(R.string.Sondage_Elem_Poll_Done);
             }
         }
         if(sondage.Chemin_Image.equals("N")){
@@ -227,11 +233,10 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
                 }
         }
         holder.Titre.setText(sondage.Titre);
-        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yy");
-        holder.DateDebut.setText("Publié le: "+format.format(sondage.date_public));
-        holder.DateFin.setText("Fini le : "+format.format(sondage.date_echeance));
+        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yy", c.getResources().getConfiguration().locale);
+        holder.DateDebut.setText(String.format(c.getString(R.string.Sondage_Elem_Date_Publie), format.format(sondage.date_public)));
+        holder.DateFin.setText(String.format(c.getString(R.string.Sondage_Elem_Date_End), format.format(sondage.date_echeance)));
 
-        holder.id_Sondage.setText(sondage.ID);
         ValueEventListener auteurListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -244,7 +249,6 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
                         ((AdaptListener)c).changePage(ConsultProfilFragment.newInstance(sondage.Auteur));
                     }
                 });
-                holder.id_Auteur.setText(sondage.Auteur.ID);
                 if(sondage.Publied){
                     holder.btn_modifier.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -269,6 +273,8 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
                     });
                 }else{
                     holder.btn_Statistiques.setImageDrawable(c.getResources().getDrawable(R.drawable.ic_publish));
+                    holder.BtnStatText.setText(R.string.Sondage_Elem_BtnPublish_Desc);
+                    holder.btn_Statistiques.setContentDescription(c.getString(R.string.Sondage_Elem_BtnPublish_Desc));
                     holder.btn_Statistiques.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -304,6 +310,8 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
                                                                 });
                                                         Toast.makeText(c, "Le sondage a été publié", Toast.LENGTH_LONG).show();
                                                         holder.btn_Statistiques.setImageDrawable(c.getResources().getDrawable(R.drawable.ic_stats));
+                                                        holder.BtnStatText.setText(R.string.Sondage_Elem_BtnStats_Desc);
+                                                        holder.btn_Statistiques.setContentDescription(c.getString(R.string.Sondage_Elem_BtnStats_Desc));
                                                         holder.btn_Statistiques.setOnClickListener(new View.OnClickListener() {
                                                             @Override
                                                             public void onClick(View view) {
@@ -312,6 +320,8 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
                                                         });
                                                         sondage.Publied = true;
                                                         holder.btn_modifier.setEnabled(false);
+                                                        holder.BtnEditText.setText(R.string.Sondage_Elem_BtnEdit_Desc_Disabled);
+                                                        holder.btn_modifier.setContentDescription(c.getString(R.string.Sondage_Elem_BtnEdit_Desc_Disabled));
                                                     }
                                                 }
                                             });
@@ -372,8 +382,8 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
         TextView Titre;
         TextView DateDebut;
         TextView DateFin;
-        TextView id_Sondage;
-        TextView id_Auteur;
+        TextView BtnEditText;
+        TextView BtnStatText;
         ImageView Image;
         ProgressBar Loading;
         public ViewHolder(View view){
@@ -383,7 +393,8 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
             btn_commencer = view.findViewById(R.id.sondage_elem_start_btn);
             Loading = view.findViewById(R.id.sondage_elem_progress);
             btnVote = view.findViewById(R.id.btn_vote_layout);
-
+            BtnEditText = view.findViewById(R.id.sondage_elem_edit_text);
+            BtnStatText = view.findViewById(R.id.sondage_elem_stats_text);
             btn_modifier = view.findViewById(R.id.sondage_elem_edit_btn);
             btn_Statistiques = view.findViewById(R.id.sondage_elem_stats_btn);
             btn_supprimer = view.findViewById(R.id.sondage_elem_delete_btn);
@@ -391,8 +402,6 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
             Titre = view.findViewById(R.id.sondage_elem_titre);
             DateDebut = view.findViewById(R.id.sondage_elem_date_debut);
             DateFin = view.findViewById(R.id.sondage_elem_date_fin);
-            id_Sondage = view.findViewById(R.id.sondage_elem_id);
-            id_Auteur = view.findViewById(R.id.sondage_elem_id_auteur);
             Image = view.findViewById(R.id.sondage_elem_image);
         }
     }

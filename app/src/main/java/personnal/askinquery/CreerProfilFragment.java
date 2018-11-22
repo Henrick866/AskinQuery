@@ -47,6 +47,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.google.firebase.storage.internal.Util;
 
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
@@ -70,12 +71,13 @@ public class CreerProfilFragment extends Fragment {
     private TextView Title, UserErr, EmailErr, PassErr, PassStrengthIndic;
     private EditText UserField, EmailField, PassField;
     private ImageView AvatarPreview;
-    private Button btnConfirm, btnUpload;
+    private Button btnConfirm, btnUpload, BtnAvailable;
     private ProgressBar PassStrength;
     private Bitmap ImageBitmap;
     private Uri Image;
     private int SumPass;
     private ProgressDialog progressDialog;
+    private boolean HasChecked, UsernameFound;
     private static final int MY_PERMISSION_REQUEST_READ_STORAGE = 200;
     private final int GALL_ACTION = 17;
 
@@ -125,11 +127,30 @@ public class CreerProfilFragment extends Fragment {
         AvatarPreview = view.findViewById(R.id.profil_form_avatar_preview);
         btnUpload = view.findViewById(R.id.profil_form_file_btn);
         btnConfirm = view.findViewById(R.id.profil_form_btn_confirm);
+        BtnAvailable = view.findViewById(R.id.profil_form_available_btn);
+        HasChecked = false;
+        UsernameFound = false;
+        BtnAvailable.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AvailableUsername(UserField.getEditableText().toString());
+            }
+        });
         btnUpload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(i, GALL_ACTION);
+            }
+        });
+        UserField.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if(!b){
+                    if(!UserField.getEditableText().toString().isEmpty()) {
+                        AvailableUsername(UserField.getEditableText().toString());
+                    }
+                }
             }
         });
         btnConfirm.setOnClickListener(new View.OnClickListener() {
@@ -187,27 +208,68 @@ public class CreerProfilFragment extends Fragment {
                         PassStrength.setProgress(0);
                         PassStrength.getProgressDrawable().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
                         PassStrengthIndic.setTextColor(Color.BLACK);
-                        PassStrengthIndic.setText("Inacceptable");
+                        PassStrengthIndic.setText(R.string.Pass_Strength_Unacceptable);
                         break;
                     case 2: PassStrength.setProgress(33);
                         PassStrength.getProgressDrawable().setColorFilter(getResources().getColor(R.color.colorRed), PorterDuff.Mode.SRC_IN);
                         PassStrengthIndic.setTextColor(getResources().getColor(R.color.colorRed));
-                        PassStrengthIndic.setText("Faible");
+                        PassStrengthIndic.setText(R.string.Pass_Strength_Weak);
                         break;
                     case 3: PassStrength.setProgress(66);
                         PassStrength.getProgressDrawable().setColorFilter(getResources().getColor(R.color.colorYellow), PorterDuff.Mode.SRC_IN);
                         PassStrengthIndic.setTextColor(getResources().getColor(R.color.colorYellow));
-                        PassStrengthIndic.setText("Moyen");
+                        PassStrengthIndic.setText(R.string.Pass_Strength_Medium);
                         break;
                     case 4: PassStrength.setProgress(100);
                         PassStrength.getProgressDrawable().setColorFilter(getResources().getColor(R.color.colorGreen), PorterDuff.Mode.SRC_IN);
                         PassStrengthIndic.setTextColor(getResources().getColor(R.color.colorGreen));
-                        PassStrengthIndic.setText("Fort");
+                        PassStrengthIndic.setText(R.string.Pass_Strength_Strong);
                         break;
                 }
             }
         }
     };
+    private void AvailableUsername(final String tempUser){
+        UserField.setCompoundDrawablesWithIntrinsicBounds(null, null, getResources().getDrawable(R.drawable.progress), null);
+        ValueEventListener ProfileUsernameVerifier = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                boolean Found = false;
+                for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
+                    if(tempUser.equals(dataSnapshot1.child(FireBaseInteraction.Profil_Keys.USERNAME).getValue())){
+                        Found = true;
+                    }
+                }
+                if(Found){
+                    UserField.setCompoundDrawablesWithIntrinsicBounds(null, null, getResources().getDrawable(R.drawable.ic_clear_color),null);
+                }else{
+                    UserField.setCompoundDrawablesWithIntrinsicBounds(null, null, getResources().getDrawable(R.drawable.ic_done_color), null);
+                }
+                HasChecked = true;
+                UsernameFound = Found;
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        if(!tempUser.isEmpty()) {
+            if(tempUser.length() < 3){
+                UserErr.setText(R.string.Username_Err_Short);
+                UserErr.setVisibility(View.VISIBLE);
+            }else if(tempUser.length() > 25){
+                UserErr.setText(R.string.Username_Err_Long);
+                UserErr.setVisibility(View.VISIBLE);
+            }else {
+                UserErr.setVisibility(View.INVISIBLE);
+                DatabaseReference profilRef = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Profil_Keys.STRUCT_NAME);
+                profilRef.addListenerForSingleValueEvent(ProfileUsernameVerifier);
+            }
+        }else{
+            UserErr.setText(R.string.Gen_Empty_Field);
+            UserErr.setVisibility(View.VISIBLE);
+        }
+    }
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data){
         if (requestCode == GALL_ACTION && resultCode == Activity.RESULT_OK) {
@@ -259,13 +321,13 @@ public class CreerProfilFragment extends Fragment {
         Pass = PassField.getEditableText().toString();
         if (!Email.isEmpty()){
             if (!Email.matches("([A-Za-z0-9\\-\\_\\.]+)\\@([A-Za-z0-9]+)\\.([A-Za-z]{2,})")) {
-                EmailErr.setText("Courriel invalide.");
+                EmailErr.setText(R.string.Email_Field_Err_Invalid);
                 EmailErr.setVisibility(View.VISIBLE);
             }else{
                 EmailErr.setVisibility(View.INVISIBLE);
             }
         }else{
-            EmailErr.setText("Champ vide.");
+            EmailErr.setText(R.string.Gen_Empty_Field);
             EmailErr.setVisibility(View.VISIBLE);
         }
         if(!Pass.isEmpty()){
@@ -273,26 +335,34 @@ public class CreerProfilFragment extends Fragment {
                 if(SumPass < 2){
                     Valid = false;
                     PassErr.setVisibility(View.VISIBLE);
-                    PassErr.setText("Mot de passe trop faible.");
+                    PassErr.setText(R.string.Pass_Err_Too_Weak);
                 }else{
                     PassErr.setVisibility(View.INVISIBLE);
                 }
             }else{
                 Valid = false;
                 PassErr.setVisibility(View.VISIBLE);
-                PassErr.setText("Mot de passe trop petit (8 caractères minimum).");
+                PassErr.setText(R.string.Pass_Err_Too_Short);
             }
         }else{
             Valid = false;
             PassErr.setVisibility(View.VISIBLE);
-            PassErr.setText("Champ vide.");
+            PassErr.setText(R.string.Gen_Empty_Field);
         }
         if(User.isEmpty()){
             Valid = false;
             UserErr.setVisibility(View.VISIBLE);
-            UserErr.setText("Champ vide.");
+            UserErr.setText(R.string.Gen_Empty_Field);
         }else{
-            UserErr.setVisibility(View.INVISIBLE);
+            if(User.length() < 3){
+                UserErr.setText(R.string.Username_Err_Short);
+                UserErr.setVisibility(View.VISIBLE);
+            }else if(User.length() > 25){
+                UserErr.setText(R.string.Username_Err_Long);
+                UserErr.setVisibility(View.VISIBLE);
+            }else {
+                UserErr.setVisibility(View.INVISIBLE);
+            }
         }
         if(Valid){
             progressDialog = new ProgressDialog(getActivity());

@@ -38,7 +38,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.internal.Util;
@@ -114,6 +116,7 @@ public class MainActivity extends AppCompatActivity
         updateMenu(user);
 
         Intent intent = getIntent();
+
         if(intent != null){//si on a recu une notification, on est connecté.
             if(intent.getStringExtra("FragmentName")!=null) {
                 if (intent.getStringExtra("FragmentName").equals("NewPoll")) {
@@ -328,9 +331,9 @@ public class MainActivity extends AppCompatActivity
                 mAuth.signOut();
                 user = mAuth.getCurrentUser();
                 updateMenu(user);
-                /*for(HashMap.Entry<String, String> cursor : Utilisateur_Connecte.Auteurs_Suivis.entrySet()) {//pour désactiver les notifications qui ne sont plus ciblés vers cet appareil
+                for(HashMap.Entry<String, String> cursor : Utilisateur_Connecte.Auteurs_Suivis.entrySet()) {//pour désactiver les notifications qui ne sont plus ciblés vers cet appareil
                     FirebaseMessaging.getInstance().unsubscribeFromTopic(cursor.getKey());
-                }*/
+                }
                 changePage(SondageListFragment.newInstance(false, null));
             }else{
                 drawer.closeDrawer(GravityCompat.START);

@@ -147,7 +147,6 @@ public class CreerOptionDialog extends DialogFragment implements CreerOptionAdap
         if(mParam1.Type_Question != Question.TYPE_TEXTE){
             DownloadImagesList();
         }
-        Log.e("Test","images chargés");
         creerOptionAdapter = new CreerOptionAdapter(getActivity(), mParam1.Options, mParam1.Type_Question, this);
         OptionListe.setAdapter(creerOptionAdapter);
         btnAjout.setOnClickListener(new View.OnClickListener() {
@@ -233,7 +232,7 @@ public class CreerOptionDialog extends DialogFragment implements CreerOptionAdap
         }
         creerOptionAdapter.notifyDataSetChanged();
         if (mParam1.Options.size() < 2) {
-            OptionsError.setText("Vous devez avoir au moins deux choix de réponses");
+            OptionsError.setText(R.string.Create_Question_Option_Min_Err);
             OptionsError.setVisibility(View.VISIBLE);
         } else {
             OptionsError.setVisibility(View.INVISIBLE);

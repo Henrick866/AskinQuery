@@ -106,7 +106,7 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
         });
         holder.TitreView.setText(publication.Titre);
         holder.TexteView.setText(publication.Texte);
-        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yy");
+        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yy", c.getResources().getConfiguration().locale);
         holder.DateView.setText(format.format(publication.Date_Public));
 
         if(publication.Type != Publication.TYPE_TEXTE){
@@ -118,8 +118,10 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
                         @Override
                         public void onSuccess(byte[] bytes) {
                             Bitmap b = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                            holder.Instruct.setText("Appuyez sur l'image pour la voir en grand format");
+                            holder.Instruct.setText(R.string.Post_Elem_Instruct_Img);
                             holder.Instruct.setVisibility(View.VISIBLE);
+                            holder.Icon.setImageResource(R.drawable.ic_loupe_black_24dp);
+                            holder.Icon.setVisibility(View.VISIBLE);
                             holder.MediaView.setImageBitmap(b);
                             BitmapMap.put(publication.ID, b);
                             holder.MediaView.setVisibility(View.VISIBLE);
@@ -150,8 +152,10 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
                         }
                     });
                 }else{
-                        holder.Instruct.setText("Appuyez sur l'image pour la voir en grand format");
+                        holder.Instruct.setText(R.string.Post_Elem_Instruct_Img);
                         holder.Instruct.setVisibility(View.VISIBLE);
+                    holder.Icon.setImageResource(R.drawable.ic_loupe_black_24dp);
+                    holder.Icon.setVisibility(View.VISIBLE);
                         holder.MediaView.setImageBitmap(BitmapMap.get(publication.ID));
                     holder.Loading.setVisibility(View.GONE);
                         holder.MediaView.setVisibility(View.VISIBLE);
@@ -185,9 +189,11 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
                     AvatarRef.getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
                         @Override
                         public void onSuccess(byte[] bytes) {
-                            holder.Instruct.setText("Cliquez sur l'image pour lire la vidéo.");
+                            holder.Instruct.setText(R.string.Post_Elem_Instruct_Vid);
                             holder.Instruct.setVisibility(View.VISIBLE);
                             Bitmap b = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                            holder.Icon.setImageResource(R.drawable.ic_play_circle_color);
+                            holder.Icon.setVisibility(View.VISIBLE);
                             holder.MediaView.setImageBitmap(b);
                             BitmapMap.put(publication.ID, b);
                             holder.MediaView.setVisibility(View.VISIBLE);
@@ -210,8 +216,10 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
                         }
                     });
                 }else{
-                    holder.Instruct.setText("Cliquez sur l'image pour lire la vidéo.");
+                    holder.Instruct.setText(R.string.Post_Elem_Instruct_Vid);
                     holder.Instruct.setVisibility(View.VISIBLE);
+                    holder.Icon.setImageResource(R.drawable.ic_play_circle_color);
+                    holder.Icon.setVisibility(View.VISIBLE);
                     holder.MediaView.setImageBitmap(BitmapMap.get(publication.ID));
                     holder.Loading.setVisibility(View.GONE);
                     holder.MediaView.setVisibility(View.VISIBLE);
@@ -233,8 +241,10 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
                 }
             }else{
                 if(publication.Media.equals("N")){
-                    holder.Instruct.setText("Cliquez sur l'image pour répondre au sondage.");
+                    holder.Instruct.setText(R.string.Post_Elem_Instruct_Poll);
                     holder.Instruct.setVisibility(View.VISIBLE);
+                    holder.Icon.setImageResource(R.drawable.ic_sondage_debut);
+                    holder.Icon.setVisibility(View.VISIBLE);
                     holder.MediaView.setImageResource(R.mipmap.ic_launcher);
                     holder.Loading.setVisibility(View.GONE);
                     holder.MediaView.setVisibility(View.VISIBLE);
@@ -246,9 +256,11 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
                         ImageRef.getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
                             @Override
                             public void onSuccess(byte[] bytes) {
-                                holder.Instruct.setText("Cliquez sur l'image pour répondre au sondage.");
+                                holder.Instruct.setText(R.string.Post_Elem_Instruct_Poll);
                                 holder.Instruct.setVisibility(View.VISIBLE);
                                 Bitmap b = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                                holder.Icon.setImageResource(R.drawable.ic_sondage_debut);
+                                holder.Icon.setVisibility(View.VISIBLE);
                                 holder.MediaView.setImageBitmap(b);
                                 holder.Loading.setVisibility(View.GONE);
                                 BitmapMap.put(publication.ID, b);
@@ -259,8 +271,11 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
                             }
                         });
                     }else{
-                        holder.Instruct.setText("Cliquez sur l'image pour répondre au sondage.");
+                        holder.Instruct.setText(R.string.Post_Elem_Instruct_Poll);
                         holder.Instruct.setVisibility(View.VISIBLE);
+                        holder.Icon.setImageResource(R.drawable.ic_sondage_debut);
+                        holder.Icon.setVisibility(View.VISIBLE);
+
                         holder.MediaView.setImageBitmap(BitmapMap.get(publication.ID));
                         holder.Loading.setVisibility(View.GONE);
                         holder.MediaView.setVisibility(View.VISIBLE);
@@ -373,9 +388,9 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
                 if(user != null){//si il est connecté quand le sondage est en cours
                     Profil UtilConn = ((AdaptListener)c).getUtilisateur_Connecte();
                     if(user.getUid().equals(S.AuteurRef)){
-                        holder.Instruct.setText("Cliquez sur l'image pour accéder au sondage.");
+                        holder.Instruct.setText(R.string.Post_Elem_Instruct_Poll);
                         holder.Instruct.setVisibility(View.VISIBLE);
-                        holder.AlertSondage.setText("Consulter les résultats");
+                        holder.AlertSondage.setText(R.string.Post_Elem_Alert_Poll_Results);
                         holder.AlertSondage.setVisibility(View.VISIBLE);
                         holder.MediaView.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -386,13 +401,13 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
                     }else if(UtilConn.Sondages_Faits.containsKey(S.ID)) {
                         if (UtilConn.Sondages_Faits.get(S.ID) instanceof Boolean) {//si il a terminé, le sondage a été répondu
                             //ne peut plus répondre
-                            holder.AlertSondage.setText("Sondage Répondu");
+                            holder.AlertSondage.setText(R.string.Post_Elem_Alert_Poll_Answered);
                             holder.AlertSondage.setVisibility(View.VISIBLE);
                         } else {//si il a sauvegardé, on réponds avec sauvegarde;
                             //sauvegarde
-                            holder.Instruct.setText("Cliquez sur l'image pour accéder au sondage.");
+                            holder.Instruct.setText(R.string.Post_Elem_Instruct_Poll);
                             holder.Instruct.setVisibility(View.VISIBLE);
-                            holder.AlertSondage.setText("Continuer");
+                            holder.AlertSondage.setText(R.string.Post_Elem_Alert_Poll_Continue);
                             holder.AlertSondage.setVisibility(View.VISIBLE);
                             holder.MediaView.setOnClickListener(new View.OnClickListener() {
                                 @Override
@@ -402,7 +417,7 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
                             });
                         }
                     }else{
-                        holder.Instruct.setText("Cliquez sur l'image pour accéder au sondage.");
+                        holder.Instruct.setText(R.string.Post_Elem_Instruct_Poll);
                         holder.Instruct.setVisibility(View.VISIBLE);
                         holder.MediaView.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -414,7 +429,7 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
 
 
                 }else{//si l'util n'est pas connecté quand le sondage est en cours, il réponds
-                    holder.Instruct.setText("Cliquez sur l'image pour accéder au sondage.");
+                    holder.Instruct.setText(R.string.Post_Elem_Instruct_Poll);
                     holder.Instruct.setVisibility(View.VISIBLE);
                     holder.MediaView.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -427,9 +442,9 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
                 if(user != null){//si l'util est connecté
                     Profil UtilConn = ((AdaptListener)c).getUtilisateur_Connecte();
                     if(user.getUid().equals(S.AuteurRef)){
-                        holder.Instruct.setText("Cliquez sur l'image pour accéder au sondage.");
+                        holder.Instruct.setText(R.string.Post_Elem_Instruct_Poll);
                         holder.Instruct.setVisibility(View.VISIBLE);
-                        holder.AlertSondage.setText("Consulter les résultats");
+                        holder.AlertSondage.setText(R.string.Post_Elem_Alert_Poll_Results);
                         holder.AlertSondage.setVisibility(View.VISIBLE);
                         holder.MediaView.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -441,9 +456,9 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
                         if (UtilConn.Sondages_Faits.get(S.ID) instanceof Boolean) {//si la réponse est terminée..
                             //peut consulter
                             if (S.Compil_Public) {//si la compilation est publique
-                                holder.Instruct.setText("Cliquez sur l'image pour accéder au sondage.");
+                                holder.Instruct.setText(R.string.Post_Elem_Instruct_Poll);
                                 holder.Instruct.setVisibility(View.VISIBLE);
-                                holder.AlertSondage.setText("Consulter les résultats");
+                                holder.AlertSondage.setText(R.string.Post_Elem_Alert_Poll_Results);
                                 holder.AlertSondage.setVisibility(View.VISIBLE);
                                 holder.MediaView.setOnClickListener(new View.OnClickListener() {
                                     @Override
@@ -452,22 +467,22 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
                                     }
                                 });
                             } else {
-                                holder.AlertSondage.setText("Sondage Répondu");
+                                holder.AlertSondage.setText(R.string.Post_Elem_Alert_Poll_Answered);
                                 holder.AlertSondage.setVisibility(View.VISIBLE);
                             }
                         } else {
                             //ne peut pas consulter
-                            holder.AlertSondage.setText("Sondage Terminé");
+                            holder.AlertSondage.setText(R.string.Post_Elem_Alert_Poll_Finished);
                             holder.AlertSondage.setVisibility(View.VISIBLE);
                         }
                     }else{
-                        holder.AlertSondage.setText("Sondage Terminé");
+                        holder.AlertSondage.setText(R.string.Post_Elem_Alert_Poll_Finished);
                         holder.AlertSondage.setVisibility(View.VISIBLE);
                     }
 
                 }else{//si il n'est pas connecté et que le sondage est terminé, trop tard
                     //nope
-                    holder.AlertSondage.setText("Sondage Terminé");
+                    holder.AlertSondage.setText(R.string.Post_Elem_Alert_Poll_Finished);
                     holder.AlertSondage.setVisibility(View.VISIBLE);
                 }
             }
@@ -482,12 +497,13 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
 
     static class ViewHolder{
         TextView TitreView, TexteView, UserNameView, DateView, AlertSondage, Instruct;
-        ImageView MediaView;
+        ImageView MediaView, Icon;
         ImageView AvatarView;
         LinearLayout ZoneAdmin;
         ProgressBar Loading;
         ImageButton BtnPlainte, BtnSupp, BtnEdit;
         public ViewHolder(View view, int position){
+            Icon = view.findViewById(R.id.pub_elem_img_icon);
             Instruct = view.findViewById(R.id.pub_elem_instruct);
             TitreView = view.findViewById(R.id.pub_elem_titre);
             TexteView = view.findViewById(R.id.pub_elem_texte);

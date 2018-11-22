@@ -168,7 +168,7 @@ public class AnswerSondageFragment extends Fragment{
         if(Si_Resultats){
             ((View)BtnSave.getParent()).setVisibility(View.GONE);
             Separateur.setVisibility(View.GONE);
-            BtnTerminer.setText("Revenir");
+            BtnTerminer.setText(R.string.Poll_Answ_GoBack);
             BtnTerminer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

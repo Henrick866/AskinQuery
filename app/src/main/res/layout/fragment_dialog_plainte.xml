@@ -9,10 +9,9 @@
     <!-- TODO: Update blank fragment layout -->
 
     <TextView
-        android:id="@+id/textView2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Veuiller indiquer les raisons de votre plainte."
+        android:text="@string/Dialog_Flag_Title"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
         android:textSize="18sp" />
@@ -23,7 +22,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:hint="Raisons"
+        android:hint="@string/Dialog_Flag_Hint"
         android:inputType="textMultiLine" />
 
     <TextView
@@ -33,7 +32,7 @@
         android:layout_marginTop="5dp"
         android:paddingStart="10dp"
         android:paddingEnd="10dp"
-        android:text="Le champ est vide"
+        android:text="@string/Gen_Empty_Field"
         android:textAlignment="textEnd"
         android:textAppearance="@style/TextAppearance.AppCompat"
         android:textColor="@color/colorRed"
@@ -55,7 +54,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
 
-            android:text="Envoyer" />
+            android:text="@string/Dialog_Flag_Done" />
         </com.balysv.materialripple.MaterialRippleLayout>
 
         <View
@@ -71,7 +70,7 @@
             style="@style/buttonNoBorderCustom"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="Annuler"
+            android:text="@string/Mng_Profil_Cancel"
             android:textColor="@color/colorRed" />
         </com.balysv.materialripple.MaterialRippleLayout>
     </LinearLayout>

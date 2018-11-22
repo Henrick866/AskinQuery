@@ -87,7 +87,7 @@ public class CreatePostFragment extends Fragment {
     private TextView TitreForm, TitreErr, ContentErr, Instruct;
     private EditText TitreField, ContentField;
     private Button ImgUpBtn, VidUpBtn, PollLinkBtn, DoneBtn, MedRmvBtn;
-    private ImageView MediaPreview;
+    private ImageView MediaPreview, MediaPreviewIcon;
 
     private FirebaseAuth mAuth;
     private FirebaseUser user;
@@ -166,6 +166,7 @@ public class CreatePostFragment extends Fragment {
         MediaPreview = view.findViewById(R.id.publication_edit_media_preview);
         MedRmvBtn = view.findViewById(R.id.publication_edit_mediaRmvBtn);
         Instruct = view.findViewById(R.id.publication_edit_instruct);
+        MediaPreviewIcon = view.findViewById(R.id.publication_edit_media_preview_icon);
         Type = Publication.TYPE_TEXTE;
 
         DatabaseReference SondageByAuthorRef = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Sondage_Keys.STRUCT_NAME);
@@ -191,7 +192,7 @@ public class CreatePostFragment extends Fragment {
         mListener.ChangeTitle("Publication | Créer");
         if(Si_Edit){
             mListener.ChangeTitle("Publication | Modifier");
-            TitreForm.setText("Modifier une publication");
+            TitreForm.setText(R.string.Post_Form_Title_Edit);
             TitreField.setText(publication.Titre);
             ContentField.setText(publication.Texte);
             Type = publication.Type;
@@ -201,7 +202,7 @@ public class CreatePostFragment extends Fragment {
                 if(publication.Type == Publication.TYPE_VIDEO) {
 
                      ImageRef  = ImageRef.child(FireBaseInteraction.Storage_Paths.PUBLICATION_VIDEOS_THUMBNAILS).child(publication.ID+".jpg");
-                     MedRmvBtn.setText("Retirer la vidéo");
+                     MedRmvBtn.setText(R.string.Post_Form_Media_Remove_Vid);
                     MediaPreview.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
@@ -220,8 +221,10 @@ public class CreatePostFragment extends Fragment {
                     ImageRef.getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
                         @Override
                         public void onSuccess(byte[] bytes) {
-                            Instruct.setText("Appuyez sur l'image pour lire la vidéo.");
+                            Instruct.setText(R.string.Post_Elem_Instruct_Vid);
                             Instruct.setVisibility(View.VISIBLE);
+                            MediaPreviewIcon.setImageResource(R.drawable.ic_play_circle_color);
+                            MediaPreviewIcon.setVisibility(View.VISIBLE);
                             ImageBitmap = BitmapFactory.decodeByteArray(bytes,0, bytes.length);
                             MediaPreview.setImageBitmap(ImageBitmap);
                             MediaPreview.setVisibility(View.VISIBLE);
@@ -232,12 +235,14 @@ public class CreatePostFragment extends Fragment {
 
                     if(publication.Type == Publication.TYPE_IMAGE){
                         ImageRef = ImageRef.child(FireBaseInteraction.Storage_Paths.PUBLICATION_IMAGES_THUMBNAILS).child(publication.ID+".jpg");//charge thumb
-                        MedRmvBtn.setText("Retirer l'image");
+                        MedRmvBtn.setText(R.string.Post_Form_Media_Remove_Img);
                         ImageRef.getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
                             @Override
                             public void onSuccess(byte[] bytes) {
-                                Instruct.setText("Appuyez sur l'image pour voir l'image en grand format.");
+                                Instruct.setText(R.string.Post_Elem_Instruct_Img);
                                 Instruct.setVisibility(View.VISIBLE);
+                                MediaPreviewIcon.setImageResource(R.drawable.ic_loupe_black_24dp);
+                                MediaPreviewIcon.setVisibility(View.VISIBLE);
                                 ImageBitmap = BitmapFactory.decodeByteArray(bytes,0, bytes.length);
                                 MediaPreview.setImageBitmap(ImageBitmap);
                                 MediaPreview.setVisibility(View.VISIBLE);
@@ -266,11 +271,13 @@ public class CreatePostFragment extends Fragment {
                         });
                     }else{
                         SondageLink = publication.SondageRef;
-                        MedRmvBtn.setText("Retirer le lien");
-                        Instruct.setText("(Désactivé pour ne pas perdre la progression) Appuyez sur l'image pour répondre au sondage.");
+                        MedRmvBtn.setText(R.string.Post_Form_Media_Remove_Poll);
+                        Instruct.setText(R.string.Post_Elem_Instruct_Poll_Disabled);
                         Instruct.setVisibility(View.VISIBLE);
                         if(publication.Media.equals("N")){
                             MediaPreview.setImageResource(R.mipmap.ic_launcher);
+                            MediaPreviewIcon.setImageResource(R.drawable.ic_sondage_debut);
+                            MediaPreviewIcon.setVisibility(View.VISIBLE);
                             MediaPreview.setVisibility(View.VISIBLE);
                             MedRmvBtn.setVisibility(View.VISIBLE);
                         }else{
@@ -279,6 +286,8 @@ public class CreatePostFragment extends Fragment {
                                 @Override
                                 public void onSuccess(byte[] bytes) {
                                     ImageBitmap = BitmapFactory.decodeByteArray(bytes,0, bytes.length);
+                                    MediaPreviewIcon.setImageResource(R.drawable.ic_sondage_debut);
+                                    MediaPreviewIcon.setVisibility(View.VISIBLE);
                                     MediaPreview.setImageBitmap(ImageBitmap);
                                     MediaPreview.setVisibility(View.VISIBLE);
                                     MedRmvBtn.setVisibility(View.VISIBLE);
@@ -335,6 +344,7 @@ public class CreatePostFragment extends Fragment {
                         MedRmvBtn.setVisibility(View.GONE);
                         break;
                 }
+                MediaPreviewIcon.setVisibility(View.GONE);
                 Instruct.setVisibility(View.GONE);
                 Type = Publication.TYPE_TEXTE;
             }
@@ -357,14 +367,14 @@ public class CreatePostFragment extends Fragment {
                 boolean Valid = true;
                 if(newPublication.Titre.isEmpty()){
                     Valid = false;
-                    TitreErr.setText("Le champ est vide");
+                    TitreErr.setText(R.string.Gen_Empty_Field);
                     TitreErr.setVisibility(View.VISIBLE);
                 }else{
                     TitreErr.setVisibility(View.INVISIBLE);
                 }
                 if(newPublication.Texte.isEmpty()){
                     Valid = false;
-                    ContentErr.setText("Le champ est vide");
+                    ContentErr.setText(R.string.Gen_Empty_Field);
                     ContentErr.setVisibility(View.VISIBLE);
                 }else{
                     ContentErr.setVisibility(View.INVISIBLE);
@@ -607,9 +617,11 @@ public class CreatePostFragment extends Fragment {
                 cursor.close();
                 ImageBitmap = ThumbnailUtils.createVideoThumbnail(picturePath, MediaStore.Video.Thumbnails.MINI_KIND);
                 MediaPreview.setImageBitmap(ImageBitmap);
+                MediaPreviewIcon.setImageResource(R.drawable.ic_play_circle_color);
+                MediaPreviewIcon.setVisibility(View.VISIBLE);
                 MediaPreview.setVisibility(View.VISIBLE);
                 MedRmvBtn.setVisibility(View.VISIBLE);
-                Instruct.setText("Appuyez sur l'image pour lire la vidéo.");
+                Instruct.setText(R.string.Post_Elem_Instruct_Vid);
                 Instruct.setVisibility(View.VISIBLE);
                 MediaPreview.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -646,8 +658,10 @@ public class CreatePostFragment extends Fragment {
                 }
                 Media = null;
                 mediachange = true;
-                Instruct.setText("Appuyez sur l'image pour la voir en grand format");
+                Instruct.setText(R.string.Post_Elem_Instruct_Img);
                 Instruct.setVisibility(View.VISIBLE);
+                MediaPreviewIcon.setImageResource(R.drawable.ic_loupe_black_24dp);
+                MediaPreviewIcon.setVisibility(View.VISIBLE);
                 MediaPreview.setImageBitmap(ImageBitmap);
                 MediaPreview.setVisibility(View.VISIBLE);
                 MediaPreview.setOnClickListener(new View.OnClickListener() {
@@ -674,9 +688,11 @@ public class CreatePostFragment extends Fragment {
         ImageBitmap = TraitementImage.RotateImage(Media, getActivity());
         Media = null;
         mediachange = true;
-        Instruct.setText("Appuyez sur l'image pour la voir en grand format");
+        Instruct.setText(R.string.Post_Elem_Instruct_Img);
         Instruct.setVisibility(View.VISIBLE);
         MediaPreview.setImageBitmap(ImageBitmap);
+        MediaPreviewIcon.setImageResource(R.drawable.ic_loupe_black_24dp);
+        MediaPreviewIcon.setVisibility(View.VISIBLE);
         MediaPreview.setVisibility(View.VISIBLE);
         MediaPreview.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -701,11 +717,13 @@ public class CreatePostFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 String result = (String)dataSnapshot.getValue();
-                if(result == "N"){
-                    Instruct.setText("(Désactivé pour ne pas perdre la progression) Appuyez sur l'image pour répondre au sondage.");
+                if(result.equals("N")){
+                    Instruct.setText(R.string.Post_Elem_Instruct_Poll_Disabled);
                     Instruct.setVisibility(View.VISIBLE);
                     ImgLinkSondage = "N";
                     MediaPreview.setImageResource(R.mipmap.ic_launcher);
+                    MediaPreviewIcon.setImageResource(R.drawable.ic_sondage_debut);
+                    MediaPreviewIcon.setVisibility(View.VISIBLE);
                     MediaPreview.setVisibility(View.VISIBLE);
                     MedRmvBtn.setVisibility(View.VISIBLE);
                 }else{
@@ -714,10 +732,12 @@ public class CreatePostFragment extends Fragment {
                     ImgSondageGet.getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
                         @Override
                         public void onSuccess(byte[] bytes) {
-                            Instruct.setText("(Désactivé pour ne pas perdre la progression) Appuyez sur l'image pour répondre au sondage.");
+                            Instruct.setText(R.string.Post_Elem_Instruct_Poll_Disabled);
                             Instruct.setVisibility(View.VISIBLE);
                             Bitmap Image = BitmapFactory.decodeByteArray(bytes,0, bytes.length);//pas besoin de imagebitmap, car il existe déja sur le serveur
                             MediaPreview.setImageBitmap(Image);
+                            MediaPreviewIcon.setImageResource(R.drawable.ic_sondage_debut);
+                            MediaPreviewIcon.setVisibility(View.VISIBLE);
                             MediaPreview.setVisibility(View.VISIBLE);
                             MedRmvBtn.setVisibility(View.VISIBLE);
                         }

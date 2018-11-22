@@ -95,28 +95,38 @@ public class LoginFragment extends Fragment {
             @Override
             public void onClick(View view) {
 
-
-                OldUser = null;
-                if(user != null){
-                    if(user.isAnonymous()){
-                        OldUser = user;
-                    }
-                }
-                //todo :: sync les données?
-                //todo:: demander la syncronisation
-                //todo: via les transactions, vérifiez si le sondage a été répondu par les deux parties, si oui, décrémentez les scores
+                boolean Valid = true;
                 String Pass = PassField.getEditableText().toString(), Email = EmailField.getEditableText().toString();
-                mAuth.signInWithEmailAndPassword(Email, Pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if(task.isSuccessful()){
-                            SyncSubscribe();
-                        }else{
-                            LoginErr.setText("Courriel ou mot de passe érronné.");
-                            LoginErr.setVisibility(View.VISIBLE);
+                if(Email.isEmpty()){
+                    Valid = false;
+                }
+                if(Pass.isEmpty()){
+                    Valid = false;
+                }
+
+                if(Valid) {
+                    OldUser = null;
+                    if (user != null) {
+                        if (user.isAnonymous()) {
+                            OldUser = user;
                         }
                     }
-                });
+                    mAuth.signInWithEmailAndPassword(Email, Pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (task.isSuccessful()) {
+                                LoginErr.setVisibility(View.INVISIBLE);
+                                SyncSubscribe();
+                            } else {
+                                LoginErr.setText(R.string.Login_Wrong_Creds);
+                                LoginErr.setVisibility(View.VISIBLE);
+                            }
+                        }
+                    });
+                }else{
+                    LoginErr.setText(R.string.Login_Empty_Fields);
+                    LoginErr.setVisibility(View.VISIBLE);
+                }
 
             }
         });

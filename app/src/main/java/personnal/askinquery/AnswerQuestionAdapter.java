@@ -87,7 +87,7 @@ public class AnswerQuestionAdapter extends ArrayAdapter<Question> implements Ans
         }
         holder.ListeOption.setAdapter(answerOptionAdapter);
         Utils.setListViewHeightBasedOnItems(holder.ListeOption);
-        holder.TexteQuestion.setText((position+1)+". "+question.Texte_Question);
+        holder.TexteQuestion.setText(c.getString(R.string.Poll_Answ_Question_Title, position+1, question.Texte_Question));
 
         if(question.Type_Question != Question.TYPE_TEXTE){
         for(int i = 0; i < liste_options.size(); i++){
@@ -111,11 +111,11 @@ public class AnswerQuestionAdapter extends ArrayAdapter<Question> implements Ans
         }
         }
         if(question.Type_Question == Question.TYPE_VIDEO){
-            holder.TexteInstruct.setText("Appuyez sur l'image pour lire la vidéo");
+            holder.TexteInstruct.setText(R.string.Post_Elem_Instruct_Vid);
             holder.TexteInstruct.setVisibility(View.VISIBLE);
         }
         if(question.Type_Question == Question.TYPE_IMAGE){
-            holder.TexteInstruct.setText("Appuyez sur l'image pour la voir en grand format");
+            holder.TexteInstruct.setText(R.string.Post_Elem_Instruct_Img);
             holder.TexteInstruct.setVisibility(View.VISIBLE);
         }
 

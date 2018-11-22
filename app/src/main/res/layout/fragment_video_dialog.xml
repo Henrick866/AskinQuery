@@ -19,7 +19,7 @@
             android:drawableEnd="@drawable/ic_clear_color"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
-            android:text="Fermer"
+            android:text="@string/Close_Dialog"
             android:textColor="@color/colorRed" />
     </com.balysv.materialripple.MaterialRippleLayout>
     <FrameLayout

@@ -91,7 +91,7 @@ public class CreerQuestionAdapter extends ArrayAdapter<Question> implements Cree
         if(QuestionData.get(POSITION).toBeDeleted){
             view.setVisibility(View.GONE);
         }else {
-            viewHolder.NumQuestion.setText("Question #" + (position + 1));
+            viewHolder.NumQuestion.setText(c.getString(R.string.Create_Question_Elem_Numerate, (position+1)));
 
             List<String> spinnerArray = new ArrayList<>();
             spinnerArray.add("(Non sélectionné)");
@@ -106,16 +106,16 @@ public class CreerQuestionAdapter extends ArrayAdapter<Question> implements Cree
                 viewHolder.btnDropDown.setEnabled(true);
             } else {
                 viewHolder.btnDropDown.setEnabled(false);
-                viewHolder.TypeError.setText("Vous devez choisir un type de question");
+                viewHolder.TypeError.setText(R.string.Create_Question_NoType_Err);
             }
             if (QuestionData.size() < 1) {
-                creerSondageFragment.QuestionsError.setText("Vous devez poser au moins une question.");
+                creerSondageFragment.QuestionsError.setText(R.string.Create_Sondage_NoQuestion_Err);
                 creerSondageFragment.QuestionsError.setVisibility(View.VISIBLE);
             }
             final CreerQuestionAdapter questionAdapter = this;
             final CreerQuestionAdapter.DialogFunctions dialogFunctions = new CreerQuestionAdapter.DialogFunctions();
             if (QuestionData.get(position).Options.size() < 2) {
-                viewHolder.OptionsError.setText("Vous devez ajouter au moins deux choix de réponses.");
+                viewHolder.OptionsError.setText(R.string.Create_Question_Option_Min_Err);
                 viewHolder.OptionsError.setVisibility(View.VISIBLE);
             } else {
                 viewHolder.OptionsError.setVisibility(View.INVISIBLE);
@@ -176,7 +176,7 @@ public class CreerQuestionAdapter extends ArrayAdapter<Question> implements Cree
                 public void afterTextChanged(Editable s) {
                     String newTexte = s.toString();
                     if (newTexte.isEmpty()) {
-                        viewHolder.TexteError.setText("Vous devez poser une question");
+                        viewHolder.TexteError.setText(R.string.Create_Question_NoQuestion_Err);
                         viewHolder.TexteError.setVisibility(View.VISIBLE);
                     } else {
                         if (QuestionData.get(Position).Texte_Question == null) {//si nouv
@@ -197,12 +197,12 @@ public class CreerQuestionAdapter extends ArrayAdapter<Question> implements Cree
                     viewHolder.TexteQuestion.setText(QuestionData.get(POSITION).Texte_Question);
                 } else {
                     viewHolder.TexteQuestion.setText("");
-                    viewHolder.TexteError.setText("Vous devez poser une question");
+                    viewHolder.TexteError.setText(R.string.Create_Question_NoQuestion_Err);
                     viewHolder.TexteError.setVisibility(View.VISIBLE);
                 }
             } else {
                 viewHolder.TexteQuestion.setText("");
-                viewHolder.TexteError.setText("Vous devez poser une question");
+                viewHolder.TexteError.setText(R.string.Create_Question_NoQuestion_Err);
                 viewHolder.TexteError.setVisibility(View.VISIBLE);
             }
             viewHolder.TexteQuestion.setTag(questionTxtWatcher);
@@ -225,7 +225,7 @@ public class CreerQuestionAdapter extends ArrayAdapter<Question> implements Cree
                     } else if (pos == 0) {
                         viewHolder.btnDropDown.setEnabled(false);
                         QuestionData.get(POSITION).Type_Question = 0;
-                        viewHolder.TypeError.setText("Vous devez choisir un type de question");
+                        viewHolder.TypeError.setText(R.string.Create_Question_NoType_Err);
                         viewHolder.TypeError.setVisibility(View.VISIBLE);
                     }
                 }
@@ -274,23 +274,17 @@ public class CreerQuestionAdapter extends ArrayAdapter<Question> implements Cree
             Deployed = false;
             position = p;
             nbNewOption = 0;
-            TexteError = (TextView)view.findViewById(R.id.question_edit_texte_error);
-            TypeError = (TextView)view.findViewById(R.id.question_edit_type_error);
-            OptionsError =(TextView)view.findViewById(R.id.question_edit_options_error);
-            TypeSelect = (Spinner)view.findViewById(R.id.sondage_edit_question_type);
-            TexteQuestion = (EditText)view.findViewById(R.id.sondage_edit_question_titre);
-            NumQuestion = (TextView)view.findViewById(R.id.sondage_edit_num_quest);
-            btnSupp = (ImageButton)view.findViewById(R.id.sondage_edit_question_delete);
-            btnDropDown = (Button)view.findViewById(R.id.question_edit_dropdown_button);
+            TexteError = view.findViewById(R.id.question_edit_texte_error);
+            TypeError = view.findViewById(R.id.question_edit_type_error);
+            OptionsError = view.findViewById(R.id.question_edit_options_error);
+            TypeSelect = view.findViewById(R.id.sondage_edit_question_type);
+            TexteQuestion = view.findViewById(R.id.sondage_edit_question_titre);
+            NumQuestion = view.findViewById(R.id.sondage_edit_num_quest);
+            btnSupp = view.findViewById(R.id.sondage_edit_question_delete);
+            btnDropDown = view.findViewById(R.id.question_edit_dropdown_button);
 
 
         }
-    }
-    public String onFinishedOptionDialog(ArrayList<Option> Options, int Position){
-        QuestionData.get(Position).Options = Options;
-        //creerOptionDialog.dismiss();
-        Toast.makeText(getContext(), "La liste des options de la question #"+(Position+1)+" a été mis à jour", Toast.LENGTH_LONG).show();
-        return "done";
     }
     public interface AdaptListener{
         FragmentManager getFragmentManagerQ();

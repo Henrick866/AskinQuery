@@ -8,6 +8,7 @@
         android:visibility="gone"
         android:adjustViewBounds="true"
         android:cropToPadding="false"
+        android:contentDescription="@string/Image_Dialog_Desc"
         android:layout_height="wrap_content" />
 
     <ProgressBar

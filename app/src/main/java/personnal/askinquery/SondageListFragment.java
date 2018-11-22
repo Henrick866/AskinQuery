@@ -12,6 +12,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.bumptech.glide.util.Util;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -49,7 +51,8 @@ public class SondageListFragment extends ListFragment {
     private static final String mParam1 = "Si_Gestion_Sond";
     private static final String mParam2 = "Filter";
     private static final String mParam3 = "Answered";
-
+    private ProgressBar progressBar;
+    private TextView Empty;
     Profil Utilisateur;
     private String Filter;
     boolean Answered;
@@ -158,6 +161,10 @@ public class SondageListFragment extends ListFragment {
                     SondageList.add(S);
                 }
             }
+            if(SondageList.isEmpty()){
+                Empty.setVisibility(View.VISIBLE);
+            }
+            progressBar.setVisibility(View.GONE);
             SondageAdapter adapter = new SondageAdapter(getActivity(), SondageList, Si_Gestion_Sond, Filter!=null);
             setListAdapter(adapter);
         }
@@ -187,6 +194,10 @@ public class SondageListFragment extends ListFragment {
                 // log the error or whatever you need to do
             }
             // Do stuff with views
+            if(SondageList.isEmpty()){
+                Empty.setVisibility(View.VISIBLE);
+            }
+            progressBar.setVisibility(View.GONE);
             SondageAdapter adapter = new SondageAdapter(getActivity(), SondageList, Si_Gestion_Sond, Filter!=null);
             setListAdapter(adapter);
         }
@@ -205,6 +216,9 @@ public class SondageListFragment extends ListFragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_sondage_list, container, false);
         final Button btn_Ajout = view.findViewById(R.id.sondage_ajout_btn);
+
+        progressBar = view.findViewById(R.id.sondage_list_loader);
+        Empty = view.findViewById(R.id.sondage_list_empty);
         if(Si_Gestion_Sond){
             mListener.ChangeTitle("Sondages | Gestion");
         }else if(Filter!=null){

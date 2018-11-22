@@ -64,7 +64,6 @@ public class CreerOptionAdapter extends ArrayAdapter<Option> {
         Type = type;
         OptionData = options;
         currentEdited = -1;
-        this.adaptListener = adaptListener;
     }
     @Override
     public int getCount(){
@@ -96,25 +95,30 @@ public class CreerOptionAdapter extends ArrayAdapter<Option> {
         if(OptionData.get(POSITION).toBeDeleted){
             view.setVisibility(View.GONE);
         }else {
-            holder.OptionNum.setText("Option #" + (position + 1));
+            holder.OptionNum.setText(c.getString(R.string.Create_Option_Elem_Numerate, (position + 1)));
             if (Type != Question.TYPE_TEXTE) {//exécute ce chargement trop souvent pour rien, comment enregistrer les médias en cache?
                 StorageReference OptionMedRef;
                 if (OptionData.get(POSITION).notOnServer) {//si n'est pas sur le serveur, créé récement
                     if (OptionData.get(POSITION).ImagePreload == null) {//si l'image bitmap n'existe pas
-                        Log.e("Test", "Dud");
                         holder.ImagePreview.setVisibility(View.GONE);
                         holder.Loading.setVisibility(View.GONE);
                         holder.MediaError.setVisibility(View.VISIBLE);
-                        holder.MediaError.setText("Aucune image/vidéo sélectionnée, veuillez en choisir une.");
+                        if(Type == Question.TYPE_VIDEO){
+                            holder.MediaError.setText(c.getString(R.string.Create_Option_Elem_No_Media_Err, "vidéo"));
+                        }else{
+                            holder.MediaError.setText(c.getString(R.string.Create_Option_Elem_No_Media_Err, "image"));
+                        }
+
                     } else {//si bitmap existe
                         holder.Loading.setVisibility(View.GONE);
                         holder.ImagePreview.setImageBitmap(OptionData.get(POSITION).ImagePreload);
                         holder.ImagePreview.setVisibility(View.VISIBLE);
                         holder.MediaError.setVisibility(View.INVISIBLE);
-                        Log.e("Test", "Loaded");
                         if (Type == Question.TYPE_VIDEO) {// + si c'est une vidéo, mets un clicklistener sur l'image qui ouvre un dialog
-                            holder.Instruct.setText("Appuyez sur l'image pour lire la vidéo");
+                            holder.Instruct.setText(R.string.Post_Elem_Instruct_Vid);
                             holder.Instruct.setVisibility(View.VISIBLE);
+                            holder.ImagePreviewIcon.setVisibility(View.VISIBLE);
+                            holder.ImagePreviewIcon.setImageResource(R.drawable.ic_play_circle_color);
                             holder.ImagePreview.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
@@ -130,8 +134,10 @@ public class CreerOptionAdapter extends ArrayAdapter<Option> {
                                 }
                             });
                         }else{
-                            holder.Instruct.setText("Appuyez sur l'image pour voir l'image en grand format");
+                            holder.Instruct.setText(R.string.Post_Elem_Instruct_Img);
                             holder.Instruct.setVisibility(View.VISIBLE);
+                            holder.ImagePreviewIcon.setVisibility(View.VISIBLE);
+                            holder.ImagePreviewIcon.setImageResource(R.drawable.ic_loupe_black_24dp);
                             holder.ImagePreview.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
@@ -158,8 +164,10 @@ public class CreerOptionAdapter extends ArrayAdapter<Option> {
                         holder.ImagePreview.setVisibility(View.VISIBLE);
                         holder.MediaError.setVisibility(View.INVISIBLE);
                         if (Type == Question.TYPE_VIDEO) {// + si c'est une vidéo, mets un clicklistener sur l'image qui ouvre un dialog
-                            holder.Instruct.setText("Appuyez sur l'image pour lire la vidéo");
+                            holder.Instruct.setText(R.string.Post_Elem_Instruct_Vid);
                             holder.Instruct.setVisibility(View.VISIBLE);
+                            holder.ImagePreviewIcon.setVisibility(View.VISIBLE);
+                            holder.ImagePreviewIcon.setImageResource(R.drawable.ic_play_circle_color);
                             holder.ImagePreview.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
@@ -175,8 +183,10 @@ public class CreerOptionAdapter extends ArrayAdapter<Option> {
                                 }
                             });
                         }else{
-                            holder.Instruct.setText("Appuyez sur l'image pour voir l'image en grand format");
+                            holder.Instruct.setText(R.string.Post_Elem_Instruct_Img);
                             holder.Instruct.setVisibility(View.VISIBLE);
+                            holder.ImagePreviewIcon.setVisibility(View.VISIBLE);
+                            holder.ImagePreviewIcon.setImageResource(R.drawable.ic_loupe_black_24dp);
                             holder.ImagePreview.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
@@ -204,10 +214,10 @@ public class CreerOptionAdapter extends ArrayAdapter<Option> {
                 holder.ZoneUpload.setVisibility(View.GONE);
                 holder.Instruct.setVisibility(View.GONE);
                 holder.MediaError.setVisibility(View.GONE);
+                holder.ImagePreviewIcon.setVisibility(View.GONE);
                 holder.Loading.setVisibility(View.GONE);
                 holder.ImagePreview.setVisibility(View.GONE);
             }
-            final CreerOptionAdapter adapter = this;
             holder.btnDelete.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -238,7 +248,7 @@ public class CreerOptionAdapter extends ArrayAdapter<Option> {
                 @Override
                 public void onFocusChange(View view, boolean b) {
                     //adaptListener.ToggleDoneBtn(!b);
-                    if (b == true) {
+                    if (b) {
                         currentEdited = POSITION;
                     }
                 }
@@ -258,7 +268,7 @@ public class CreerOptionAdapter extends ArrayAdapter<Option> {
                 public void afterTextChanged(Editable s) {
                     String newTexte = s.toString();
                     if (newTexte.isEmpty()) {
-                        holder.TexteError.setText("Vous devez proposer une réponse");
+                        holder.TexteError.setText(R.string.Create_Option_Elem_No_Text_Err);
                         holder.TexteError.setVisibility(View.VISIBLE);
                     } else {
                         if (currentEdited == POSITION) {
@@ -282,12 +292,12 @@ public class CreerOptionAdapter extends ArrayAdapter<Option> {
                     holder.TexteReponse.setText(OptionData.get(POSITION).Texte);
                 } else {
                     holder.TexteReponse.setText("");
-                    holder.TexteError.setText("Vous devez proposer une réponse");
+                    holder.TexteError.setText(R.string.Create_Option_Elem_No_Text_Err);
                     holder.TexteError.setVisibility(View.VISIBLE);
                 }
             } else {
                 holder.TexteReponse.setText("");
-                holder.TexteError.setText("Vous devez proposer une réponse");
+                holder.TexteError.setText(R.string.Create_Option_Elem_No_Text_Err);
                 holder.TexteError.setVisibility(View.VISIBLE);
             }
             holder.TexteReponse.setTag(TxtFieldWatcher);
@@ -304,9 +314,8 @@ public class CreerOptionAdapter extends ArrayAdapter<Option> {
         RelativeLayout ZoneUpload;
         ImageButton btnDelete;
         EditText TexteReponse;
-        ImageView ImagePreview;
+        ImageView ImagePreview, ImagePreviewIcon;
         Button btnUpload;
-        File VideoFile;
         ProgressBar Loading;
         Bitmap Image;
         public ViewHolder(View view, int position){
@@ -320,6 +329,7 @@ public class CreerOptionAdapter extends ArrayAdapter<Option> {
             MediaError = view.findViewById(R.id.option_edit_media_error);
             Loading = view.findViewById(R.id.sondage_edit_option_progress);
             Instruct = view.findViewById(R.id.option_edit_instruct);
+            ImagePreviewIcon = view.findViewById(R.id.sondage_edit_option_image_preview_icon);
 
 
         }

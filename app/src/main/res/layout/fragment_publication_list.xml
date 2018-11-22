@@ -18,16 +18,23 @@
         style="@style/buttonCustom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Publier quelque chose" />
+        android:text="@string/Post_New_Post" />
     </com.balysv.materialripple.MaterialRippleLayout>
 
     <ProgressBar
-        android:id="@id/android:empty"
+        android:id="@+id/pub_list_loader"
         style="?android:attr/progressBarStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:indeterminate="true"
         android:indeterminateDrawable="@drawable/progress" />
+    <TextView
+        android:layout_width="match_parent"
+        android:textAlignment="center"
+        android:visibility="gone"
+        android:text="@string/Post_List_Empty"
+        android:id="@+id/pub_list_empty"
+        android:layout_height="wrap_content" />
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"

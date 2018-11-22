@@ -201,12 +201,12 @@ public class CreerSondageFragment extends Fragment implements CreerOptionDialog.
                 }
             }
         });
-        final SimpleDateFormat format = new SimpleDateFormat("dd-MM-yy");
+        final SimpleDateFormat format = new SimpleDateFormat("dd-MM-yy", getResources().getConfiguration().locale);
         //Initialisation des champs;
         mListener.ChangeTitle("Sondage | Créer");
         if(Si_Edit){
             mListener.ChangeTitle("Sondage | Modifier");
-            TitreFormulaire.setText("Modifier un sondage");
+            TitreFormulaire.setText(R.string.Create_Sondage_Poll_Title_View_Edit);
             //date echance, init à l'ancienne date.
             TitreSondage.setText(sondage.Titre);
             Calendar c1 = Calendar.getInstance();
@@ -262,7 +262,7 @@ public class CreerSondageFragment extends Fragment implements CreerOptionDialog.
             QuestionAdapter = new CreerQuestionAdapter(getActivity(), liste_question, creerSondageFragment);
             ListeQuestion.setAdapter(QuestionAdapter);
             QuestionsError.setVisibility(View.VISIBLE);
-            QuestionsError.setText("Vous devez poser au moins une question.");
+            QuestionsError.setText(R.string.Create_Sondage_NoQuestion_Err);
         }
         //Fin initialisation champs
 
@@ -283,7 +283,7 @@ public class CreerSondageFragment extends Fragment implements CreerOptionDialog.
                     TitreError.setVisibility(View.INVISIBLE);
                 }else{
                     TitreError.setVisibility(View.VISIBLE);
-                    TitreError.setText("Vous devez mettre un titre au sondage.");
+                    TitreError.setText(R.string.Create_Sondage_No_Title_Err);
                 }
             }
         });
@@ -512,13 +512,13 @@ public class CreerSondageFragment extends Fragment implements CreerOptionDialog.
     private void Validation(Sondage S){
         boolean Valid = true;
         if(S.Titre.isEmpty()) {
-            TitreError.setText("Vous devez mettre un titre au sondage.");
+            TitreError.setText(R.string.Create_Sondage_No_Title_Err);
             TitreError.setVisibility(View.VISIBLE);
             Valid = false;
         }//si titre vide
         if(!Si_Edit) {//à moins qu'il ne soit nouveau, ce n'est pas grave.
             if (S.date_echeance.before(S.date_public)) {
-                DateEcheanceError.setText("La date d'échéance ne peut être avant la date d'aujourd'hui");
+                DateEcheanceError.setText(R.string.Create_Sondage_Date_Err);
                 DateEcheanceError.setVisibility(View.VISIBLE);
                 Valid = false;
             }
@@ -566,7 +566,7 @@ public class CreerSondageFragment extends Fragment implements CreerOptionDialog.
                 Valid = false;
             }
         }else{
-            QuestionsError.setText("Vous devez poser au moins une question");
+            QuestionsError.setText(R.string.Create_Sondage_NoQuestion_Err);
             QuestionsError.setVisibility(View.VISIBLE);
             Valid = false;
         }

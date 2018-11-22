@@ -4,7 +4,6 @@
     android:layout_width="match_parent"
     android:orientation="vertical"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".CreerOptionDialog">
 
     <LinearLayout
@@ -25,7 +24,7 @@
                 android:background="@color/transparent"
                 android:drawableStart="@drawable/ic_done_color"
                 android:padding="10dp"
-                android:text="Terminer" />
+                android:text="@string/Poll_Answ_Done" />
     </com.balysv.materialripple.MaterialRippleLayout>
         <View
             android:layout_width="2dp"
@@ -43,7 +42,7 @@
             android:layout_weight="1"
             android:background="@color/transparent"
             android:drawableStart="@drawable/ic_clear_color"
-            android:text="Annuler"
+            android:text="@string/Mng_Profil_Cancel"
             android:textColor="@color/colorRed" />
         </com.balysv.materialripple.MaterialRippleLayout>
     </LinearLayout>
@@ -63,7 +62,7 @@
                 android:id="@+id/sondage_edit_question_add_option"
                 style="@style/buttonImageCustom"
                 android:layout_width="60dp"
-
+                android:contentDescription="@string/Create_Option_dialog_btn_desc"
                 android:layout_height="60dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/ic_ajout" />
@@ -76,7 +75,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="invisible"
-        android:text="TextView"
         android:textAppearance="@style/TextAppearance.AppCompat"
         android:textColor="@color/colorRed" />
 

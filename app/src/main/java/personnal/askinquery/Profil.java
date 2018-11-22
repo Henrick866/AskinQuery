@@ -21,7 +21,6 @@ public class Profil implements Serializable {
         this.Username = Username;
         this.Courriel = Courriel;
         this.Avatar = Avatar;
-        this.Auteurs_Suivis = new HashMap<String, String>();
     }
     public HashMap<String, Object> toMap(){
         HashMap<String, Object> Map = new HashMap<>();

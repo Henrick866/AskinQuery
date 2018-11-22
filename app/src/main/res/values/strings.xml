@@ -14,4 +14,154 @@
     <string name="Connexion"><u>Se connecter</u></string>
     <string name="Deconnexion"><u>Se déconnecter</u></string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!-- SondageList -->
+    <string name="Sondage_Elem_Poll_Done">Sondage terminé</string>
+    <string name="Sondage_Elem_Poll_Saved">Continuez le sondage</string>
+    <string name="Sondage_Elem_Poll_Results">Consultez les résultats</string>
+    <string name="Sondage_Elem_Poll_Answered">Sondage répondu</string>
+    <string name="Sondage_Elem_Poll_Start">Débutez le sondage</string>
+    <string name="Sondage_Elem_Date_Publie">Publié le : %1$s</string>
+    <string name="Sondage_Elem_Date_End">Échéance le : %1$s</string>
+    <string name="Sondage_Elem_ImgBtn_Plainte_Desc">Portez plainte sur ce sondage</string>
+    <string name="Sondage_Elem_Img_Desc">Bannière du sondage</string>
+    <string name="Sondage_Elem_BtnEdit_Desc">Modifiez le sondage</string>
+    <string name="Sondage_Elem_BtnEdit_Desc_Disabled">Modifiez le sondage (publié, ne peut être modifié)</string>
+    <string name="Sondage_Elem_BtnStats_Desc">Consultez les résultats du sondage</string>
+    <string name="Sondage_Elem_BtnPublish_Desc">Publiez le sondage</string>
+    <string name="Sondage_Elem_BtnDelete_Desc">Supprimez le sondage</string>
+    <string name="Sondage_New_Poll">Créez un sondage</string>
+    <string name="Sondage_List_Empty">Aucun sondage trouvé.</string>
+
+    <!--Publication List-->
+    <string name="Post_Elem_Instruct_Img">Appuyez sur l\'image pour la voir en grand format</string>
+    <string name="Post_Elem_Instruct_Vid">Appuyez sur l\'image pour lire la vidéo</string>
+    <string name="Post_Elem_Instruct_Poll">Appuyez sur l\'image pour répondre au sondage</string>
+    <string name="Post_Elem_Instruct_Poll_Disabled">(Désactivé pour ne pas perdre la progression) Appuyez sur l\'image pour répondre au sondage</string>
+    <string name="Post_Elem_Desc_Media">Média lié avec la publication</string>
+    <string name="Post_Elem_Desc_Media_icon">icône d\'action du média de la publication</string>
+    <string name="Post_Elem_BtnEdit_Desc">Modifiez la publication</string>
+    <string name="Post_Elem_BtnDelete_Desc">Supprimez la publication</string>
+    <string name="Post_Elem_BtnPlainte_Desc">Portez plainte sur cette publication</string>
+    <string name="Post_Elem_Alert_Poll_Finished">Sondage terminé</string>
+    <string name="Post_Elem_Alert_Poll_Continue">Continuez le sondage</string>
+    <string name="Post_Elem_Alert_Poll_Results">Consultez les résultats du sondage</string>
+    <string name="Post_Elem_Alert_Poll_Answered">Sondage répondu</string>
+    <string name="Post_New_Post">Créez une publication</string>
+    <string name="Post_List_Empty">Aucune publication trouvée.</string>
+
+    <!--Manage Profil-->
+    <string name="Mng_Profil_Change_Avatar">Changer</string>
+    <string name="Mng_Profil_Delete_Avatar">Supprimer</string>
+    <string name="Mng_Profil_UsernameTag">Nom d\'utilisateur :</string>
+    <string name="Mng_Profil_EmailTag">Courriel :</string>
+    <string name="Mng_Profil_PasswordTag">Changer le mot de passe.</string>
+    <string name="Mng_Profil_FollowedTag">Créateurs suivis.</string>
+    <string name="Mng_Profil_OtherTag">Gestion du compte.</string>
+    <string name="Mng_Profil_Delete">Supprimer le compte</string>
+        <!-- Manage Profil Dialogs-->
+        <string name="Username_Field_Hint">Nom d\'utilisateur</string>
+        <string name="Mng_Profil_Username_Err_Same">Le nom d\'utilisateur est identique.</string>
+        <string name="Mng_Profil_Cancel">Annuler</string>
+        <string name="Mng_Profil_Confirm">Confirmer</string>
+        <string name="Username_Check">Vérifiez la disponibilité</string>
+    <string name="Username_Err_Short">Nom d\'utilisateur trop court (3 caractères minimum)</string>
+    <string name="Username_Err_Long">Nom d\'utilisateur trop long (25 caractères maximum)</string>
+
+        <string name="Email_Field_Hint">Courriel</string>
+        <string name="Email_Field_Err_Invalid">Courriel invalide</string>
+
+        <string name="Pass_Field_Hint">Mot de passe</string>
+        <string name="Pass_Err_Too_Weak">Mot de passe trop faible</string>
+        <string name="Pass_Err_Too_Short">Mot de passe trop court (8 caractères minimum)</string>
+        <string name="Pass_Strength_Unacceptable">Inacceptable</string>
+        <string name="Pass_Strength_Weak">Faible</string>
+        <string name="Pass_Strength_Medium">Moyen</string>
+        <string name="Pass_Strength_Strong">Fort</string>
+        <string name="Profil_Create_Title">Créer un profil</string>
+        <string name="Profil_Create_Btn">S\'enregistrer</string>
+        <string name="Avatar_Title">Avatar</string>
+        <string name="Avatar_Download">Choisir une image</string>
+
+    <!--Answer Sondages-->
+    <string name="Poll_Answ_Percent">%1$d %%</string>
+    <string name="Poll_Answ_Question_Title">%1$d . %2$s</string>
+    <string name="Poll_Answ_Option_Img_Desc">Miniature de l\'image du choix</string>
+    <string name="Poll_Answ_Option_Img_Icon_Desc">Icône de l\'action à faire</string>
+    <string name="Poll_Answ_GoBack">Revenir</string>
+    <string name="Poll_Answ_Done">Terminer</string>
+    <string name="Poll_Answ_Save">Enregistrer et partir</string>
+
+    <!--Consult Profil-->
+    <string name="Profil_Consult_Subscribe">S\'abonner</string>
+    <string name="Profil_Consult_Unsubscribe">Se désabonner</string>
+    <string name="Profil_Consult_Check_Polls">Voir les sondages</string>
+    <string name="Profil_Consult_Check_Posts">Voir les publications</string>
+
+    <!-- Create Post-->
+    <string name="Post_Form_Title_New">Créer une publication</string>
+    <string name="Post_Form_Title_Edit">Modifier la publication</string>
+    <string name="Post_Form_Title_Field_Hint">Titre</string>
+    <string name="Post_Form_Content_Field_Hint">Contenu de la publication</string>
+    <string name="Post_Form_Media_Pick">Choisir un média ou un sondage à publier</string>
+    <string name="Post_Form_Media_Pick_Img">Image</string>
+    <string name="Post_Form_Media_Pick_Vid">Vidéo</string>
+    <string name="Post_Form_Media_Pick_Poll">Sondage</string>
+    <string name="Post_Form_Media_Remove_Img">Retirez l\'image</string>
+    <string name="Post_Form_Media_Remove_Vid">Retirez la vidéo</string>
+    <string name="Post_Form_Media_Remove_Poll">Retirez le lien</string>
+    <string name="Post_Form_Done">Publier</string>
+
+    <!---Create Poll-->
+    <string name="Create_Option_dialog_btn_desc">Appuyez pour ajouter un choix de réponse.</string>
+    <string name="Create_Option_Elem_Delete_Desc">Appuyez pour supprimer un choix de réponse.</string>
+    <string name="Create_Option_Elem_TextField_Hint">Réponse</string>
+    <string name="Create_Option_Elem_BtnUpload">Téléverser</string>
+    <string name="Create_Option_Elem_Numerate">Option #%1$d</string>
+    <string name="Create_Option_Elem_No_Media_Err">Aucune %1$s sélectionnée, veuillez en choisir une.</string>
+    <string name="Create_Option_Elem_No_Text_Err">Vous devez proposer une réponse</string>
+
+    <string name="Create_Question_Option_Min_Err">Vous devez avoir au moins deux choix de réponses</string>
+    <string name="Create_Question_Elem_Numerate">Question #%1$d</string>
+    <string name="Create_Question_NoType_Err">Vous devez choisir un type de question</string>
+    <string name="Create_Question_NoQuestion_Err">Vous devez poser une question.</string>
+    <string name="Create_Question_Elem_Delete_Desc">Appuyez pour supprimer cette question.</string>
+    <string name="Create_Question_Elem_TextField_Hint">Votre question</string>
+    <string name="Create_Question_Elem_Type_Tag">Type de question</string>
+    <string name="Create_Question_Elem_Option_Tag">Choix de réponses</string>
+    <string name="Create_Question_Elem_Option_Btn">Voir les choix de réponses</string>
+    <string name="Create_Question_Elem_Add_Btn">Ajouter une question</string>
+
+    <string name="Create_Sondage_NoQuestion_Err">Vous devez avoir au moins une question dans le sondage.</string>
+    <string name="Create_Sondage_Save_Btn">Enregistrer</string>
+    <string name="Create_Sondage_Poll_Title_View_New">Créer un sondage</string>
+    <string name="Create_Sondage_Poll_Title_View_Edit">Modifier un sondage</string>
+    <string name="Create_Sondage_Poll_End_Date_Tag">Date d\'échéance du sondage.</string>
+    <string name="Create_Sondage_Poll_End_Date_Preview_Tag">Date sélectionnée :</string>
+    <string name="Create_Sondage_Poll_Public_Results_Tag">Permettre aux répondants de consulter les résultats après la date d\'échéance? (optionnel)</string>
+    <string name="Create_Sondage_Poll_Img_Btn">Bannière du sondage</string>
+    <string name="Create_Sondage_No_Title_Err">Vous devez mettre un titre au sondage.</string>
+    <string name="Create_Sondage_Date_Err">La date d\'échéance ne peut être avant la date d\'aujourd\'hui.</string>
+
+    <!-- Login -->
+    <string name="Login_Title">Connexion</string>
+    <string name="Btn_Login">Se connecter</string>
+    <string name="Login_Btn_Create">S\'enregistrer</string>
+    <string name="Login_Empty_Fields">Champ(s) vide(s), veuillez le(s) remplir</string>
+    <string name="Login_Wrong_Creds">Courriel ou mot de passe érroné(s)</string>
+
+    <!--Flag Dialog-->
+    <string name="Dialog_Flag_Title">Veuiller indiquer les raisons de votre plainte.</string>
+    <string name="Dialog_Flag_Hint">Raisons</string>
+    <string name="Dialog_Flag_Done">Envoyer</string>
+
+    <!-- Other -->
+    <string name="Pass_Dialog_Tag">Entrez votre mot de passe pour vérifier votre identité.</string>
+    <string name="Close_Dialog">Fermer</string>
+    <string name="Image_Dialog_Desc">Grande version de l\'image sélectionnée</string>
+
+
+
+
+    <string name="Gen_Empty_Field">Le champ est vide.</string>
+
 </resources>

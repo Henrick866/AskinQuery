@@ -35,15 +35,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp"
-                android:text="#NomUserAuteur"
                 android:textAppearance="@style/TextAppearance.AppCompat"
                 android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/pub_elem_date"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Date" />
+                android:layout_height="wrap_content"/>
 
 
         </LinearLayout>
@@ -64,8 +62,10 @@
                     android:id="@+id/pub_elem_plainte_btn"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-
+                    android:contentDescription="@string/Post_Elem_BtnPlainte_Desc"
+                    android:adjustViewBounds="false"
                     android:background="@drawable/round_btn"
+                    android:cropToPadding="false"
                     android:src="@drawable/ic_flag"
                     android:tint="@color/colorRed" />
             </com.balysv.materialripple.MaterialRippleLayout>
@@ -77,7 +77,6 @@
         android:layout_marginTop="5dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="TextView"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textSize="18sp" />
@@ -89,7 +88,6 @@
         android:layout_height="wrap_content"
         android:paddingStart="10dp"
         android:paddingEnd="10dp"
-        android:text="TextView"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
     <TextView
@@ -97,7 +95,6 @@
         android:layout_marginTop="5dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Clicquez"
         android:textAlignment="center"
         android:visibility="invisible" />
 
@@ -107,17 +104,45 @@
         android:layout_height="wrap_content"
         android:indeterminate="true"
         android:indeterminateDrawable="@drawable/progress"/>
-    <ImageView
-        android:layout_marginTop="5dp"
-        android:id="@+id/pub_elem_image"
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_gravity="center">
+        <ImageView
+            android:id="@+id/pub_elem_image"
+            android:contentDescription="@string/Post_Elem_Desc_Media"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxHeight="128dp"
+            android:adjustViewBounds="true"
+            android:cropToPadding="false"
+            android:visibility="gone"
+            app:srcCompat="@drawable/ic_menu_gallery" />
+
+        <ImageView
+            android:id="@+id/pub_elem_img_icon"
+            android:contentDescription="@string/Post_Elem_Desc_Media_icon"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignEnd="@id/pub_elem_image"
+            android:layout_alignBottom="@id/pub_elem_image"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="5dp"
+            android:src="@drawable/ic_sondage_debut"
+            android:visibility="gone"
+            android:tint="@color/colorPrimaryMedLight" />
+    </RelativeLayout>
+    <!--<ImageView
+        android:layout_marginTop="5dp"
+        android:id="@+id/pub_elem_image"
+        android:layout_width="200dp"
+        android:layout_height="100dp"
         android:layout_gravity="center"
         android:maxHeight="200dp"
-        android:visibility="gone"
         android:adjustViewBounds="true"
         android:cropToPadding="false"
-        app:srcCompat="@drawable/ic_menu_gallery" />
+        app:srcCompat="@drawable/ic_menu_gallery" />-->
 
     <TextView
         android:layout_marginTop="5dp"
@@ -130,43 +155,64 @@
 
     <LinearLayout
         android:layout_width="300dp"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:id="@+id/pub_elem_zone_admin"
         android:layout_gravity="center"
         android:orientation="horizontal">
-        <com.balysv.materialripple.MaterialRippleLayout
+        <LinearLayout
             android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_height="match_parent">
+            android:orientation="vertical">
+            <com.balysv.materialripple.MaterialRippleLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
         <ImageButton
             android:id="@+id/pub_elem_edit_btn"
             style="@style/buttonImageCustom"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:contentDescription="@string/Post_Elem_BtnEdit_Desc"
+            android:layout_height="50dp"
             android:background="@color/transparent"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_edit" />
-
         </com.balysv.materialripple.MaterialRippleLayout>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/Post_Elem_BtnEdit_Desc"
+            android:textAlignment="center"/>
+    </LinearLayout>
         <View
             android:layout_width="2dp"
             android:layout_height="match_parent"
             android:background="@color/LightGrey"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
         <com.balysv.materialripple.MaterialRippleLayout
             android:layout_width="match_parent"
-            android:layout_weight="1"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
         <ImageButton
             android:id="@+id/pub_elem_del_btn"
             style="@style/buttonImageCustom"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="50dp"
+            android:contentDescription="@string/Post_Elem_BtnDelete_Desc"
             android:background="@color/transparent"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_delete"
             android:tint="@color/colorRed" />
         </com.balysv.materialripple.MaterialRippleLayout>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/Post_Elem_BtnDelete_Desc"
+                android:textAlignment="center"/>
+        </LinearLayout>
     </LinearLayout>
 
 </LinearLayout>

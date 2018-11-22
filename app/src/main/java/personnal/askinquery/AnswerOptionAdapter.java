@@ -64,12 +64,16 @@ final AnswerOptionAdapter.ViewHolder holder;
         }
         holder.TexteOption.setText(option.Texte);
         if(Type != Question.TYPE_TEXTE) {
-            holder.OptionImg.setVisibility(View.VISIBLE);
+
             holder.Loading.setVisibility(View.VISIBLE);
             if (option.ImagePreload != null) {
                 holder.Loading.setVisibility(View.GONE);
                 holder.OptionImg.setImageBitmap(option.ImagePreload);
+
                 if(Type == Question.TYPE_VIDEO){
+                    holder.OptionIcon.setImageResource(R.drawable.ic_play_circle_color);
+                    holder.OptionIcon.setVisibility(View.VISIBLE);
+                    holder.OptionImg.setVisibility(View.VISIBLE);
                     holder.OptionImg.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
@@ -85,6 +89,9 @@ final AnswerOptionAdapter.ViewHolder holder;
                         }
                     });
                 }else{
+                    holder.OptionIcon.setImageResource(R.drawable.ic_loupe_black_24dp);
+                    holder.OptionIcon.setVisibility(View.VISIBLE);
+                    holder.OptionImg.setVisibility(View.VISIBLE);
                     holder.OptionImg.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
@@ -121,10 +128,10 @@ final AnswerOptionAdapter.ViewHolder holder;
             if(total > 0) {
                 int percentage = (option.Score * 100) / option.getTotalVotes();
                 holder.LineResult.setProgress(percentage);
-                holder.PercentVote.setText(percentage + "%");
+                holder.PercentVote.setText(c.getString(R.string.Poll_Answ_Percent, percentage));
             }else{
                 holder.LineResult.setProgress(0);
-                holder.PercentVote.setText("0%");
+                holder.PercentVote.setText("0 %");
             }
         }else{
             holder.CheckZone.setVisibility(View.VISIBLE);
@@ -156,7 +163,7 @@ final AnswerOptionAdapter.ViewHolder holder;
 
 static class ViewHolder{
     TextView TexteOption, PercentVote;
-    ImageView OptionImg;
+    ImageView OptionImg, OptionIcon;
     FrameLayout CheckZone;
     CheckBox VoteBtn;
     LinearLayout ResultZone;
@@ -170,6 +177,7 @@ static class ViewHolder{
         ResultZone = view.findViewById(R.id.answer_option_results);
         Loading = view.findViewById(R.id.answer_option_progress);
         LineResult = view.findViewById(R.id.answer_option_bar);
+        OptionIcon = view.findViewById(R.id.answer_option_icon);
         if(positionChecked == position){
             VoteBtn.setChecked(true);
         }else{

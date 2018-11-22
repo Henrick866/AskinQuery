@@ -227,22 +227,32 @@ public class ManageProfilFragment extends Fragment {
                     public void onClick(View view) {
                         UserErr.setTextColor(getResources().getColor(R.color.colorRed));
                         if(!InputField.getEditableText().toString().isEmpty()) {
-                            if(InputField.getEditableText().toString().equals(user.getDisplayName())){
-                                UserErr.setText("le nom d'utilisateur est identique");
-                                UserErr.setTextColor(Color.BLACK);
+                            if(InputField.getEditableText().toString().length() < 3){
+                                UserErr.setText(R.string.Username_Err_Short);
+                                UserErr.setTextColor(getResources().getColor(R.color.colorRed));
                                 UserErr.setVisibility(View.VISIBLE);
-                            }else{
-                                UserErr.setVisibility(View.INVISIBLE);
-                                AvailableUsername(InputField.getEditableText().toString());
+                            }else if(InputField.getEditableText().toString().length() > 25){
+                                UserErr.setText(R.string.Username_Err_Long);
+                                UserErr.setTextColor(getResources().getColor(R.color.colorRed));
+                                UserErr.setVisibility(View.VISIBLE);
+                            }else {
+                                if (InputField.getEditableText().toString().equals(user.getDisplayName())) {
+                                    UserErr.setText(R.string.Mng_Profil_Username_Err_Same);
+                                    UserErr.setTextColor(Color.BLACK);
+                                    UserErr.setVisibility(View.VISIBLE);
+                                } else {
+                                    UserErr.setVisibility(View.INVISIBLE);
+                                    AvailableUsername(InputField.getEditableText().toString());
+                                }
                             }
 
                         }else{
-                            UserErr.setText("Le champ est vide.");
+                            UserErr.setText(R.string.Gen_Empty_Field);
                             UserErr.setVisibility(View.VISIBLE);
                         }
                     }
                 });
-                Confirm.setText("Annuler");
+                Confirm.setText(R.string.Mng_Profil_Cancel);
                 Confirm.setTextColor(getResources().getColor(R.color.colorRed));
                 Confirm.setOnClickListener(CancelClick);
 
@@ -303,12 +313,12 @@ public class ManageProfilFragment extends Fragment {
                                         }
                                     });
                                 } else {
-                                    EmailErr.setText("Courriel invalide");
+                                    EmailErr.setText(R.string.Email_Field_Err_Invalid);
                                     EmailErr.setVisibility(View.VISIBLE);
                                 }
                             }
                         }else{
-                            EmailErr.setText("Le champ est vide");
+                            EmailErr.setText(R.string.Gen_Empty_Field);
                             EmailErr.setVisibility(View.VISIBLE);
                         }
                     }
@@ -346,7 +356,7 @@ public class ManageProfilFragment extends Fragment {
                         if(!InputField.getEditableText().toString().isEmpty()){
                             if(InputField.getEditableText().toString().length() >= 8){
                                 if(SumPass < 2){
-                                    PassErr.setText("Mot de passe trop faible.");
+                                    PassErr.setText(R.string.Pass_Err_Too_Weak);
                                     PassErr.setVisibility(View.VISIBLE);
                                 }else{
                                     PassErr.setVisibility(View.INVISIBLE);
@@ -376,11 +386,11 @@ public class ManageProfilFragment extends Fragment {
 
                                 }
                             }else{
-                                PassErr.setText("Mot de passe trop petit (8 caractères minimum).");
+                                PassErr.setText(R.string.Pass_Err_Too_Short);
                                 PassErr.setVisibility(View.VISIBLE);
                             }
                         }else{
-                            PassErr.setText("Le champ est vide.");
+                            PassErr.setText(R.string.Gen_Empty_Field);
                             PassErr.setVisibility(View.VISIBLE);
                         }
                     }
@@ -607,22 +617,22 @@ public class ManageProfilFragment extends Fragment {
                         PassStrength.setProgress(0);
                         PassStrength.getProgressDrawable().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
                         PassStrengthIndic.setTextColor(Color.BLACK);
-                        PassStrengthIndic.setText("Inacceptable");
+                        PassStrengthIndic.setText(R.string.Pass_Strength_Unacceptable);
                         break;
                     case 2: PassStrength.setProgress(33);
                         PassStrength.getProgressDrawable().setColorFilter(getResources().getColor(R.color.colorRed), PorterDuff.Mode.SRC_IN);
                         PassStrengthIndic.setTextColor(getResources().getColor(R.color.colorRed));
-                        PassStrengthIndic.setText("Faible");
+                        PassStrengthIndic.setText(R.string.Pass_Strength_Weak);
                         break;
                     case 3: PassStrength.setProgress(66);
                         PassStrength.getProgressDrawable().setColorFilter(getResources().getColor(R.color.colorYellow), PorterDuff.Mode.SRC_IN);
                         PassStrengthIndic.setTextColor(getResources().getColor(R.color.colorYellow));
-                        PassStrengthIndic.setText("Moyen");
+                        PassStrengthIndic.setText(R.string.Pass_Strength_Medium);
                         break;
                     case 4: PassStrength.setProgress(100);
                         PassStrength.getProgressDrawable().setColorFilter(getResources().getColor(R.color.colorGreen), PorterDuff.Mode.SRC_IN);
                         PassStrengthIndic.setTextColor(getResources().getColor(R.color.colorGreen));
-                        PassStrengthIndic.setText("Fort");
+                        PassStrengthIndic.setText(R.string.Pass_Strength_Strong);
                         break;
                 }
             }
@@ -642,13 +652,13 @@ public class ManageProfilFragment extends Fragment {
                 if(Found){
                     InputField.setCompoundDrawablesWithIntrinsicBounds(null, null, getResources().getDrawable(R.drawable.ic_clear_color),null);
                     Confirm.setEnabled(false);
-                    Confirm.setText("Annuler");
+                    Confirm.setText(R.string.Mng_Profil_Cancel);
                     Confirm.setTextColor(getResources().getColor(R.color.colorRed));
                     Confirm.setOnClickListener(CancelClick);
                 }else{
                     InputField.setCompoundDrawablesWithIntrinsicBounds(null, null, getResources().getDrawable(R.drawable.ic_done_color), null);
                     Confirm.setEnabled(true);
-                    Confirm.setText("Confirmer");
+                    Confirm.setText(R.string.Mng_Profil_Confirm);
                     Confirm.setTextColor(getResources().getColor(R.color.colorPrimary));
                     Confirm.setOnClickListener(ConfirmUsernameClick);
                 }

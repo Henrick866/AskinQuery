@@ -20,24 +20,29 @@
 
             android:layout_height="wrap_content"
             android:shadowColor="@color/LightGrey"
-            android:text="Créer un sondage" />
+            android:text="@string/Sondage_New_Poll" />
 
 
     </com.balysv.materialripple.MaterialRippleLayout>
 
     <ProgressBar
-        android:id="@id/android:empty"
+        android:id="@+id/sondage_list_loader"
         style="?android:attr/progressBarStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:indeterminate="true"
-        android:visibility="gone"
         android:indeterminateDrawable="@drawable/progress" />
+    <TextView
+        android:layout_width="match_parent"
+        android:textAlignment="center"
+        android:id="@+id/sondage_list_empty"
+        android:text="@string/Sondage_List_Empty"
+        android:visibility="gone"
+        android:layout_height="wrap_content" />
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@id/android:list"
-        android:visibility="gone"
         android:headerDividersEnabled="false"
         android:footerDividersEnabled="false" />
 
