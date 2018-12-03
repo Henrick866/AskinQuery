@@ -85,7 +85,7 @@ public class ManageProfilFragment extends Fragment {
     private LinearLayout Layout;
     private Bitmap ImageBitmap;
     private Uri Image;
-    private int SumPass;
+    private int SumPass, TaskTodo, TaskDone;
     private AuthCredential credential;
     private StorageReference AvatarRef;
     private DatabaseReference UserReference;
@@ -420,6 +420,7 @@ public class ManageProfilFragment extends Fragment {
                                                         @Override
                                                         public void onComplete(@NonNull Task<Void> task) {
                                                             if (task.isSuccessful()) {
+                                                                AddTask();
                                                                 DatabaseReference delProfileRef = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Profil_Keys.STRUCT_NAME).child(UserId);
 
                                                                 delProfileRef.removeValue();
@@ -433,8 +434,7 @@ public class ManageProfilFragment extends Fragment {
                                                                 dialog.dismiss();
                                                                 Toast.makeText(getActivity(), "Compte supprimé avec succès", Toast.LENGTH_LONG).show();
                                                                 Layout.setVisibility(View.GONE);
-                                                                mListener.updateMenu(mAuth.getCurrentUser());
-                                                                mListener.changePage(SondageListFragment.newInstance(false, null));
+                                                                TaskFinish();
                                                             } else {
                                                                 Toast.makeText(getActivity(), "Erreur, compte non supprimé.", Toast.LENGTH_LONG).show();
                                                             }
@@ -503,8 +503,18 @@ public class ManageProfilFragment extends Fragment {
         });
         return view;
     }
-
+    private void AddTask(){
+        TaskTodo++;
+    }
+    private void TaskFinish(){
+        TaskDone++;
+        if(TaskTodo == TaskDone){
+            mListener.updateMenu(mAuth.getCurrentUser());
+            mListener.changePage(SondageListFragment.newInstance(false, null));
+        }
+    }
     private void DeleteSondages(String user){
+        AddTask();
         FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Sondage_Keys.STRUCT_NAME).orderByChild(FireBaseInteraction.Sondage_Keys.AUTEUR_REF).equalTo(user).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -545,8 +555,10 @@ public class ManageProfilFragment extends Fragment {
 
             }
         });
+        TaskFinish();
     }
     private void DeleteSondage(Sondage S){
+        AddTask();
         DatabaseReference SondageRef = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Sondage_Keys.STRUCT_NAME).child(S.ID);
         StorageReference SondageMediaRef = FirebaseStorage.getInstance().getReference();
         for(Question q : S.Questions){
@@ -571,8 +583,10 @@ public class ManageProfilFragment extends Fragment {
             FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.SONDAGES_IMAGES_THUMBNAILS).child(S.ID+".jpg").delete();
         }
         SondageRef.removeValue();
+        TaskFinish();
     }
     private void DeleteAllPublications(String user){
+        AddTask();
         FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Publications_Keys.STRUCT_NAME).orderByChild(FireBaseInteraction.Publications_Keys.AUTEUR).equalTo(user).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -587,8 +601,10 @@ public class ManageProfilFragment extends Fragment {
 
             }
         });
+        TaskFinish();
     }
     private void DeletePublic(final Publication publication){
+        AddTask();
                 final DatabaseReference PublicationRef = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Publications_Keys.STRUCT_NAME).child(publication.ID);
                 if(publication.Type == Publication.TYPE_VIDEO){
                     StorageReference PubMediaRef = FirebaseStorage.getInstance().getReference().child(publication.Media);
@@ -618,6 +634,7 @@ public class ManageProfilFragment extends Fragment {
                     PublicationRef.removeValue();
                     progressDialog.dismiss();
                 }
+                TaskFinish();
     }
 
     @Override
