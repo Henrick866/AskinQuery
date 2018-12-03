@@ -29,7 +29,7 @@
         android:theme="@style/AppTheme"
         android:windowSoftInputMode="adjustResize">
 
-        <!-- TODO:: remettre l'orientation par défaut, je le force en portrait pour les test, question d'éliminer une possibilité d'érreur -->
+        <!-- un peu trop tard pour debug le changement d'orientation -->
         <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main"

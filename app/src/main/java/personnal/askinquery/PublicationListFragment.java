@@ -49,10 +49,10 @@ public class PublicationListFragment extends ListFragment {
     // TODO: Rename and change types of parameters
     private boolean Si_Gestion;
     private String Filtre;
-
-
+    private FirebaseAuth mAuth;
+    private View Shadow;
     private FirebaseUser user;
-    private FirebaseMultiQuery firebaseMultiQuery;
+    private FirebaseMultiQueryPublications firebaseMultiQuery;
     private OnFragmentInteractionListener mListener;
     private SwipeRefreshLayout swipeRefreshLayout;
     private TextView Empty;
@@ -85,7 +85,8 @@ public class PublicationListFragment extends ListFragment {
             Si_Gestion = getArguments().getBoolean(ARG_PARAM1);
             Filtre = getArguments().getString(ARG_PARAM2);
         }
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+
+        mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
     }
     private void LoadPublications(){
@@ -100,14 +101,14 @@ public class PublicationListFragment extends ListFragment {
                 query = databaseReference.orderByChild(FireBaseInteraction.Publications_Keys.AUTEUR).equalTo(user.getUid());
                 query.addListenerForSingleValueEvent(LoadPubs);
             }else{//standard
-                ArrayList<DatabaseReference> ListDataRef = new ArrayList<>();
+                ArrayList<Query> ListDataRef = new ArrayList<>();
                 Profil p = mListener.getUtilisateur_Connecte();
                 for(HashMap.Entry<String, String> cursor : p.Auteurs_Suivis.entrySet()) {
-                    ListDataRef.add(databaseReference.orderByChild(FireBaseInteraction.Publications_Keys.AUTEUR).equalTo(cursor.getKey()).getRef());
+                    ListDataRef.add(databaseReference.orderByChild(FireBaseInteraction.Publications_Keys.AUTEUR).equalTo(cursor.getKey()));
                 }
-                ListDataRef.add(databaseReference.orderByChild(FireBaseInteraction.Publications_Keys.AUTEUR).equalTo(user.getUid()).getRef());
-                firebaseMultiQuery = new FirebaseMultiQuery(ListDataRef);
-                final Task<Map<DatabaseReference, DataSnapshot>> allLoad = firebaseMultiQuery.start();
+                ListDataRef.add(databaseReference.orderByChild(FireBaseInteraction.Publications_Keys.AUTEUR).equalTo(user.getUid()));
+                firebaseMultiQuery = new FirebaseMultiQueryPublications(ListDataRef);
+                final Task<Map<Query, DataSnapshot>> allLoad = firebaseMultiQuery.start();
                 allLoad.addOnCompleteListener(getActivity(), new AllOnCompleteListener());
             }
 
@@ -159,14 +160,14 @@ public class PublicationListFragment extends ListFragment {
 
         }
     };
-    private class AllOnCompleteListener implements OnCompleteListener<Map<DatabaseReference, DataSnapshot>> {
+    private class AllOnCompleteListener implements OnCompleteListener<Map<Query, DataSnapshot>> {
         @Override
-        public void onComplete(@NonNull Task<Map<DatabaseReference, DataSnapshot>> task) {
+        public void onComplete(@NonNull Task<Map<Query, DataSnapshot>> task) {
             ArrayList<Publication> PublicationList = new ArrayList<>();
             if (task.isSuccessful()) {
-                final Map<DatabaseReference, DataSnapshot> result = task.getResult();
+                final Map<Query, DataSnapshot> result = task.getResult();
 
-                for(Map.Entry<DatabaseReference, DataSnapshot> cursor : result.entrySet()) {//j'itère toutes les listes
+                for(Map.Entry<Query, DataSnapshot> cursor : result.entrySet()) {//j'itère toutes les listes
                     DataSnapshot dataSnapshot1 = cursor.getValue();//une sous-liste
                     for(DataSnapshot dataSnapshot2 : dataSnapshot1.getChildren()){
                         Publication P = dataSnapshot2.getValue(Publication.class);
@@ -201,7 +202,6 @@ public class PublicationListFragment extends ListFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View Shadow;
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_publication_list, container, false);
         Empty = view.findViewById(R.id.pub_list_empty);

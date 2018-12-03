@@ -8,17 +8,17 @@ import java.util.Map;
 public class Publication implements Serializable {
     String ID;
     public String Media;
-    String AuteurRef;
-    String Titre;
+    public String AuteurRef;
+    public String Titre;
     Profil Auteur;
-    int Type; //0:txt;1:img;2:vid;3:sondage;
-    String Texte;
-    String SondageRef;
+    public int Type; //0:txt;1:img;2:vid;3:sondage;
+    public String Texte;
+    public String SondageRef;
     static final int TYPE_TEXTE = 0;
     static final int TYPE_IMAGE = 1;
     static final int TYPE_VIDEO = 2;
     static final int TYPE_SONDAGE = 3;
-    long date_public;
+    public long date_public;
     Date Date_Public;
     public Publication(){
 
