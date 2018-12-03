@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.Fragment;
-import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -32,21 +31,12 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.DataSource;
-import com.bumptech.glide.load.engine.GlideException;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
-
 
 /**
  * A simple {@link Fragment} subclass.
@@ -60,7 +50,6 @@ public class CreerOptionDialog extends DialogFragment implements CreerOptionAdap
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private static final String ARG_PARAM3 = "param3";
 
     private static final int MEDIA_GALL_OPTION = 3;
     private static final int MY_PERMISSION_REQUEST_READ_STORAGE = 200;
@@ -74,10 +63,7 @@ public class CreerOptionDialog extends DialogFragment implements CreerOptionAdap
     Bitmap ImageBitmap;
     int optionPosition;
     CreerOptionAdapter creerOptionAdapter;
-    private OnFragmentInteractionListener mListener;
-    OptionDialogListener optionDialogListener;
-    int QuestionPosition;
-    String PathImage;
+    int QuestionPosition, TaskTodo, TaskDone;
     public CreerOptionDialog() {
         // Required empty public constructor
     }
@@ -88,13 +74,12 @@ public class CreerOptionDialog extends DialogFragment implements CreerOptionAdap
      *
      * @return A new instance of fragment CreerOptionDialog.
      */
-    public static CreerOptionDialog newInstance(Question question, int Position, CreerQuestionAdapter.DialogFunctions creerQuestionAdapter) {
+    public static CreerOptionDialog newInstance(Question question, int Position) {
         CreerOptionDialog fragment = new CreerOptionDialog();
         Bundle args = new Bundle();
 
         args.putSerializable(ARG_PARAM1, question);
         args.putInt(ARG_PARAM2, Position);
-        args.putSerializable(ARG_PARAM3, creerQuestionAdapter);
         fragment.setArguments(args);
         return fragment;
     }
@@ -104,7 +89,6 @@ public class CreerOptionDialog extends DialogFragment implements CreerOptionAdap
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mParam1 = (Question)getArguments().getSerializable(ARG_PARAM1);
-            optionDialogListener = (CreerQuestionAdapter.DialogFunctions)getArguments().getSerializable(ARG_PARAM3);
             QuestionPosition = getArguments().getInt(ARG_PARAM2);
         }
     }
@@ -142,8 +126,6 @@ public class CreerOptionDialog extends DialogFragment implements CreerOptionAdap
         btnAjout = view.findViewById(R.id.sondage_edit_question_add_option);
         Done = view.findViewById(R.id.option_edit_done_btn);
         Cancel = view.findViewById(R.id.option_edit_cancel_btn);
-        CountDownLatch StartSignal = new CountDownLatch(1);
-        CountDownLatch DoneSignal = new CountDownLatch(mParam1.Options.size());
         if(mParam1.Type_Question != Question.TYPE_TEXTE){
             DownloadImagesList();
         }
@@ -169,7 +151,7 @@ public class CreerOptionDialog extends DialogFragment implements CreerOptionAdap
             public void onClick(View view) {
 
 
-                String isDone = optionDialogListener.onFinishedOptionDialog(mParam1.Options, QuestionPosition);
+                String isDone = CreerQuestionAdapter.DialogFunctions.onFinishedOptionDialog(mParam1.Options, QuestionPosition);
                 OptionListe.setAdapter(null);
                 dismiss();
             }
@@ -181,22 +163,23 @@ public class CreerOptionDialog extends DialogFragment implements CreerOptionAdap
             }
         });
     }
-
+    private void AddTask(){
+        TaskTodo++;
+    }
+    private void TaskDone(){
+        TaskDone++;
+        if(TaskDone == TaskTodo){
+            creerOptionAdapter.notifyDataSetChanged();
+        }
+    }
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
     }
 
     /**
@@ -262,6 +245,7 @@ public class CreerOptionDialog extends DialogFragment implements CreerOptionAdap
                 Log.e("test", "Done");
                     //création bitmap + assignation bitmap;
                 creerOptionAdapter.notifyDataSetChanged();
+                mParam1.Options.get(this.optionPosition).DataChanged = true;
             }
 
 
@@ -290,6 +274,9 @@ public class CreerOptionDialog extends DialogFragment implements CreerOptionAdap
     private void DownloadImagesList(){ // charge les images/thumbnails une fois lors de l'initialisation de la liste.
         //si imagepreload = null -> si opt.notonserv = false
         StorageReference OptionMedRef;
+        TaskDone = 0;
+        TaskTodo = 0;
+        AddTask();
         for(int i = 0; i < mParam1.Options.size(); i++){
             Option o = mParam1.Options.get(i);
             final int index = i;
@@ -301,43 +288,32 @@ public class CreerOptionDialog extends DialogFragment implements CreerOptionAdap
                         OptionMedRef = FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.OPTIONS_VIDEOS_THUMBNAILS).child(o.ID+".jpg");
                     }
                     Log.e("Test", "Chargement");
+                    AddTask();
                     OptionMedRef.getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
                         @Override
                         public void onSuccess(byte[] bytes) {
                             mParam1.Options.get(index).ImagePreload = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                            creerOptionAdapter.notifyDataSetChanged();
+                            TaskDone();
                         }
                     });
-                }else{//si il n'st pas sur le serveur, il est local, deux options, l'image a été choisi donc un bitmap existe, sinon il ne l'est pas;
+                }//si il n'st pas sur le serveur, il est local, deux options, l'image a été choisi donc un bitmap existe, sinon il ne l'est pas;
 
-                }
+
             }
         }
+        TaskDone();
 
     }
+    interface OnFragmentInteractionListener{}
     private void MakeImage(){
 
         ImageBitmap = TraitementImage.RotateImage(Image, getActivity());
-        //Image = TraitementImage.ConvertBitmapToUri(ImageBitmap, getActivity());
         mParam1.Options.get(this.optionPosition).Chemin_Media = "N";
-        //mParam1.Options.get(this.optionPosition).UriImage = Image.toString();
         mParam1.Options.get(this.optionPosition).ImagePreload = TraitementImage.CreateThumbnail(ImageBitmap, getActivity(), 512);
         mParam1.Options.get(this.optionPosition).ImageFull = ImageBitmap;
         Image = null;
         ImageBitmap = null;
         mParam1.Options.get(this.optionPosition).DataChanged = true;
         creerOptionAdapter.notifyDataSetChanged();
-    }
-    public void ToggleDoneBtn(boolean b){
-        Done.setEnabled(b);
-    }
-    public FragmentManager getFragmentManagerQ(){
-        return getFragmentManager();
-    }
-    public interface OptionDialogListener{
-        String onFinishedOptionDialog(ArrayList<Option> liste_option, int Position);
-    }
-    public interface OnFragmentInteractionListener {
-        //void onFragmentInteraction(Uri uri);
     }
 }

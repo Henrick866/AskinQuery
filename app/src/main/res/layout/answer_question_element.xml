@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:layout_marginTop="10dp"
+    android:layout_marginBottom="10dp"
+    android:padding="7dp"
+    android:background="@drawable/list_item_bg"
+    android:id="@+id/answer_question_layout"
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/answer_question_texte"
@@ -13,11 +16,19 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textSize="18sp" />
 
+
     <TextView
         android:id="@+id/answer_question_instruct"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="invisible" />
+
+    <ProgressBar
+        android:id="@+id/answer_question_progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:theme="@style/LoaderAccent"/>
 
     <ListView
         android:id="@+id/answer_question_options"

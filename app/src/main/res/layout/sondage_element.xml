@@ -1,62 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:paddingStart="7dp"
-    android:paddingEnd="7dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:layout_marginTop="5dp"
     android:layout_marginBottom="5dp"
-    android:layout_height="wrap_content">
+    android:background="@drawable/list_item_bg"
+    android:orientation="vertical"
+    android:paddingTop="7dp"
+    android:paddingBottom="7dp"
+    >
 
     <LinearLayout
-        android:baselineAligned="false"
-        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:baselineAligned="false"
+        android:paddingStart="7dp"
+        android:paddingEnd="7dp"
+        android:orientation="horizontal">
 
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="3"
-            >
+            android:orientation="vertical">
 
             <TextView
+                android:id="@+id/sondage_elem_titre"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/sondage_elem_titre"
                 android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
             <TextView
                 android:id="@+id/sondage_elem_nom_auteur"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
                 android:clickable="true"
                 android:focusable="true"
-                android:layout_marginTop="5dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 android:textColor="@android:color/holo_blue_light"
                 android:textSize="18sp" />
 
             <LinearLayout
-                android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/sondage_elem_date_debut"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:layout_marginTop="5dp"
+                    android:layout_weight="1"
                     android:textAppearance="@style/TextAppearance.AppCompat" />
 
                 <TextView
                     android:id="@+id/sondage_elem_date_fin"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:layout_marginTop="5dp"
+                    android:layout_weight="1"
                     android:textAppearance="@style/TextAppearance.AppCompat" />
             </LinearLayout>
 
@@ -66,19 +70,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="0.1">
+
             <com.balysv.materialripple.MaterialRippleLayout
                 android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
+                app:mrl_rippleRoundedCorners="2dp"
                 android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:layout_height="wrap_content">
+                android:layout_marginBottom="5dp">
 
                 <ImageButton
                     android:id="@+id/sondage_elem_plainte_btn"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:contentDescription="@string/Sondage_Elem_ImgBtn_Plainte_Desc"
                     android:background="@drawable/round_btn"
+                    android:contentDescription="@string/Sondage_Elem_ImgBtn_Plainte_Desc"
                     android:src="@drawable/ic_flag"
                     android:tint="@color/colorRed" />
             </com.balysv.materialripple.MaterialRippleLayout>
@@ -89,46 +95,62 @@
         android:id="@+id/sondage_elem_progress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone"
         android:indeterminate="true"
-        android:indeterminateDrawable="@drawable/progress"/>
+        android:theme="@style/LoaderAccent"
+        android:visibility="gone" />
 
     <ImageView
+        android:layout_marginStart="7dp"
+        android:layout_marginEnd="7dp"
+        android:id="@+id/sondage_elem_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:srcCompat="@android:drawable/ic_menu_gallery"
-        android:id="@+id/sondage_elem_image"
-        android:visibility="visible"
-        android:maxHeight="150dp"
-        android:contentDescription="@string/Sondage_Elem_Img_Desc"
-        android:adjustViewBounds="true"
-        android:cropToPadding="false"
-        android:layout_marginTop="5dp"
         android:layout_gravity="center"
-        android:scaleType="fitCenter" />
-
+        android:layout_marginTop="5dp"
+        android:adjustViewBounds="true"
+        android:contentDescription="@string/Sondage_Elem_Img_Desc"
+        android:cropToPadding="false"
+        android:maxHeight="150dp"
+        android:scaleType="fitCenter"
+        android:visibility="gone"
+        app:srcCompat="@android:drawable/ic_menu_gallery" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:id="@+id/SondElemShadow"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/shadow_down_top" />
     <LinearLayout
-        android:orientation="horizontal"
+        android:paddingStart="7dp"
+        android:paddingEnd="7dp"
+        android:paddingTop="5dp"
+        android:id="@+id/sondage_elem_zone_admin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:id="@+id/sondage_elem_zone_admin">
-        <LinearLayout android:layout_width="match_parent" android:orientation="vertical"
-            android:layout_height="wrap_content" android:layout_weight="1">
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/SondElemEditZone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
             <com.balysv.materialripple.MaterialRippleLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-            <ImageButton
-                android:id="@+id/sondage_elem_edit_btn"
-                style="@style/buttonImageCustom"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:background="@color/transparent"
-                android:scaleType="fitCenter"
-                android:contentDescription="@string/Sondage_Elem_BtnEdit_Desc"
-                android:src="@drawable/ic_edit" />
-        </com.balysv.materialripple.MaterialRippleLayout>
+                <ImageButton
+                    android:id="@+id/sondage_elem_edit_btn"
+                    style="@style/buttonImageCustom"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:background="@color/transparent"
+                    android:contentDescription="@string/Sondage_Elem_BtnEdit_Desc"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_edit" />
+            </com.balysv.materialripple.MaterialRippleLayout>
+
             <TextView
                 android:id="@+id/sondage_elem_edit_text"
                 android:layout_width="match_parent"
@@ -136,24 +158,29 @@
                 android:text="@string/Sondage_Elem_BtnEdit_Desc"
                 android:textAlignment="center" />
         </LinearLayout>
-        <View android:layout_width="2dp" android:layout_height="match_parent" android:background="@color/LightGrey"/>
-        <LinearLayout android:layout_width="match_parent" android:orientation="vertical"
-            android:layout_height="wrap_content" android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
             <com.balysv.materialripple.MaterialRippleLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-            <ImageButton
-                android:id="@+id/sondage_elem_stats_btn"
-                style="@style/buttonImageCustom"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:background="@color/transparent"
-                android:scaleType="fitCenter"
-                android:contentDescription="@string/Sondage_Elem_BtnStats_Desc"
-                android:src="@drawable/ic_stats" />
+                <ImageButton
+                    android:id="@+id/sondage_elem_stats_btn"
+                    style="@style/buttonImageCustom"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:background="@color/transparent"
+                    android:contentDescription="@string/Sondage_Elem_BtnStats_Desc"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_stats" />
 
-        </com.balysv.materialripple.MaterialRippleLayout>
+            </com.balysv.materialripple.MaterialRippleLayout>
+
             <TextView
                 android:id="@+id/sondage_elem_stats_text"
                 android:layout_width="match_parent"
@@ -161,24 +188,28 @@
                 android:text="@string/Sondage_Elem_BtnStats_Desc"
                 android:textAlignment="center" />
         </LinearLayout>
-        <View android:layout_width="2dp" android:layout_height="match_parent" android:background="@color/LightGrey"/>
-        <LinearLayout android:layout_width="match_parent" android:orientation="vertical"
-            android:layout_height="wrap_content" android:layout_weight="1">
-        <com.balysv.materialripple.MaterialRippleLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
 
-            <ImageButton
-                android:id="@+id/sondage_elem_delete_btn"
-                style="@style/buttonImageCustom"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <com.balysv.materialripple.MaterialRippleLayout
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:contentDescription="@string/Sondage_Elem_BtnDelete_Desc"
-                android:background="@color/transparent"
-                android:scaleType="fitCenter"
-                android:src="@drawable/ic_delete"
-                android:tint="@color/colorRed" />
-        </com.balysv.materialripple.MaterialRippleLayout>
+                android:layout_height="wrap_content">
+
+                <ImageButton
+                    android:id="@+id/sondage_elem_delete_btn"
+                    style="@style/buttonImageCustom"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:background="@color/transparent"
+                    android:contentDescription="@string/Sondage_Elem_BtnDelete_Desc"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_delete"
+                    android:tint="@color/colorRed" />
+            </com.balysv.materialripple.MaterialRippleLayout>
 
             <TextView
                 android:layout_width="match_parent"
@@ -189,15 +220,18 @@
 
     </LinearLayout>
 
-    <RelativeLayout
+    <LinearLayout
+        android:id="@+id/btn_vote_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/btn_vote_layout">
+        android:layout_marginTop="5dp"
+        android:gravity="center_horizontal">
+
         <com.balysv.materialripple.MaterialRippleLayout
             android:layout_width="wrap_content"
-            android:layout_centerInParent="true"
-            android:layout_marginTop="5dp"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            app:mrl_rippleOverlay="true"
+            android:layout_gravity="center_horizontal">
 
             <Button
                 android:id="@+id/sondage_elem_start_btn"
@@ -209,7 +243,7 @@
                 android:text="@string/Sondage_Elem_Poll_Start"
                 android:textAlignment="center" />
         </com.balysv.materialripple.MaterialRippleLayout>
-    </RelativeLayout>
+    </LinearLayout>
 
 
 </LinearLayout>

@@ -13,6 +13,9 @@
     <string name="profile_group_title">Profil</string>
     <string name="Connexion"><u>Se connecter</u></string>
     <string name="Deconnexion"><u>Se déconnecter</u></string>
+    <string name="Main_NotConnected">Non connecté.</string>
+    <string name="Main_PleaseConnect">Veuillez vous connecter.</string>
+
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <!-- SondageList -->
     <string name="Sondage_Elem_Poll_Done">Sondage terminé</string>
@@ -21,6 +24,7 @@
     <string name="Sondage_Elem_Poll_Answered">Sondage répondu</string>
     <string name="Sondage_Elem_Poll_Start">Débutez le sondage</string>
     <string name="Sondage_Elem_Date_Publie">Publié le : %1$s</string>
+    <string name="Sondage_Elem_Date_Created">Créé le : %1$s</string>
     <string name="Sondage_Elem_Date_End">Échéance le : %1$s</string>
     <string name="Sondage_Elem_ImgBtn_Plainte_Desc">Portez plainte sur ce sondage</string>
     <string name="Sondage_Elem_Img_Desc">Bannière du sondage</string>
@@ -58,29 +62,30 @@
     <string name="Mng_Profil_FollowedTag">Créateurs suivis.</string>
     <string name="Mng_Profil_OtherTag">Gestion du compte.</string>
     <string name="Mng_Profil_Delete">Supprimer le compte</string>
-        <!-- Manage Profil Dialogs-->
-        <string name="Username_Field_Hint">Nom d\'utilisateur</string>
-        <string name="Mng_Profil_Username_Err_Same">Le nom d\'utilisateur est identique.</string>
-        <string name="Mng_Profil_Cancel">Annuler</string>
-        <string name="Mng_Profil_Confirm">Confirmer</string>
-        <string name="Username_Check">Vérifiez la disponibilité</string>
+    <!-- Manage Profil Dialogs-->
+    <string name="Username_Field_Hint">Nom d\'utilisateur</string>
+    <string name="Mng_Profil_Username_Err_Same">Le nom d\'utilisateur est identique.</string>
+    <string name="Mng_Profil_Cancel">Annuler</string>
+    <string name="Mng_Profil_Confirm">Confirmer</string>
+    <string name="Username_Check">Vérifiez la disponibilité</string>
     <string name="Username_Err_Short">Nom d\'utilisateur trop court (3 caractères minimum)</string>
     <string name="Username_Err_Long">Nom d\'utilisateur trop long (25 caractères maximum)</string>
+    <string name="Username_Err_Found">le nom d\'utilisateur existe déjà, veuillez en trouver un autre.</string>
 
-        <string name="Email_Field_Hint">Courriel</string>
-        <string name="Email_Field_Err_Invalid">Courriel invalide</string>
+    <string name="Email_Field_Hint">Courriel</string>
+    <string name="Email_Field_Err_Invalid">Courriel invalide</string>
 
-        <string name="Pass_Field_Hint">Mot de passe</string>
-        <string name="Pass_Err_Too_Weak">Mot de passe trop faible</string>
-        <string name="Pass_Err_Too_Short">Mot de passe trop court (8 caractères minimum)</string>
-        <string name="Pass_Strength_Unacceptable">Inacceptable</string>
-        <string name="Pass_Strength_Weak">Faible</string>
-        <string name="Pass_Strength_Medium">Moyen</string>
-        <string name="Pass_Strength_Strong">Fort</string>
-        <string name="Profil_Create_Title">Créer un profil</string>
-        <string name="Profil_Create_Btn">S\'enregistrer</string>
-        <string name="Avatar_Title">Avatar</string>
-        <string name="Avatar_Download">Choisir une image</string>
+    <string name="Pass_Field_Hint">Mot de passe</string>
+    <string name="Pass_Err_Too_Weak">Mot de passe trop faible</string>
+    <string name="Pass_Err_Too_Short">Mot de passe trop court (8 caractères minimum)</string>
+    <string name="Pass_Strength_Unacceptable">Inacceptable</string>
+    <string name="Pass_Strength_Weak">Faible</string>
+    <string name="Pass_Strength_Medium">Moyen</string>
+    <string name="Pass_Strength_Strong">Fort</string>
+    <string name="Profil_Create_Title">Créer un profil</string>
+    <string name="Profil_Create_Btn">S\'enregistrer</string>
+    <string name="Avatar_Title">Avatar (Optionnel)</string>
+    <string name="Avatar_Download">Choisir une image</string>
 
     <!--Answer Sondages-->
     <string name="Poll_Answ_Percent">%1$d %%</string>
@@ -102,7 +107,7 @@
     <string name="Post_Form_Title_Edit">Modifier la publication</string>
     <string name="Post_Form_Title_Field_Hint">Titre</string>
     <string name="Post_Form_Content_Field_Hint">Contenu de la publication</string>
-    <string name="Post_Form_Media_Pick">Choisir un média ou un sondage à publier</string>
+    <string name="Post_Form_Media_Pick">Choisir un média ou un sondage (que vous avez créé) à partager (optionnel)</string>
     <string name="Post_Form_Media_Pick_Img">Image</string>
     <string name="Post_Form_Media_Pick_Vid">Vidéo</string>
     <string name="Post_Form_Media_Pick_Poll">Sondage</string>
@@ -139,8 +144,11 @@
     <string name="Create_Sondage_Poll_End_Date_Preview_Tag">Date sélectionnée :</string>
     <string name="Create_Sondage_Poll_Public_Results_Tag">Permettre aux répondants de consulter les résultats après la date d\'échéance? (optionnel)</string>
     <string name="Create_Sondage_Poll_Img_Btn">Bannière du sondage</string>
+    <string name="Create_Sondage_Poll_Img_Tag">Bannière du sondage (Optionnel)</string>
     <string name="Create_Sondage_No_Title_Err">Vous devez mettre un titre au sondage.</string>
     <string name="Create_Sondage_Date_Err">La date d\'échéance ne peut être avant la date d\'aujourd\'hui.</string>
+    <string name="Create_Sondage_Publish_Btn_Desc">Publier immédiatement le sondage (Ne peut plus être modifié)</string>
+    <string name="Create_Sondage_Save_Btn_Desc">Enregistrer le sondage pour le publier plus tard (Peut être modifié)</string>
 
     <!-- Login -->
     <string name="Login_Title">Connexion</string>
@@ -148,6 +156,7 @@
     <string name="Login_Btn_Create">S\'enregistrer</string>
     <string name="Login_Empty_Fields">Champ(s) vide(s), veuillez le(s) remplir</string>
     <string name="Login_Wrong_Creds">Courriel ou mot de passe érroné(s)</string>
+    <string name="Login_Forgotten"><u>Mot de passe oublié?</u></string>
 
     <!--Flag Dialog-->
     <string name="Dialog_Flag_Title">Veuiller indiquer les raisons de votre plainte.</string>
@@ -156,10 +165,12 @@
 
     <!-- Other -->
     <string name="Pass_Dialog_Tag">Entrez votre mot de passe pour vérifier votre identité.</string>
+    <string name="Pass_Reset_Dialog_Tag">Entrez votre courriel pour pouvoir réinitialiser votre mot de passe.</string>
+    <string name="Pass_Reset_Dialog_Success">Le courriel pour réinitialiser votre mot de passe a été envoyé.</string>
+    <string name="Pass_Reset_Dialog_Error">Erreur, veuillez recommencer.</string>
     <string name="Close_Dialog">Fermer</string>
     <string name="Image_Dialog_Desc">Grande version de l\'image sélectionnée</string>
-
-
+    <string name="Video_Dialog_Err">Téléchargement échoué</string>
 
 
     <string name="Gen_Empty_Field">Le champ est vide.</string>

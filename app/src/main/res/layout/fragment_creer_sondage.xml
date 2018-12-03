@@ -3,49 +3,49 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:paddingEnd="7dp"
-    android:paddingStart="7dp"
     android:weightSum="1"
     tools:context="personnal.askinquery.CreerSondageFragment">
     <LinearLayout
-        android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:layout_marginTop="5dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="7dp"
+        android:layout_marginEnd="7dp"
         android:orientation="horizontal">
-        <com.balysv.materialripple.MaterialRippleLayout
-            android:layout_width="match_parent"
-            android:layout_weight="1"
-            android:layout_height="wrap_content">
-
-            <Button
-                android:id="@+id/sondage_edit_done"
-                style="@style/buttonNoBorderCustom"
+            <com.balysv.materialripple.MaterialRippleLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawableEnd="@drawable/ic_publish_color"
-                android:paddingStart="20dp"
-                android:paddingEnd="10dp"
-                android:text="@string/Post_Form_Done" />
-        </com.balysv.materialripple.MaterialRippleLayout>
+                android:layout_weight="1"
+                >
+                <Button
+                    android:id="@+id/sondage_edit_done"
+                    style="@style/buttonNoBorderCustom"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableEnd="@drawable/ic_publish_color"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="10dp"
+                    android:text="@string/Post_Form_Done" />
+            </com.balysv.materialripple.MaterialRippleLayout>
+
         <View
             android:layout_width="2dp"
             android:layout_height="match_parent"
-            android:background="@color/LightGrey" />
-        <com.balysv.materialripple.MaterialRippleLayout
-            android:layout_width="match_parent"
-            android:layout_weight="1"
-            android:layout_height="wrap_content">
-
-            <Button
-                android:id="@+id/sondage_edit_save"
-                style="@style/buttonNoBorderCustom"
+            android:background="@color/LightGrey"/>
+            <com.balysv.materialripple.MaterialRippleLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawableEnd="@drawable/ic_save_color"
-                android:paddingStart="20dp"
-                android:paddingEnd="10dp"
-                android:text="@string/Create_Sondage_Save_Btn" />
-        </com.balysv.materialripple.MaterialRippleLayout>
+                android:layout_weight="1"
+                >
+                <Button
+                    android:id="@+id/sondage_edit_save"
+                    style="@style/buttonNoBorderCustom"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableEnd="@drawable/ic_save_color"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="10dp"
+                    android:text="@string/Create_Sondage_Save_Btn" />
+            </com.balysv.materialripple.MaterialRippleLayout>
 
     </LinearLayout>
 
@@ -56,6 +56,10 @@
         android:layout_height="wrap_content"
         android:textColor="@color/colorRed"
         android:visibility="invisible" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:background="@drawable/shadow_top_down" />
 
     <TabHost
         android:id="@+id/TabHost"
@@ -65,6 +69,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+
             android:orientation="vertical">
 
             <TabWidget
@@ -76,207 +81,227 @@
                 android:id="@android:id/tabcontent"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
-
-                <LinearLayout
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:background="@drawable/shadow_top_down" />
+                <ScrollView
                     android:id="@+id/TabSondage"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
+                    android:layout_height="match_parent">
 
-                    <ScrollView
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                        android:paddingStart="7dp"
+                        android:paddingEnd="7dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/sondage_edit_title_form"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/Create_Sondage_Poll_Title_View_New"
+                            android:textAlignment="center"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+
+                        <EditText
+                            android:id="@+id/sondage_edit_titre"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:ems="10"
+                            android:hint="@string/Post_Form_Title_Field_Hint"
+                            android:inputType="textPersonName" />
+
+                        <TextView
+                            android:id="@+id/sondage_edit_titre_error"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:textAppearance="@style/TextAppearance.AppCompat"
+                            android:textColor="@color/colorRed"
+                            android:visibility="invisible" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:text="@string/Create_Sondage_Poll_End_Date_Tag"
+                            android:textAlignment="center"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+
+                        <DatePicker
+                            android:id="@+id/sondage_edit_date"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:spinnersShown="false" />
+
+                        <TextView
+                            android:id="@+id/sondage_edit_date_error"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:textColor="@color/colorRed"
+                            android:visibility="invisible" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:text="@string/Create_Sondage_Poll_End_Date_Preview_Tag"
+                            android:textAlignment="center"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:id="@+id/sondage_edit_date_confirm"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:textAlignment="center"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                            android:textColor="@color/colorPrimaryDark" />
+
+                        <CheckBox
+                            android:id="@+id/sondage_edit_public_results"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:text="@string/Create_Sondage_Poll_Public_Results_Tag" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:text="@string/Create_Sondage_Poll_Img_Tag"
+                            android:textAlignment="center"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                            android:textSize="18sp" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical">
+                            android:layout_height="match_parent"
+                            android:layout_marginTop="5dp"
+                            android:orientation="horizontal">
 
-                            <TextView
-                                android:id="@+id/sondage_edit_title_form"
+                            <com.balysv.materialripple.MaterialRippleLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="@string/Create_Sondage_Poll_Title_View_New"
-                                android:textAlignment="center"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+                                android:layout_weight="1">
 
-                            <EditText
-                                android:id="@+id/sondage_edit_titre"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:ems="10"
-                                android:hint="@string/Post_Form_Title_Field_Hint"
-                                android:inputType="textPersonName" />
+                                <Button
+                                    android:id="@+id/sondage_edit_upload_img"
+                                    style="@style/buttonNoBorderCustom"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:background="@color/transparent"
+                                    android:drawableTop="@drawable/ic_file_upload_color"
+                                    android:text="@string/Create_Option_Elem_BtnUpload" />
+                            </com.balysv.materialripple.MaterialRippleLayout>
 
-                            <TextView
-                                android:id="@+id/sondage_edit_titre_error"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="5dp"
-                                android:textAppearance="@style/TextAppearance.AppCompat"
-                                android:textColor="@color/colorRed"
-                                android:visibility="invisible" />
-
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="5dp"
-                                android:text="@string/Create_Sondage_Poll_End_Date_Tag"
-                                android:textAlignment="center"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
-
-                            <DatePicker
-                                android:id="@+id/sondage_edit_date"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center_horizontal"
-                                android:spinnersShown="false" />
-
-                            <TextView
-                                android:id="@+id/sondage_edit_date_error"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="5dp"
-                                android:textColor="@color/colorRed"
-                                android:visibility="invisible" />
-
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="5dp"
-                                android:text="@string/Create_Sondage_Poll_End_Date_Preview_Tag"
-                                android:textAlignment="center"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-                                android:textSize="18sp" />
-
-                            <TextView
-                                android:id="@+id/sondage_edit_date_confirm"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="5dp"
-                                android:textAlignment="center"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textColor="@color/colorPrimaryDark" />
-
-                            <CheckBox
-                                android:id="@+id/sondage_edit_public_results"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="10dp"
-                                android:layout_marginTop="5dp"
-                                android:layout_marginRight="10dp"
-                                android:text="@string/Create_Sondage_Poll_Public_Results_Tag" />
-
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="5dp"
-                                android:text="@string/Create_Sondage_Poll_Img_Btn"
-                                android:textAlignment="center"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                                android:textSize="18sp" />
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
+                            <View
+                                android:layout_width="2dp"
                                 android:layout_height="match_parent"
-                                android:layout_marginTop="5dp"
-                                android:orientation="horizontal">
+                                android:background="@color/LightGrey" />
 
-                                <com.balysv.materialripple.MaterialRippleLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="1">
-
-                                    <Button
-                                        android:id="@+id/sondage_edit_upload_img"
-                                        style="@style/buttonNoBorderCustom"
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"
-                                        android:background="@color/transparent"
-                                        android:drawableTop="@drawable/ic_file_upload_color"
-                                        android:text="@string/Create_Option_Elem_BtnUpload" />
-                                </com.balysv.materialripple.MaterialRippleLayout>
-
-                                <View
-                                    android:layout_width="2dp"
-                                    android:layout_height="match_parent"
-                                    android:background="@color/LightGrey" />
-
-                                <com.balysv.materialripple.MaterialRippleLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="1">
-
-                                    <Button
-                                        android:id="@+id/sondage_edit_remove_img"
-                                        style="@style/buttonNoBorderCustom"
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"
-                                        android:background="@color/transparent"
-                                        android:drawableTop="@drawable/ic_clear_color"
-                                        android:text="@string/Post_Form_Media_Remove_Img"
-                                        android:textColor="@color/colorRed" />
-                                </com.balysv.materialripple.MaterialRippleLayout>
-                            </LinearLayout>
-
-                            <ImageView
-                                android:id="@+id/sondage_edit_image_preview"
+                            <com.balysv.materialripple.MaterialRippleLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:contentDescription="@string/Sondage_Elem_Img_Desc"
-                                android:layout_marginTop="5dp"
-                                android:adjustViewBounds="true"
-                                android:cropToPadding="false"
-                                android:maxHeight="150dp"
-                                android:src="@drawable/ic_menu_gallery"
-                                android:visibility="gone" />
+                                android:layout_weight="1">
+
+                                <Button
+                                    android:id="@+id/sondage_edit_remove_img"
+                                    style="@style/buttonNoBorderCustom"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:background="@color/transparent"
+                                    android:drawableTop="@drawable/ic_clear_color"
+                                    android:text="@string/Post_Form_Media_Remove_Img"
+                                    android:textColor="@color/colorRed" />
+                            </com.balysv.materialripple.MaterialRippleLayout>
                         </LinearLayout>
-                    </ScrollView>
 
-                </LinearLayout>
+                        <ImageView
+                            android:id="@+id/sondage_edit_image_preview"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:adjustViewBounds="true"
+                            android:contentDescription="@string/Sondage_Elem_Img_Desc"
+                            android:cropToPadding="false"
+                            android:maxHeight="150dp"
+                            android:src="@drawable/ic_menu_gallery"
+                            android:visibility="gone" />
+
+                    </LinearLayout>
+                </ScrollView>
 
 
-                <LinearLayout
+                <RelativeLayout
                     android:id="@+id/TabQuestions"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical">
-
+                    android:background="@drawable/background">
                     <RelativeLayout
+                        android:id="@+id/PollEditAddQuestion"
                         android:layout_width="match_parent"
+                        android:background="@color/Blanc"
                         android:layout_height="wrap_content">
+                        <View
+                            android:layout_alignParentTop="true"
+                            android:layout_width="match_parent"
+                            android:layout_height="5dp"
+                            android:background="@drawable/shadow_top_down" />
+                    <com.balysv.materialripple.MaterialRippleLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:layout_marginTop="5dp">
 
-                        <com.balysv.materialripple.MaterialRippleLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="5dp"
-                            android:layout_centerInParent="true">
-
-                            <ImageButton
-                                android:id="@+id/sondage_edit_add_question"
-                                style="@style/buttonImageCustom"
-                                android:layout_width="50dp"
-                                android:contentDescription="@string/Create_Question_Elem_Add_Btn"
-                                android:layout_height="50dp"
-                                android:scaleType="fitCenter"
-                                android:src="@drawable/ic_ajout" />
-                        </com.balysv.materialripple.MaterialRippleLayout>
-
+                        <ImageButton
+                            android:id="@+id/sondage_edit_add_question"
+                            style="@style/buttonImageCustom"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:background="@color/transparent"
+                            android:contentDescription="@string/Create_Question_Elem_Add_Btn"
+                            android:scaleType="fitCenter"
+                            android:src="@drawable/ic_ajout" />
+                    </com.balysv.materialripple.MaterialRippleLayout>
                     </RelativeLayout>
+
                     <ProgressBar
+                        android:layout_below="@id/PollEditAddQuestion"
                         android:id="@+id/sondage_edit_questions_load"
                         style="?android:attr/progressBarStyle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
                         android:indeterminate="true"
-                        android:visibility="visible"
-                        android:indeterminateDrawable="@drawable/progress" />
+                        android:theme="@style/LoaderAccent"
+                        android:visibility="visible" />
+
                     <ListView
+                        android:paddingTop="5dp"
+                        android:paddingBottom="5dp"
+                        android:clipToPadding="false"
+                        android:paddingStart="7dp"
+                        android:paddingEnd="7dp"
+                        android:layout_below="@id/PollEditAddQuestion"
                         android:id="@+id/sondage_edit_questions_list"
                         android:layout_width="match_parent"
                         android:layout_height="fill_parent"
-                        android:descendantFocusability="beforeDescendants" />
-                </LinearLayout>
+                        android:layout_marginTop="5dp"
+                        android:descendantFocusability="beforeDescendants"
+                        android:divider="@color/transparent"
+                        android:dividerHeight="10dp" />
+                    <View
+                        android:layout_below="@id/PollEditAddQuestion"
+                        android:layout_width="match_parent"
+                        android:layout_height="5dp"
+                        android:background="@drawable/shadow_top_down" />
+                </RelativeLayout>
 
             </FrameLayout>
 

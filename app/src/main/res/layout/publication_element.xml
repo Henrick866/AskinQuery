@@ -4,11 +4,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:orientation="vertical"
-    android:paddingTop="5dp"
-    android:paddingBottom="5dp"
+    android:paddingTop="7dp"
+    android:paddingBottom="7dp"
+    android:background="@drawable/list_item_bg"
     android:layout_height="wrap_content">
 
     <LinearLayout
+        android:paddingStart="7dp"
+        android:paddingEnd="7dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
@@ -73,6 +76,8 @@
     </LinearLayout>
 
     <TextView
+        android:paddingStart="7dp"
+        android:paddingEnd="7dp"
         android:id="@+id/pub_elem_titre"
         android:layout_marginTop="5dp"
         android:layout_width="match_parent"
@@ -82,15 +87,18 @@
         android:textSize="18sp" />
 
     <TextView
+
         android:layout_marginTop="5dp"
         android:id="@+id/pub_elem_texte"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp"
+        android:paddingStart="17dp"
+        android:paddingEnd="17dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
     <TextView
+        android:paddingStart="7dp"
+        android:paddingEnd="7dp"
         android:id="@+id/pub_elem_instruct"
         android:layout_marginTop="5dp"
         android:layout_width="match_parent"
@@ -103,12 +111,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:indeterminate="true"
-        android:indeterminateDrawable="@drawable/progress"/>
+        android:theme="@style/LoaderAccent"/>
+
     <RelativeLayout
+        android:paddingStart="7dp"
+        android:paddingEnd="7dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:layout_gravity="center">
+        <com.balysv.materialripple.MaterialRippleLayout
+            android:layout_width="wrap_content"
+            app:mrl_rippleOverlay="true"
+            android:id="@+id/PubElemRipple"
+            android:layout_height="wrap_content">
         <ImageView
             android:id="@+id/pub_elem_image"
             android:contentDescription="@string/Post_Elem_Desc_Media"
@@ -119,20 +135,23 @@
             android:cropToPadding="false"
             android:visibility="gone"
             app:srcCompat="@drawable/ic_menu_gallery" />
-
+        </com.balysv.materialripple.MaterialRippleLayout>
         <ImageView
             android:id="@+id/pub_elem_img_icon"
             android:contentDescription="@string/Post_Elem_Desc_Media_icon"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_alignEnd="@id/pub_elem_image"
-            android:layout_alignBottom="@id/pub_elem_image"
+            android:layout_alignEnd="@id/PubElemRipple"
+            android:layout_alignBottom="@id/PubElemRipple"
             android:layout_marginEnd="5dp"
+            android:background="@drawable/round_btn"
+            android:padding="5dp"
             android:layout_marginBottom="5dp"
             android:src="@drawable/ic_sondage_debut"
             android:visibility="gone"
-            android:tint="@color/colorPrimaryMedLight" />
+            android:tint="@color/Blanc" />
     </RelativeLayout>
+
     <!--<ImageView
         android:layout_marginTop="5dp"
         android:id="@+id/pub_elem_image"
@@ -152,11 +171,19 @@
         android:textAlignment="center"
         android:textColor="@color/colorAccentMedDark"
         android:visibility="invisible" />
-
-    <LinearLayout
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
         android:layout_marginTop="5dp"
+        android:background="@drawable/shadow_down_top"
+        android:id="@+id/PubElemShadow"
+        />
+    <LinearLayout
+        android:paddingStart="7dp"
+        android:paddingEnd="7dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="5dp"
         android:id="@+id/pub_elem_zone_admin"
         android:layout_gravity="center"
         android:orientation="horizontal">
@@ -184,10 +211,6 @@
             android:text="@string/Post_Elem_BtnEdit_Desc"
             android:textAlignment="center"/>
     </LinearLayout>
-        <View
-            android:layout_width="2dp"
-            android:layout_height="match_parent"
-            android:background="@color/LightGrey"/>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

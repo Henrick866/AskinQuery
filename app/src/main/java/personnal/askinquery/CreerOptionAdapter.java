@@ -2,20 +2,13 @@ package personnal.askinquery;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Path;
-import android.net.Uri;
-import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,45 +17,32 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.VideoView;
 
-import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Henrick on 2018-09-21.
  */
 
 public class CreerOptionAdapter extends ArrayAdapter<Option> {
-    private static AdaptListener adaptListener;
-    public ArrayList<Option> OptionData;
-    Context c;
-    int currentEdited;
-    int Type;
-    int Position;
-    int PositionQuestion;
-    public interface OptionsToQuestion{
-
-    }
-    public CreerOptionAdapter(Context context, ArrayList<Option> options, int type, AdaptListener adaptListener){
+    private AdaptListener adaptListener;
+    private ArrayList<Option> OptionData;
+    private Context c;
+    private int currentEdited;
+    private int Type;
+    CreerOptionAdapter(Context context, ArrayList<Option> options, int type, AdaptListener adaptListener){
         super(context, 0, options);
         c = context;
         Type = type;
         OptionData = options;
+        this.adaptListener = adaptListener;
         currentEdited = -1;
     }
     @Override
@@ -76,7 +56,6 @@ public class CreerOptionAdapter extends ArrayAdapter<Option> {
 
     public View getView(int position, View convertView, ViewGroup parent){
         final Option option = getItem(position);
-        Position = position;
         final int POSITION = position;
         if(OptionData.get(position) == null){
             OptionData.add(option);
@@ -85,10 +64,9 @@ public class CreerOptionAdapter extends ArrayAdapter<Option> {
         final CreerOptionAdapter.ViewHolder holder;
         if(view == null){
             view = LayoutInflater.from(getContext()).inflate(R.layout.option_edit_element, parent, false);
-            holder = new CreerOptionAdapter.ViewHolder(view, position);
+            holder = new CreerOptionAdapter.ViewHolder(view);
 
             view.setTag(holder);
-            //holder.TexteReponse.setTag(OptionData.get(POSITION).ID);
         }else{
             holder = (CreerOptionAdapter.ViewHolder)view.getTag();
         }
@@ -122,15 +100,10 @@ public class CreerOptionAdapter extends ArrayAdapter<Option> {
                             holder.ImagePreview.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
-                                    FragmentManager fm = adaptListener.getFragmentManagerQ();
-                                    FragmentTransaction ft = fm.beginTransaction();
-                                    Fragment prev = fm.findFragmentByTag("fragment_video_dialog");
-                                    if (prev != null) {
-                                        ft.remove(prev);
-                                    }
-                                    ft.addToBackStack(null);
-                                    VideoDialogFragment creerOptionDialog = VideoDialogFragment.newInstance(OptionData.get(POSITION).UriVideo, OptionData.get(POSITION).notOnServer);
-                                    creerOptionDialog.show(ft, "fragment_video_dialog");
+                                    Intent intent = new Intent(c, VideoPopupActivity.class);
+                                    intent.putExtra("Path", OptionData.get(POSITION).UriVideo);
+                                    intent.putExtra("NotOnServer", OptionData.get(POSITION).notOnServer);
+                                    c.startActivity(intent);
                                 }
                             });
                         }else{
@@ -141,7 +114,7 @@ public class CreerOptionAdapter extends ArrayAdapter<Option> {
                             holder.ImagePreview.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
-                                    Dialog dialog = new Dialog(c);
+                                    final Dialog dialog = new Dialog(c);
                                     dialog.setContentView(R.layout.image_dialog);
                                     dialog.show();
                                     final ImageView Image = dialog.findViewById(R.id.image_dialog_imageview);
@@ -149,6 +122,13 @@ public class CreerOptionAdapter extends ArrayAdapter<Option> {
                                     Image.setImageBitmap(OptionData.get(POSITION).ImageFull);
                                     progressBar.setVisibility(View.GONE);
                                     Image.setVisibility(View.VISIBLE);
+                                    final Button CloseBtn = dialog.findViewById(R.id.ImageCloseBtn);
+                                    CloseBtn.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            dialog.dismiss();
+                                        }
+                                    });
 
                                 }
                             });
@@ -171,15 +151,10 @@ public class CreerOptionAdapter extends ArrayAdapter<Option> {
                             holder.ImagePreview.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
-                                    FragmentManager fm = adaptListener.getFragmentManagerQ();
-                                    FragmentTransaction ft = fm.beginTransaction();
-                                    Fragment prev = fm.findFragmentByTag("fragment_video_dialog");
-                                    if (prev != null) {
-                                        ft.remove(prev);
-                                    }
-                                    ft.addToBackStack(null);
-                                    VideoDialogFragment creerOptionDialog = VideoDialogFragment.newInstance(OptionData.get(POSITION).Chemin_Media, OptionData.get(POSITION).notOnServer);
-                                    creerOptionDialog.show(ft, "fragment_video_dialog");
+                                    Intent intent = new Intent(c, VideoPopupActivity.class);
+                                    intent.putExtra("Path", OptionData.get(POSITION).Chemin_Media);
+                                    intent.putExtra("NotOnServer", OptionData.get(POSITION).notOnServer);
+                                    c.startActivity(intent);
                                 }
                             });
                         }else{
@@ -190,7 +165,7 @@ public class CreerOptionAdapter extends ArrayAdapter<Option> {
                             holder.ImagePreview.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
-                                    Dialog dialog = new Dialog(c);
+                                    final Dialog dialog = new Dialog(c);
                                     dialog.setContentView(R.layout.image_dialog);
                                     dialog.show();
                                     final ImageView Image = dialog.findViewById(R.id.image_dialog_imageview);
@@ -203,6 +178,13 @@ public class CreerOptionAdapter extends ArrayAdapter<Option> {
                                             Image.setImageBitmap(b);
                                             progressBar.setVisibility(View.GONE);
                                             Image.setVisibility(View.VISIBLE);
+                                        }
+                                    });
+                                    final Button CloseBtn = dialog.findViewById(R.id.ImageCloseBtn);
+                                    CloseBtn.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            dialog.dismiss();
                                         }
                                     });
                                 }
@@ -318,7 +300,7 @@ public class CreerOptionAdapter extends ArrayAdapter<Option> {
         Button btnUpload;
         ProgressBar Loading;
         Bitmap Image;
-        public ViewHolder(View view, int position){
+        ViewHolder(View view){
             OptionNum = view.findViewById(R.id.sondage_edit_option_num);
             ZoneUpload = view.findViewById(R.id.sondage_edit_option_upload);
             btnDelete = view.findViewById(R.id.sondage_edit_option_delete);
@@ -338,7 +320,5 @@ public class CreerOptionAdapter extends ArrayAdapter<Option> {
         void DeleteOption(int optionPosition);
         void updateOptions(ArrayList<Option> lo);
         void LoadMedia(int optionPosition, int type);
-        FragmentManager getFragmentManagerQ();
-        void ToggleDoneBtn(boolean b);
     }
 }

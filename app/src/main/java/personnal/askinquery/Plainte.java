@@ -9,9 +9,9 @@ public class Plainte {
     public String CibleID;
     public String TypeCible; //au cas où 2 id se ressemblent;
     public long Date;
-    public static final String TYPE_SONDAGE = "SONDAGE";
-    public static final String TYPE_PUBLICATION = "PUBLICATION";
-    public static final String TYPE_PROFIL = "PROFIL";
+    static final String TYPE_SONDAGE = "SONDAGE";
+    static final String TYPE_PUBLICATION = "PUBLICATION";
+    static final String TYPE_PROFIL = "PROFIL";
     public Plainte(){
 
     }

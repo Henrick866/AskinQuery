@@ -3,6 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:padding="7dp"
+    android:background="@drawable/background"
     android:layout_height="match_parent">
     <ScrollView
         android:layout_width="match_parent"
@@ -10,8 +12,8 @@
 <LinearLayout
 android:layout_width="match_parent"
 android:layout_height="wrap_content"
-    android:paddingStart="7dp"
-    android:paddingEnd="7dp"
+    android:padding="7dp"
+    android:background="@drawable/list_item_bg"
     android:orientation="vertical"
     tools:context=".CreatePostFragment">
 
@@ -127,6 +129,12 @@ android:layout_height="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:layout_gravity="center_horizontal">
+        <com.balysv.materialripple.MaterialRippleLayout
+            android:layout_width="wrap_content"
+            android:id="@+id/CreatePostRipple"
+            android:layout_marginTop="5dp"
+            app:mrl_rippleOverlay="true"
+            android:layout_height="wrap_content">
     <ImageView
         android:id="@+id/publication_edit_media_preview"
         android:layout_width="wrap_content"
@@ -139,16 +147,18 @@ android:layout_height="wrap_content"
         android:cropToPadding="false"
         android:src="@drawable/ic_menu_gallery"
         android:visibility="gone" />
+        </com.balysv.materialripple.MaterialRippleLayout>
         <ImageView
             android:layout_width="48dp"
             android:id="@+id/publication_edit_media_preview_icon"
             android:contentDescription="@string/Post_Elem_Desc_Media_icon"
             android:layout_height="48dp"
-            android:tint="@color/colorPrimaryMedLight"
-            android:layout_alignBottom="@id/publication_edit_media_preview"
-            android:layout_alignEnd="@id/publication_edit_media_preview"
+            android:tint="@color/Blanc"
+            android:layout_alignBottom="@id/CreatePostRipple"
+            android:layout_alignEnd="@id/CreatePostRipple"
             android:layout_marginEnd="5dp"
             android:layout_marginBottom="5dp"
+
             android:visibility="gone"
             android:src="@drawable/ic_loupe_black_24dp"/>
     </RelativeLayout>
@@ -164,13 +174,17 @@ android:layout_height="wrap_content"
     <com.balysv.materialripple.MaterialRippleLayout
         android:layout_width="wrap_content"
         android:layout_marginTop="5dp"
+        app:mrl_rippleOverlay="true"
+
+        android:layout_gravity="center_horizontal"
         android:layout_height="wrap_content">
     <Button
         android:id="@+id/publication_edit_mediaRmvBtn"
         style="@style/buttonCustom"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
         android:textColor="@color/colorRed"
         android:visibility="gone" />
     </com.balysv.materialripple.MaterialRippleLayout>
@@ -178,6 +192,7 @@ android:layout_height="wrap_content"
     <com.balysv.materialripple.MaterialRippleLayout
         android:layout_width="match_parent"
         android:layout_marginTop="5dp"
+        app:mrl_rippleOverlay="true"
         android:layout_height="wrap_content">
     <Button
         android:id="@+id/publication_edit_done_btn"

@@ -1,16 +1,16 @@
 package personnal.askinquery;
 
 import android.app.Dialog;
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
@@ -25,25 +25,19 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class AnswerOptionAdapter extends ArrayAdapter<Option> {
-        Context c;
+        private Context c;
         private int Type, positionQuestion;
         private boolean Si_Resultats;
-        private FirebaseUser user;
-        private HashMap<String, Boolean> mapOptionsSaved;
-        protected int PositionChecked;
-        private Sondage sondageParent;
+        private int PositionChecked;
         private LayoutInflater layoutInflater;
         private OptionToQuestionListener optionToQuestionListener;
-public AnswerOptionAdapter(Context context, ArrayList<Option> options, int type, OptionToQuestionListener optionToQuestionListener, int positionQuestion, boolean b){
+AnswerOptionAdapter(Context context, ArrayList<Option> options, int type, OptionToQuestionListener optionToQuestionListener, int positionQuestion, boolean b){
         super(context, 0, options);
         c = context;
-        sondageParent = options.get(0).Question_parent.Sondage_parent;
         this.positionQuestion = positionQuestion;
         layoutInflater = LayoutInflater.from(context);
-        user = ((AdaptListener)c).getUser();
         this.Si_Resultats = b;
         this.optionToQuestionListener = optionToQuestionListener;
         PositionChecked = this.optionToQuestionListener.getPositionChecked(positionQuestion);
@@ -65,9 +59,7 @@ final AnswerOptionAdapter.ViewHolder holder;
         holder.TexteOption.setText(option.Texte);
         if(Type != Question.TYPE_TEXTE) {
 
-            holder.Loading.setVisibility(View.VISIBLE);
             if (option.ImagePreload != null) {
-                holder.Loading.setVisibility(View.GONE);
                 holder.OptionImg.setImageBitmap(option.ImagePreload);
 
                 if(Type == Question.TYPE_VIDEO){
@@ -77,15 +69,10 @@ final AnswerOptionAdapter.ViewHolder holder;
                     holder.OptionImg.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            FragmentManager fm = ((AdaptListener)c).getFragmentManagerQ();
-                            FragmentTransaction ft = fm.beginTransaction();
-                            Fragment prev = fm.findFragmentByTag("fragment_video_dialog");
-                            if (prev != null) {
-                                ft.remove(prev);
-                            }
-                            ft.addToBackStack(null);
-                            VideoDialogFragment creerOptionDialog = VideoDialogFragment.newInstance(option.Chemin_Media, option.notOnServer);
-                            creerOptionDialog.show(ft, "fragment_video_dialog");
+                            Intent intent = new Intent(c, VideoPopupActivity.class);
+                            intent.putExtra("Path", option.Chemin_Media);
+                            intent.putExtra("NotOnServer", option.notOnServer);
+                            c.startActivity(intent);
                         }
                     });
                 }else{
@@ -95,11 +82,12 @@ final AnswerOptionAdapter.ViewHolder holder;
                     holder.OptionImg.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            Dialog dialog = new Dialog(c);
+                            final Dialog dialog = new Dialog(c);
                             dialog.setContentView(R.layout.image_dialog);
                             dialog.show();
                             final ImageView Image = dialog.findViewById(R.id.image_dialog_imageview);
                             final ProgressBar progressBar = dialog.findViewById(R.id.image_dialog_progressBar);
+
                             StorageReference FullImgRef = FirebaseStorage.getInstance().getReference().child(option.Chemin_Media);
                             FullImgRef.getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
                                 @Override
@@ -110,16 +98,21 @@ final AnswerOptionAdapter.ViewHolder holder;
                                     Image.setVisibility(View.VISIBLE);
                                 }
                             });
+                            final Button CloseBtn = dialog.findViewById(R.id.ImageCloseBtn);
+                            CloseBtn.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    dialog.dismiss();
+                                }
+                            });
                         }
                     });
                 }
             } else {
                 holder.OptionImg.setVisibility(View.INVISIBLE);
-
             }
         }else{
             holder.OptionImg.setVisibility(View.GONE);
-            holder.Loading.setVisibility(View.GONE);
         }
         if(Si_Resultats){
             holder.CheckZone.setVisibility(View.GONE);
@@ -167,15 +160,14 @@ static class ViewHolder{
     FrameLayout CheckZone;
     CheckBox VoteBtn;
     LinearLayout ResultZone;
-    ProgressBar LineResult, Loading;
-    public ViewHolder(View view, int position, int positionChecked){
+    ProgressBar LineResult;
+    ViewHolder(View view, int position, int positionChecked){
         TexteOption = view.findViewById(R.id.answer_option_text);
         PercentVote = view.findViewById(R.id.answer_option_percent);
         OptionImg = view.findViewById(R.id.answer_option_image);
         CheckZone = view.findViewById(R.id.answer_option_checkbox_zone);
         VoteBtn = view.findViewById(R.id.answer_option_checkbox);
         ResultZone = view.findViewById(R.id.answer_option_results);
-        Loading = view.findViewById(R.id.answer_option_progress);
         LineResult = view.findViewById(R.id.answer_option_bar);
         OptionIcon = view.findViewById(R.id.answer_option_icon);
         if(positionChecked == position){
@@ -191,6 +183,5 @@ public interface OptionToQuestionListener{
 }
 public interface AdaptListener{
     FirebaseUser getUser();
-    FragmentManager getFragmentManagerQ();
 }
 }

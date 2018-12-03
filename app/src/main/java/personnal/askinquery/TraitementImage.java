@@ -18,7 +18,7 @@ import android.util.DisplayMetrics;
 import java.io.ByteArrayOutputStream;
 
 public class TraitementImage {
-    public static Bitmap RotateImage(Uri uri, Activity activity){
+    static Bitmap RotateImage(Uri uri, Activity activity){
         try{
             Bitmap imageBase = MediaStore.Images.Media.getBitmap(activity.getContentResolver(), uri);
         String FullPath = getRealPath(activity, uri);
@@ -32,18 +32,11 @@ public class TraitementImage {
             case 8: matrix.postRotate(270);
                 break;
         }
-        Bitmap imageFinal = Bitmap.createBitmap(imageBase, 0, 0, imageBase.getWidth(), imageBase.getHeight(), matrix, true);
-        return imageFinal;
+        return Bitmap.createBitmap(imageBase, 0, 0, imageBase.getWidth(), imageBase.getHeight(), matrix, true);
         }catch(Exception e){
             e.printStackTrace();
             return null;
         }
-    }
-    public static Uri ConvertBitmapToUri(Bitmap bitmap, Context context){
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-        String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), bitmap, null, null);
-        return Uri.parse(path);
     }
     private static String getRealPath(Activity activity, Uri file){
         String[] filePathColumn = {MediaStore.Images.Media.DATA};
@@ -59,7 +52,7 @@ public class TraitementImage {
             return Path;
         }
     }
-    public static Bitmap createSquaredBitmap(Bitmap srcBmp, Context context) {//pour profil
+    static Bitmap createSquaredBitmap(Bitmap srcBmp, Context context) {//pour profil
         int dim = Math.max(srcBmp.getWidth(), srcBmp.getHeight());
         Bitmap dstBmp = Bitmap.createBitmap(dim, dim, Bitmap.Config.ARGB_8888);
         Resources resources = context.getResources();
@@ -72,13 +65,12 @@ public class TraitementImage {
 
         return dstBmp;
     }
-    public static Bitmap CreateThumbnail(Bitmap srcBmp, Context context, int DstHeight){
+    static Bitmap CreateThumbnail(Bitmap srcBmp, Context context, int DstHeight){
         int oHeight = srcBmp.getHeight(), oWidth = srcBmp.getWidth();
         Resources resources = context.getResources();
         DisplayMetrics metrics = resources.getDisplayMetrics();
         float dHeight = DstHeight * ((float)metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
         int dWidth = Math.round((dHeight * oWidth) / oHeight);
-        Bitmap newBitmap = Bitmap.createScaledBitmap(srcBmp, dWidth, Math.round(dHeight), false);
-        return newBitmap;
+        return Bitmap.createScaledBitmap(srcBmp, dWidth, Math.round(dHeight), false);
     }
 }

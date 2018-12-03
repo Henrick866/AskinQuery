@@ -5,8 +5,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -15,32 +13,24 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.Image;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.google.android.gms.auth.api.signin.internal.Storage;
-import com.google.android.gms.tasks.Continuation;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -49,9 +39,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.functions.FirebaseFunctions;
-import com.google.firebase.functions.FirebaseFunctionsException;
-import com.google.firebase.functions.HttpsCallableResult;
-import com.google.firebase.provider.FirebaseInitProvider;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
@@ -84,19 +71,19 @@ public class CreatePostFragment extends Fragment {
     private Publication publication;
     private boolean Si_Edit, mediachange;//media change pour determiner si il faut uploader ou non, donc si le lien est un sondage, pas besoin d'uploader de fichier
 
-    private TextView TitreForm, TitreErr, ContentErr, Instruct;
+    private TextView TitreErr, ContentErr, Instruct;
     private EditText TitreField, ContentField;
-    private Button ImgUpBtn, VidUpBtn, PollLinkBtn, DoneBtn, MedRmvBtn;
+    private Button PollLinkBtn, DoneBtn, MedRmvBtn;
     private ImageView MediaPreview, MediaPreviewIcon;
 
-    private FirebaseAuth mAuth;
+
     private FirebaseUser user;
     private ArrayList<String> ListeSondagesID;
     private ArrayList<String> ListeSondagesNom;
     private String SondageLink, ImgLinkSondage;
     private Uri Media;
     private ProgressDialog progressDialog;
-    private int Type, typeTempo;
+    private int Type, typeTempo, TaskTotal, TaskDone;
     private Bitmap ImageBitmap;
     private FirebaseFunctions mFunctions;
 
@@ -120,19 +107,6 @@ public class CreatePostFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
-    /**
-     * Test Logique:
-     * Image:
-     *      new : 1) click btn -> choix image -> makeImage() -> media = null, imgbitmap = truc, imgview.click = null;
-     *      edit : 0) pub.media download => imgbitmap 2) clickbtn -> makeimage -> imgbitmap = newtruc, imgview.click = null;
-     *      delete : imgbitmap = null, imgview = gone, noimg;
-     *      done : imgbitmap a le data final, lien créé à ce moment
-     * Video:
-     *      new : 1) click btn -> Media = lienvid local, imgbitmap = thumb, imgclick = openvid(media, true);
-     *      edit: 0) media = null, imgbitmap = thumb, imgview.click = openvid(pub.media, true); 1) btnclick, media = lienvidlocal
-     *
-     *      done: Media, imgbitmap;
-     * */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -140,6 +114,7 @@ public class CreatePostFragment extends Fragment {
             Si_Edit = getArguments().getBoolean(ARG_PARAM1);
             publication = (Publication)getArguments().getSerializable(ARG_PARAM2);
         }
+        FirebaseAuth mAuth;
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
         ListeSondagesID = new ArrayList<>();
@@ -151,6 +126,8 @@ public class CreatePostFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        TextView TitreForm;
+        Button ImgUpBtn, VidUpBtn;
         mediachange = false;
         mFunctions = FirebaseFunctions.getInstance();
         View view = inflater.inflate(R.layout.fragment_create_post, container, false);
@@ -206,16 +183,10 @@ public class CreatePostFragment extends Fragment {
                     MediaPreview.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            FragmentManager fm = getActivity().getFragmentManager();
-                            FragmentTransaction ft = fm.beginTransaction();
-                            android.app.Fragment prev = fm.findFragmentByTag("fragment_video_dialog");
-                            if (prev != null) {
-                                ft.remove(prev);
-                            }
-                            ft.addToBackStack(null);
-                            //la vidéo n'est pas en ligne;
-                            VideoDialogFragment creerOptionDialog = VideoDialogFragment.newInstance(publication.Media, false);
-                            creerOptionDialog.show(ft, "fragment_video_dialog");
+                            Intent intent = new Intent(getActivity(), VideoPopupActivity.class);
+                            intent.putExtra("Path", publication.Media);
+                            intent.putExtra("NotOnServer", false);
+                            getActivity().startActivity(intent);
                         }
                     });
                     ImageRef.getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
@@ -250,7 +221,7 @@ public class CreatePostFragment extends Fragment {
                                 MediaPreview.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) {
-                                        Dialog dialog = new Dialog(getActivity());
+                                        final Dialog dialog = new Dialog(getActivity());
                                         dialog.setContentView(R.layout.image_dialog);
                                         dialog.show();
                                         final ImageView Image = dialog.findViewById(R.id.image_dialog_imageview);
@@ -263,6 +234,13 @@ public class CreatePostFragment extends Fragment {
                                                 Image.setImageBitmap(b);
                                                 progressBar.setVisibility(View.GONE);
                                                 Image.setVisibility(View.VISIBLE);
+                                            }
+                                        });
+                                        final Button CloseBtn = dialog.findViewById(R.id.ImageCloseBtn);
+                                        CloseBtn.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View view) {
+                                                dialog.dismiss();
                                             }
                                         });
                                     }
@@ -352,146 +330,210 @@ public class CreatePostFragment extends Fragment {
         DoneBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Publication newPublication = new Publication();
-                //Assignation
-                newPublication.Type = Type;
-                newPublication.SondageRef = SondageLink==null?"N":SondageLink;
-                newPublication.Titre = TitreField.getEditableText().toString();
-                newPublication.Texte = ContentField.getEditableText().toString();
-                newPublication.AuteurRef = user.getUid(); //user ne sera pas null, car il faut être connecté pour acceder à cette page;
-                newPublication.date_public = Calendar.getInstance().getTime().getTime();
-                if(Si_Edit){
-                    newPublication.ID = publication.ID;
-                }
-                //validation
-                boolean Valid = true;
-                if(newPublication.Titre.isEmpty()){
-                    Valid = false;
-                    TitreErr.setText(R.string.Gen_Empty_Field);
-                    TitreErr.setVisibility(View.VISIBLE);
-                }else{
-                    TitreErr.setVisibility(View.INVISIBLE);
-                }
-                if(newPublication.Texte.isEmpty()){
-                    Valid = false;
-                    ContentErr.setText(R.string.Gen_Empty_Field);
-                    ContentErr.setVisibility(View.VISIBLE);
-                }else{
-                    ContentErr.setVisibility(View.INVISIBLE);
-                }
-                /*Type et image
-                * le Type ne change que si le media est validé*/
-                //Enregistrement
-                if(Valid){
-                    progressDialog = new ProgressDialog(getActivity());
-                    progressDialog.setTitle("Initialisation...");
-                    progressDialog.show();
-                    DatabaseReference PublicationRef = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Publications_Keys.STRUCT_NAME);
-                    if(Si_Edit){
-                        newPublication.ID = publication.ID;
-                    }else{
-                        newPublication.ID = PublicationRef.push().getKey();
-                    }
-                    PublicationRef = PublicationRef.child(newPublication.ID);
-                    //le média
-                    if(Type != Publication.TYPE_TEXTE){
+                progressDialog = new ProgressDialog(getActivity());
+                progressDialog.setTitle("Initialisation...");
+                progressDialog.show();
+                TaskDone = 0;
+                TaskTotal = 0;
+                Thread mThread = new Thread(){
+                    @Override
+                    public void run(){
+                        AddTask();
+                        Publication newPublication = new Publication();
+                        //Assignation
+                        newPublication.Type = Type;
+                        newPublication.SondageRef = SondageLink==null?"N":SondageLink;
+                        newPublication.Titre = TitreField.getEditableText().toString();
+                        newPublication.Texte = ContentField.getEditableText().toString();
+                        newPublication.AuteurRef = user.getUid(); //user ne sera pas null, car il faut être connecté pour acceder à cette page;
+                        newPublication.date_public = Calendar.getInstance().getTime().getTime();
+                        if(Si_Edit){
+                            newPublication.ID = publication.ID;
+                        }
+                        //validation
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                progressDialog.setTitle("Validation...");
+                            }
+                        });
+                        boolean Valid = true;
+                        if(newPublication.Titre.isEmpty()){
+                            Valid = false;
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    TitreErr.setText(R.string.Gen_Empty_Field);
+                                    TitreErr.setVisibility(View.VISIBLE);
+                                }
+                            });
 
-                        StorageReference ImgRef = FirebaseStorage.getInstance().getReference();
-                        if(Type == Publication.TYPE_IMAGE){//on upload l'image
-                            //clear vid et vidthumb
-                            if(publication != null){//il est sur le serveur, car on l'édite
-                                final StorageReference VidRef = FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.PUBLICATION_VIDEOS).child(publication.ID+".jpg");
-                                VidRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                    @Override
-                                    public void onSuccess(Uri uri) {//il existe on supprime, sinon, rien;
-                                        VidRef.delete();
-                                        FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.PUBLICATION_VIDEOS_THUMBNAILS).child(publication.ID+".jpg").delete();
-                                    }
-                                });
-                            }
-                            newPublication.Media = FireBaseInteraction.Storage_Paths.PUBLICATION_IMAGES + newPublication.ID + ".jpg";
-                            if(mediachange) {
-                                ImgRef = ImgRef.child(newPublication.Media);
-                                UploadFile(ImgRef, ImageBitmap, "Envoi de " + newPublication.ID + ".jpg");
-                                ImgRef = FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.PUBLICATION_IMAGES_THUMBNAILS).child(newPublication.ID+".jpg");
-                                UploadFile(ImgRef, TraitementImage.CreateThumbnail(ImageBitmap, getActivity(),512), "Envoi de " + newPublication.ID + ".jpg (miniature)");
-                            }
-                        }
-                        if(Type == Publication.TYPE_VIDEO){
-                            if(publication != null){//il est sur le serveur, car on l'édite
-                                final StorageReference ImgRefDel = FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.PUBLICATION_IMAGES).child(publication.ID+".jpg");
-                                ImgRefDel.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                    @Override
-                                    public void onSuccess(Uri uri) {//il existe on supprime, sinon, rien;
-                                        ImgRefDel.delete();
-                                        FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.PUBLICATION_IMAGES_THUMBNAILS).child(publication.ID+".jpg").delete();
-                                    }
-                                });
-                            }
-                            MimeTypeMap mime = MimeTypeMap.getSingleton();
-                            String Extension = mime.getExtensionFromMimeType(getActivity().getContentResolver().getType(Media));
-                            newPublication.Media = FireBaseInteraction.Storage_Paths.PUBLICATION_VIDEOS + newPublication.ID + "." + Extension;
-                            if(mediachange) {
-                                ImgRef = ImgRef.child(newPublication.Media);
-                                UploadFile(ImgRef, Media, "Envoi de " + newPublication.ID + "." + Extension);
-                                ImgRef = FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.PUBLICATION_VIDEOS_THUMBNAILS).child(newPublication.ID + ".jpg");
-                                UploadFile(ImgRef, ImageBitmap, "Envoi de " + newPublication.ID + "." + Extension + " (miniature)");
-                            }
-                        }
-                        if(Type == Publication.TYPE_SONDAGE){
-                            if(publication != null){//il est sur le serveur, car on l'édite
-                                final StorageReference ImgRefDel = FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.PUBLICATION_IMAGES).child(publication.ID+".jpg");
-                                ImgRefDel.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                    @Override
-                                    public void onSuccess(Uri uri) {//il existe on supprime, sinon, rien;
-                                        ImgRefDel.delete();
-                                        FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.PUBLICATION_IMAGES_THUMBNAILS).child(publication.ID+".jpg").delete();
-                                    }
-                                });
-                                final StorageReference VidRef = FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.PUBLICATION_VIDEOS).child(publication.ID+".jpg");
-                                VidRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                    @Override
-                                    public void onSuccess(Uri uri) {//il existe on supprime, sinon, rien;
-                                        VidRef.delete();
-                                        FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.PUBLICATION_VIDEOS_THUMBNAILS).child(publication.ID+".jpg").delete();
-                                    }
-                                });
-                            }
-                            newPublication.Media = ImgLinkSondage;
-                        }
-                    }else{
-                        if(publication != null){//il est sur le serveur, car on l'édite
-                            final StorageReference ImgRefDel = FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.PUBLICATION_IMAGES).child(publication.ID+".jpg");
-                            ImgRefDel.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        }else{
+                            getActivity().runOnUiThread(new Runnable() {
                                 @Override
-                                public void onSuccess(Uri uri) {//il existe on supprime, sinon, rien;
-                                    ImgRefDel.delete();
-                                    FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.PUBLICATION_IMAGES_THUMBNAILS).child(publication.ID+".jpg").delete();
+                                public void run() {
+                                    TitreErr.setVisibility(View.INVISIBLE);
                                 }
                             });
-                            final StorageReference VidRef = FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.PUBLICATION_VIDEOS).child(publication.ID+".jpg");
-                            VidRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+
+                        }
+                        if(newPublication.Texte.isEmpty()){
+                            Valid = false;
+                            getActivity().runOnUiThread(new Runnable() {
                                 @Override
-                                public void onSuccess(Uri uri) {//il existe on supprime, sinon, rien;
-                                    VidRef.delete();
-                                    FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.PUBLICATION_VIDEOS_THUMBNAILS).child(publication.ID+".jpg").delete();
+                                public void run() {
+
+                                    ContentErr.setText(R.string.Gen_Empty_Field);
+                                    ContentErr.setVisibility(View.VISIBLE);
+                                }
+                            });
+                        }else{
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+
+                                    ContentErr.setVisibility(View.INVISIBLE);
                                 }
                             });
                         }
-                        newPublication.Media = "N";
+                        /*Type et image
+                         * le Type ne change que si le media est validé*/
+                        //Enregistrement
+                        if(Valid){
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    progressDialog.setTitle("Envoi des données...");
+                                }
+                            });
+                            DatabaseReference PublicationRef = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Publications_Keys.STRUCT_NAME);
+                            if(Si_Edit){
+                                newPublication.ID = publication.ID;
+                            }else{
+                                newPublication.ID = PublicationRef.push().getKey();
+                            }
+                            PublicationRef = PublicationRef.child(newPublication.ID);
+                            //le média
+                            if(Type != Publication.TYPE_TEXTE){
+
+                                StorageReference ImgRef = FirebaseStorage.getInstance().getReference();
+                                if(Type == Publication.TYPE_IMAGE){//on upload l'image
+                                    //clear vid et vidthumb
+                                    if(publication != null){//il est sur le serveur, car on l'édite
+                                        final StorageReference VidRef = FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.PUBLICATION_VIDEOS).child(publication.ID+".jpg");
+                                        VidRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                            @Override
+                                            public void onSuccess(Uri uri) {//il existe on supprime, sinon, rien;
+                                                VidRef.delete();
+                                                FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.PUBLICATION_VIDEOS_THUMBNAILS).child(publication.ID+".jpg").delete();
+                                            }
+                                        });
+                                    }
+                                    newPublication.Media = FireBaseInteraction.Storage_Paths.PUBLICATION_IMAGES + newPublication.ID + ".jpg";
+                                    if(mediachange) {
+                                        ImgRef = ImgRef.child(newPublication.Media);
+                                        UploadFile(ImgRef, ImageBitmap, "Envoi de " + newPublication.ID + ".jpg");
+                                        ImgRef = FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.PUBLICATION_IMAGES_THUMBNAILS).child(newPublication.ID+".jpg");
+                                        UploadFile(ImgRef, TraitementImage.CreateThumbnail(ImageBitmap, getActivity(),512), "Envoi de " + newPublication.ID + ".jpg (miniature)");
+                                    }
+                                }
+                                if(Type == Publication.TYPE_VIDEO){
+                                    if(publication != null){//il est sur le serveur, car on l'édite
+                                        final StorageReference ImgRefDel = FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.PUBLICATION_IMAGES).child(publication.ID+".jpg");
+                                        ImgRefDel.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                            @Override
+                                            public void onSuccess(Uri uri) {//il existe on supprime, sinon, rien;
+                                                ImgRefDel.delete();
+                                                FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.PUBLICATION_IMAGES_THUMBNAILS).child(publication.ID+".jpg").delete();
+                                            }
+                                        });
+                                    }
+                                    if(mediachange) {
+                                    MimeTypeMap mime = MimeTypeMap.getSingleton();
+                                    String Extension = mime.getExtensionFromMimeType(getActivity().getContentResolver().getType(Media));
+                                    newPublication.Media = FireBaseInteraction.Storage_Paths.PUBLICATION_VIDEOS + newPublication.ID + "." + Extension;
+                                        ImgRef = ImgRef.child(newPublication.Media);
+                                        UploadFile(ImgRef, Media, "Envoi de " + newPublication.ID + "." + Extension);
+                                        ImgRef = FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.PUBLICATION_VIDEOS_THUMBNAILS).child(newPublication.ID + ".jpg");
+                                        UploadFile(ImgRef, ImageBitmap, "Envoi de " + newPublication.ID + "." + Extension + " (miniature)");
+                                    }else{
+                                        newPublication.Media = publication.Media;
+                                    }
+                                }
+                                if(Type == Publication.TYPE_SONDAGE){
+                                    if(publication != null){//il est sur le serveur, car on l'édite
+                                        final StorageReference ImgRefDel = FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.PUBLICATION_IMAGES).child(publication.ID+".jpg");
+                                        ImgRefDel.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                            @Override
+                                            public void onSuccess(Uri uri) {//il existe on supprime, sinon, rien;
+                                                ImgRefDel.delete();
+                                                FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.PUBLICATION_IMAGES_THUMBNAILS).child(publication.ID+".jpg").delete();
+                                            }
+                                        });
+                                        final StorageReference VidRef = FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.PUBLICATION_VIDEOS).child(publication.ID+".mp4");
+                                        VidRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                            @Override
+                                            public void onSuccess(Uri uri) {//il existe on supprime, sinon, rien;
+                                                VidRef.delete();
+                                                FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.PUBLICATION_VIDEOS_THUMBNAILS).child(publication.ID+".jpg").delete();
+                                            }
+                                        });
+                                    }
+                                    newPublication.Media = ImgLinkSondage;
+                                }
+                            }else{
+                                if(publication != null){//il est sur le serveur, car on l'édite
+                                    final StorageReference ImgRefDel = FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.PUBLICATION_IMAGES).child(publication.ID+".jpg");
+                                    ImgRefDel.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                        @Override
+                                        public void onSuccess(Uri uri) {//il existe on supprime, sinon, rien;
+                                            ImgRefDel.delete();
+                                            FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.PUBLICATION_IMAGES_THUMBNAILS).child(publication.ID+".jpg").delete();
+                                        }
+                                    });
+                                    final StorageReference VidRef = FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.PUBLICATION_VIDEOS).child(publication.ID+".mp4");
+                                    VidRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                        @Override
+                                        public void onSuccess(Uri uri) {//il existe on supprime, sinon, rien;
+                                            VidRef.delete();
+                                            FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.PUBLICATION_VIDEOS_THUMBNAILS).child(publication.ID+".jpg").delete();
+                                        }
+                                    });
+                                }
+                                newPublication.Media = "N";
+                            }
+
+                            Map<String, Object> PublicMap = newPublication.toMap();
+                            PublicationRef.setValue(PublicMap);
+                            PublishPost(newPublication);
+                            TaskDone();
+                        }else{
+                            progressDialog.dismiss();
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(getActivity(), "Erreurs détectés, veuillez les corriger", Toast.LENGTH_LONG).show();
+                                }
+                            });
+
+                        }
                     }
-                    progressDialog.dismiss();
-                    Map<String, Object> PublicMap = newPublication.toMap();
-                    PublicationRef.setValue(PublicMap);
-                    PublishPost(newPublication);
-                    mListener.changePage(PublicationListFragment.newInstance(true, null));
-                }else{
-                    Toast.makeText(getActivity(), "Erreurs détectés, veuillez les corriger", Toast.LENGTH_LONG).show();
-                }
+                };
+                mThread.run();
 
             }
         });
         return view;
+    }
+    private void AddTask(){
+        TaskTotal++;
+    }
+    private void TaskDone(){
+        TaskDone++;
+        if(TaskTotal == TaskDone){
+            progressDialog.dismiss();
+            mListener.changePage(PublicationListFragment.newInstance(true, null));
+        }
     }
     private void PublishPost(Publication P) {
         // Create the arguments to the callable function.
@@ -503,19 +545,38 @@ public class CreatePostFragment extends Fragment {
          mFunctions.getHttpsCallable("publishPost").call(data);
     }
     private void UploadFile(StorageReference storageReference, Uri File, final String FlavorText){
-        progressDialog.setTitle(FlavorText);
+        AddTask();
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                progressDialog.setTitle(FlavorText);
+            }
+        });
         StorageReference ref = storageReference;
         ref.putFile(File)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        progressDialog.setTitle(FlavorText + "Terminé");
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                progressDialog.setTitle(FlavorText + "Terminé");
+                            }
+                        });
+                        TaskDone();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        progressDialog.setTitle(FlavorText + "Échoué");
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                progressDialog.setTitle(FlavorText + "Échoué");
+                            }
+                        });
+
+                        TaskDone();
                     }
                 })
                 .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
@@ -528,7 +589,13 @@ public class CreatePostFragment extends Fragment {
                 });
     }
     private void UploadFile(StorageReference storageReference, Bitmap Image, final String FlavorText){
-        progressDialog.setTitle(FlavorText);
+        AddTask();
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                progressDialog.setTitle(FlavorText);
+            }
+        });
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Image.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         byte[] data = baos.toByteArray();
@@ -537,13 +604,26 @@ public class CreatePostFragment extends Fragment {
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        progressDialog.setTitle(FlavorText + "Terminé");
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                progressDialog.setTitle(FlavorText + "Terminé");
+                            }
+                        });
+                        TaskDone();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        progressDialog.setTitle(FlavorText + "Échoué");
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                progressDialog.setTitle(FlavorText + "Échoué");
+                            }
+                        });
+
+                        TaskDone();
                     }
                 })
                 .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
@@ -588,12 +668,6 @@ public class CreatePostFragment extends Fragment {
                 break;
         }
     }
-    private View.OnClickListener VideoClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-
-        }
-    };
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data){
         if(requestCode == MEDIA_GALL_OPTION && resultCode == Activity.RESULT_OK){
@@ -621,21 +695,16 @@ public class CreatePostFragment extends Fragment {
                 MediaPreviewIcon.setVisibility(View.VISIBLE);
                 MediaPreview.setVisibility(View.VISIBLE);
                 MedRmvBtn.setVisibility(View.VISIBLE);
+                MedRmvBtn.setText(R.string.Post_Form_Media_Remove_Vid);
                 Instruct.setText(R.string.Post_Elem_Instruct_Vid);
                 Instruct.setVisibility(View.VISIBLE);
                 MediaPreview.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        FragmentManager fm = getActivity().getFragmentManager();
-                        FragmentTransaction ft = fm.beginTransaction();
-                        android.app.Fragment prev = fm.findFragmentByTag("fragment_video_dialog");
-                        if (prev != null) {
-                            ft.remove(prev);
-                        }
-                        ft.addToBackStack(null);
-                        //la vidéo n'est pas en ligne;
-                        VideoDialogFragment creerOptionDialog = VideoDialogFragment.newInstance(Media.toString(), true);
-                        creerOptionDialog.show(ft, "fragment_video_dialog");
+                        Intent intent = new Intent(getActivity(), VideoPopupActivity.class);
+                        intent.putExtra("Path", Media.toString());
+                        intent.putExtra("NotOnServer", true);
+                        getActivity().startActivity(intent);
                     }
                 });
                 mediachange = true;
@@ -662,12 +731,14 @@ public class CreatePostFragment extends Fragment {
                 Instruct.setVisibility(View.VISIBLE);
                 MediaPreviewIcon.setImageResource(R.drawable.ic_loupe_black_24dp);
                 MediaPreviewIcon.setVisibility(View.VISIBLE);
+                MedRmvBtn.setText(R.string.Post_Form_Media_Remove_Img);
+                MedRmvBtn.setVisibility(View.VISIBLE);
                 MediaPreview.setImageBitmap(ImageBitmap);
                 MediaPreview.setVisibility(View.VISIBLE);
                 MediaPreview.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Dialog dialog = new Dialog(getActivity());
+                        final Dialog dialog = new Dialog(getActivity());
                         dialog.setContentView(R.layout.image_dialog);
                         dialog.show();
                         final ImageView Image = dialog.findViewById(R.id.image_dialog_imageview);
@@ -675,6 +746,13 @@ public class CreatePostFragment extends Fragment {
                         Image.setImageBitmap(ImageBitmap);
                         progressBar.setVisibility(View.GONE);
                         Image.setVisibility(View.VISIBLE);
+                        final Button CloseBtn = dialog.findViewById(R.id.ImageCloseBtn);
+                        CloseBtn.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                dialog.dismiss();
+                            }
+                        });
                     }
                 });
                 Type = typeTempo;
@@ -692,6 +770,8 @@ public class CreatePostFragment extends Fragment {
         Instruct.setVisibility(View.VISIBLE);
         MediaPreview.setImageBitmap(ImageBitmap);
         MediaPreviewIcon.setImageResource(R.drawable.ic_loupe_black_24dp);
+        MedRmvBtn.setText(R.string.Post_Form_Media_Remove_Img);
+        MedRmvBtn.setVisibility(View.VISIBLE);
         MediaPreviewIcon.setVisibility(View.VISIBLE);
         MediaPreview.setVisibility(View.VISIBLE);
         MediaPreview.setOnClickListener(new View.OnClickListener() {
@@ -726,6 +806,7 @@ public class CreatePostFragment extends Fragment {
                     MediaPreviewIcon.setVisibility(View.VISIBLE);
                     MediaPreview.setVisibility(View.VISIBLE);
                     MedRmvBtn.setVisibility(View.VISIBLE);
+                    MedRmvBtn.setText(R.string.Post_Form_Media_Remove_Poll);
                 }else{
                     ImgLinkSondage = FireBaseInteraction.Storage_Paths.SONDAGES_IMAGES_THUMBNAILS + SondageID + ".jpg";
                     StorageReference ImgSondageGet = FirebaseStorage.getInstance().getReference().child(ImgLinkSondage);
@@ -740,6 +821,7 @@ public class CreatePostFragment extends Fragment {
                             MediaPreviewIcon.setVisibility(View.VISIBLE);
                             MediaPreview.setVisibility(View.VISIBLE);
                             MedRmvBtn.setVisibility(View.VISIBLE);
+                            MedRmvBtn.setText(R.string.Post_Form_Media_Remove_Poll);
                         }
                     });
                 }

@@ -2,6 +2,7 @@ package personnal.askinquery;
 
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -14,7 +15,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -25,8 +25,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
 import java.util.HashMap;
 
@@ -44,9 +42,8 @@ public class LoginFragment extends Fragment {
 
     private EditText EmailField, PassField;
     private TextView LoginErr;
-    private Button LoginBtn, CreateBtn;
+
     private FirebaseAuth mAuth;
-    private FirebaseUser user, OldUser;
     private OnFragmentInteractionListener mListener;
 
     public LoginFragment() {
@@ -78,13 +75,67 @@ public class LoginFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              final Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        Button LoginBtn, CreateBtn;
+        TextView Forgotten;
         mListener.ChangeTitle("Profil | Connexion");
         View view = inflater.inflate(R.layout.fragment_login, container, false);
         EmailField = view.findViewById(R.id.login_email);
         PassField = view.findViewById(R.id.login_pass);
         LoginErr = view.findViewById(R.id.login_err);
+        Forgotten = view.findViewById(R.id.login_password_forgotten);
         LoginBtn = view.findViewById(R.id.login_btn);
         CreateBtn = view.findViewById(R.id.create_btn);
+        Forgotten.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                LayoutInflater li = LayoutInflater.from(getActivity());
+                View promptsView = li.inflate(R.layout.pass_reset_dialog, null);
+
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
+
+                // set prompts.xml to alertdialog builder
+                alertDialogBuilder.setView(promptsView);
+
+                final EditText userInput = promptsView.findViewById(R.id.dialog_pass_reset_field);
+                final TextView Message = promptsView.findViewById(R.id.dialog_pass_reset_message);
+                alertDialogBuilder
+                        .setCancelable(false).setTitle("Réinitialisation de mot de passe")
+                        .setPositiveButton("Envoyer",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(final DialogInterface dialog, int id) {
+                                        // get user input and set it to result
+                                        // edit text
+                                        if(!userInput.getEditableText().toString().isEmpty()) {
+                                            mAuth.sendPasswordResetEmail(userInput.getEditableText().toString()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    if (task.isSuccessful()) {
+                                                        Message.setText(R.string.Pass_Reset_Dialog_Success);
+                                                        Message.setTextColor(getResources().getColor(R.color.colorGreen));
+                                                        Message.setVisibility(View.VISIBLE);
+                                                    } else {
+                                                        Message.setText(R.string.Pass_Reset_Dialog_Error);
+                                                        Message.setTextColor(getResources().getColor(R.color.colorRed));
+                                                        Message.setVisibility(View.VISIBLE);
+                                                    }
+                                                }
+                                            });
+                                        }
+                                        else {
+                                            Message.setText(R.string.Gen_Empty_Field);
+                                            Message.setTextColor(getResources().getColor(R.color.colorRed));
+                                            Message.setVisibility(View.VISIBLE);
+                                        }
+                                    }
+                                })
+                        .setNegativeButton("Fermer",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+                                    }
+                                }).show();
+            }
+        });
         CreateBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -94,7 +145,6 @@ public class LoginFragment extends Fragment {
         LoginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 boolean Valid = true;
                 String Pass = PassField.getEditableText().toString(), Email = EmailField.getEditableText().toString();
                 if(Email.isEmpty()){
@@ -105,18 +155,13 @@ public class LoginFragment extends Fragment {
                 }
 
                 if(Valid) {
-                    OldUser = null;
-                    if (user != null) {
-                        if (user.isAnonymous()) {
-                            OldUser = user;
-                        }
-                    }
+                    final FirebaseUser OldUser = mAuth.getCurrentUser();
                     mAuth.signInWithEmailAndPassword(Email, Pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
                                 LoginErr.setVisibility(View.INVISIBLE);
-                                SyncSubscribe();
+                                    SyncSubscribe();
                             } else {
                                 LoginErr.setText(R.string.Login_Wrong_Creds);
                                 LoginErr.setVisibility(View.VISIBLE);
@@ -191,7 +236,6 @@ public class LoginFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         void changePage(Fragment fragment);
         void ChangeTitle(String newTitle);
-        Profil getUtilisateur_Connecte();
         void setUtilisateur_Connecte(Profil utilisateur_Connecte);
         void updateMenu(FirebaseUser profil);
     }

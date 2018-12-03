@@ -5,17 +5,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@drawable/background"
     tools:context=".ManageProfilFragment">
-
-
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
+            android:background="#AAFAFAFA"
             android:orientation="vertical"
             android:paddingTop="10dp">
             <com.balysv.materialripple.MaterialRippleLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:layout_height="wrap_content">
 
                 <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -29,7 +29,8 @@
             </com.balysv.materialripple.MaterialRippleLayout>
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
@@ -37,6 +38,7 @@
                     android:id="@+id/profil_manage_change_avatar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="5dp"
                     android:layout_weight="1"
                     android:clickable="true"
                     android:focusable="true"
@@ -52,6 +54,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:layout_marginStart="5dp"
                     android:text="@string/Mng_Profil_Delete_Avatar"
                     android:clickable="true"
                     android:focusable="true"
@@ -62,11 +65,16 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
-
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:background="@drawable/shadow_down_top" />
         </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:background="@color/Blanc"
         android:orientation="vertical">
 
         <TextView
@@ -76,9 +84,11 @@
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
             android:text="@string/Mng_Profil_UsernameTag" />
+
         <com.balysv.materialripple.MaterialRippleLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
             <TextView
                 android:id="@+id/profil_manage_usernameText"
                 android:layout_width="match_parent"
@@ -94,69 +104,77 @@
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 android:textSize="16sp" />
         </com.balysv.materialripple.MaterialRippleLayout>
+
         <View
             android:layout_width="match_parent"
             android:layout_height="2dp"
-            android:background="@color/LightGrey"/>
+            android:background="@color/LightGrey" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:text="@string/Mng_Profil_EmailTag" />
+
+        <com.balysv.materialripple.MaterialRippleLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
             <TextView
+                android:id="@+id/profil_manage_emailText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:text="@string/Mng_Profil_EmailTag" />
-
-    <com.balysv.materialripple.MaterialRippleLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <TextView
-            android:id="@+id/profil_manage_emailText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:drawableStart="@android:drawable/ic_dialog_email"
-            android:drawableEnd="@drawable/ic_fleche_droite"
-            android:focusable="true"
-            android:gravity="center_vertical"
-            android:paddingStart="20dp"
-            android:paddingTop="10dp"
-            android:paddingEnd="20dp"
-            android:paddingBottom="10dp"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-            android:textSize="16sp"
-            tools:drawableStart="@color/colorAccent" />
-    </com.balysv.materialripple.MaterialRippleLayout>
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="@color/LightGrey"/>
-        <com.balysv.materialripple.MaterialRippleLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-        <TextView
-            android:id="@+id/profil_manage_passText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:drawableEnd="@drawable/ic_fleche_droite"
-            android:focusable="true"
-            android:gravity="center_vertical"
-            android:paddingStart="20dp"
-            android:paddingTop="10dp"
-            android:paddingEnd="20dp"
-            android:paddingBottom="10dp"
-            android:text="@string/Mng_Profil_PasswordTag"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-            android:textSize="16sp" />
+                android:clickable="true"
+                android:drawableStart="@android:drawable/ic_dialog_email"
+                android:drawableEnd="@drawable/ic_fleche_droite"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:paddingStart="20dp"
+                android:paddingTop="10dp"
+                android:paddingEnd="20dp"
+                android:paddingBottom="10dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textSize="16sp"
+                tools:drawableStart="@color/colorAccent" />
         </com.balysv.materialripple.MaterialRippleLayout>
+
         <View
             android:layout_width="match_parent"
             android:layout_height="2dp"
-            android:background="@color/LightGrey"/>
+            android:background="@color/LightGrey" />
+
         <com.balysv.materialripple.MaterialRippleLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/profil_manage_passText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:drawableEnd="@drawable/ic_fleche_droite"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:paddingStart="20dp"
+                android:paddingTop="10dp"
+                android:paddingEnd="20dp"
+                android:paddingBottom="10dp"
+                android:text="@string/Mng_Profil_PasswordTag"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textSize="16sp" />
+        </com.balysv.materialripple.MaterialRippleLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/LightGrey" />
+
+        <com.balysv.materialripple.MaterialRippleLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
             <TextView
                 android:id="@+id/profil_manage_followed"
                 android:layout_width="match_parent"
@@ -173,28 +191,31 @@
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 android:textSize="16sp" />
         </com.balysv.materialripple.MaterialRippleLayout>
+
         <View
             android:layout_width="match_parent"
             android:layout_height="2dp"
-            android:background="@color/LightGrey"/>
+            android:background="@color/LightGrey" />
+
         <com.balysv.materialripple.MaterialRippleLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-        <TextView
-            android:id="@+id/profil_manage_moreOptions"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:drawableEnd="@drawable/ic_fleche_droite"
-            android:focusable="true"
-            android:gravity="center_vertical"
-            android:paddingStart="20dp"
-            android:paddingTop="10dp"
-            android:paddingEnd="20dp"
-            android:paddingBottom="10dp"
-            android:text="@string/Mng_Profil_OtherTag"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-            android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/profil_manage_moreOptions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:drawableEnd="@drawable/ic_fleche_droite"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:paddingStart="20dp"
+                android:paddingTop="10dp"
+                android:paddingEnd="20dp"
+                android:paddingBottom="10dp"
+                android:text="@string/Mng_Profil_OtherTag"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textSize="16sp" />
         </com.balysv.materialripple.MaterialRippleLayout>
 
     </LinearLayout>

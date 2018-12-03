@@ -6,32 +6,19 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.Spinner;
-import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.VideoView;
-
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -41,16 +28,15 @@ import java.util.List;
  * Created by Henrick on 2018-09-21.
  */
 
-public class CreerQuestionAdapter extends ArrayAdapter<Question> implements CreerOptionAdapter.OptionsToQuestion, Serializable {
-    static public ArrayList<Question> QuestionData;
-    private static CreerQuestionAdapter.AdaptListener adaptListener;
-    transient CreerSondageFragment creerSondageFragment;
+public class CreerQuestionAdapter extends ArrayAdapter<Question> implements Serializable {
+    static private ArrayList<Question> QuestionData;
+    static private CreerQuestionAdapter.AdaptListener adaptListener;
+    transient private CreerSondageFragment creerSondageFragment;
 
-    static Context c;
-    static TabHost Host;
-    int Position;
+    private Context c;
+    private int Position;
 
-    public CreerQuestionAdapter(Context context, ArrayList<Question> questions, CreerSondageFragment creerSondageFragment){
+    CreerQuestionAdapter(Context context, ArrayList<Question> questions, CreerSondageFragment creerSondageFragment){
         super(context, 0, questions);
         c = context;
         this.creerSondageFragment = creerSondageFragment;
@@ -70,8 +56,6 @@ public class CreerQuestionAdapter extends ArrayAdapter<Question> implements Cree
         Question question = getItem(position);
         Position = position;
         final int POSITION = position;
-        ArrayList<Option> Liste_Options;
-        //Log.e("POSITION Q", String.valueOf(position));
         if(QuestionData.get(position) == null){
             QuestionData.add(question);
         }
@@ -101,19 +85,22 @@ public class CreerQuestionAdapter extends ArrayAdapter<Question> implements Cree
             ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, spinnerArray);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             viewHolder.TypeSelect.setAdapter(adapter);
-            if (question.Type_Question != 0) {
-                viewHolder.TypeSelect.setSelection(QuestionData.get(position).Type_Question);
-                viewHolder.btnDropDown.setEnabled(true);
-            } else {
-                viewHolder.btnDropDown.setEnabled(false);
-                viewHolder.TypeError.setText(R.string.Create_Question_NoType_Err);
+            if(question != null) {
+                if (question.Type_Question != 0) {
+                    viewHolder.TypeSelect.setSelection(QuestionData.get(position).Type_Question);
+                    viewHolder.btnDropDown.setBackgroundColor(c.getResources().getColor(R.color.transparent));
+                    viewHolder.btnDropDown.setEnabled(true);
+                } else {
+                    viewHolder.btnDropDown.setEnabled(false);
+                    viewHolder.btnDropDown.setBackgroundColor(c.getResources().getColor(R.color.LightGrey));
+                    viewHolder.TypeError.setText(R.string.Create_Question_NoType_Err);
+                }
             }
             if (QuestionData.size() < 1) {
                 creerSondageFragment.QuestionsError.setText(R.string.Create_Sondage_NoQuestion_Err);
                 creerSondageFragment.QuestionsError.setVisibility(View.VISIBLE);
             }
             final CreerQuestionAdapter questionAdapter = this;
-            final CreerQuestionAdapter.DialogFunctions dialogFunctions = new CreerQuestionAdapter.DialogFunctions();
             if (QuestionData.get(position).Options.size() < 2) {
                 viewHolder.OptionsError.setText(R.string.Create_Question_Option_Min_Err);
                 viewHolder.OptionsError.setVisibility(View.VISIBLE);
@@ -132,7 +119,7 @@ public class CreerQuestionAdapter extends ArrayAdapter<Question> implements Cree
                         ft.remove(prev);
                     }
                     ft.addToBackStack(null);
-                    CreerOptionDialog creerOptionDialog = CreerOptionDialog.newInstance(QuestionData.get(POSITION), POSITION, dialogFunctions);
+                    CreerOptionDialog creerOptionDialog = CreerOptionDialog.newInstance(QuestionData.get(POSITION), POSITION);
                     creerOptionDialog.show(ft, "fragment_creer_option_dialog");
 
                 }
@@ -212,6 +199,7 @@ public class CreerQuestionAdapter extends ArrayAdapter<Question> implements Cree
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
                     viewHolder.btnDropDown.setEnabled(true);
+                    viewHolder.btnDropDown.setBackgroundColor(c.getResources().getColor(R.color.transparent));
                     if (pos == Question.TYPE_TEXTE) {
 
                         QuestionData.get(POSITION).Type_Question = Question.TYPE_TEXTE;
@@ -223,6 +211,7 @@ public class CreerQuestionAdapter extends ArrayAdapter<Question> implements Cree
                         QuestionData.get(POSITION).Type_Question = Question.TYPE_IMAGE;
                         viewHolder.TypeError.setVisibility(View.INVISIBLE);
                     } else if (pos == 0) {
+                        viewHolder.btnDropDown.setBackgroundColor(c.getResources().getColor(R.color.LightGrey));
                         viewHolder.btnDropDown.setEnabled(false);
                         QuestionData.get(POSITION).Type_Question = 0;
                         viewHolder.TypeError.setText(R.string.Create_Question_NoType_Err);
@@ -239,21 +228,16 @@ public class CreerQuestionAdapter extends ArrayAdapter<Question> implements Cree
 
         return view;
     }
-    class DialogFunctions implements CreerOptionDialog.OptionDialogListener, Serializable{
+    static class DialogFunctions{
         public DialogFunctions(){
         }
-        public String onFinishedOptionDialog(ArrayList<Option> options, int Position){
+        static String onFinishedOptionDialog(ArrayList<Option> options, int Position) {
             QuestionData.get(Position).Options = options;
-            //creerOptionDialog.dismiss();
-            Toast.makeText(getContext(), "La liste des options de la question #"+(Position+1)+" a été mis à jour", Toast.LENGTH_LONG).show();
+            Toast.makeText(MyAppClass.getAppContext(), "La liste des options de la question #" + (Position + 1) + " a été mis à jour", Toast.LENGTH_LONG).show();
             return "done";
         }
-
     }
-    public void updateOptions(int pos, ArrayList<Option> options){
-        QuestionData.get(pos).Options = options;
-    }
-    public ArrayList<Question> getQuestions(){
+    ArrayList<Question> getQuestions(){
         return QuestionData;
     }
     static class ViewHolder implements Serializable{
@@ -270,7 +254,7 @@ public class CreerQuestionAdapter extends ArrayAdapter<Question> implements Cree
         Question question;
         int nbNewOption;
         int position;
-        public ViewHolder(View view, final int p){
+        ViewHolder(View view, final int p){
             Deployed = false;
             position = p;
             nbNewOption = 0;
@@ -288,7 +272,5 @@ public class CreerQuestionAdapter extends ArrayAdapter<Question> implements Cree
     }
     public interface AdaptListener{
         FragmentManager getFragmentManagerQ();
-        //void LoadImage(String Chemin);
-        //void SupprimerPublication(Publication publication);
     }
 }

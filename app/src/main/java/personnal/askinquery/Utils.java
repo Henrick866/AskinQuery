@@ -5,14 +5,14 @@ import android.view.ViewGroup;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
-public class Utils {
+class Utils {
     /**
      * Sets ListView height dynamically based on the height of the items.
      *
      * @param listView to be resized
      * @return true if the listView is successfully resized, false otherwise
      */
-    public static boolean setListViewHeightBasedOnItems(ListView listView) {
+    static boolean setListViewHeightBasedOnItems(ListView listView) {
 
         ListAdapter listAdapter = listView.getAdapter();
         if (listAdapter != null) {

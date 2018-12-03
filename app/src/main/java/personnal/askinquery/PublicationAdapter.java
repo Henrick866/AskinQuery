@@ -5,8 +5,10 @@ import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
@@ -14,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -33,21 +36,17 @@ import com.google.firebase.storage.StorageReference;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 
-import de.hdodenhof.circleimageview.CircleImageView;
-
 public class PublicationAdapter extends ArrayAdapter<Publication> {
-    Context c;
-    boolean Si_Admin;
-    HashMap<String, Bitmap> BitmapMap;
-    PublicationAdapter publicationAdapter;
+    private Context c;
 
-    public PublicationAdapter(Context context, ArrayList<Publication> publications, boolean Si_Admin){
+    private HashMap<String, Bitmap> BitmapMap;
+    private PublicationAdapter publicationAdapter;
+
+    PublicationAdapter(Context context, ArrayList<Publication> publications){
         super(context, 0, publications);
         c = context;
-        this.Si_Admin = Si_Admin;
         publicationAdapter = this;
         BitmapMap = new HashMap<>();
     }
@@ -59,7 +58,7 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
         final FirebaseUser user = ((AdaptListener)c).getUser();
         if(view == null){
             view = LayoutInflater.from(c).inflate(R.layout.publication_element, parent, false);
-            holder = new PublicationAdapter.ViewHolder(view, position);
+            holder = new PublicationAdapter.ViewHolder(view);
 
             view.setTag(holder);
         }else{
@@ -129,7 +128,7 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
                             holder.MediaView.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
-                                    Dialog dialog = new Dialog(c);
+                                    final Dialog dialog = new Dialog(c);
                                     dialog.setContentView(R.layout.image_dialog);
                                     dialog.show();
                                     final ImageView Image = dialog.findViewById(R.id.image_dialog_imageview);
@@ -142,6 +141,13 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
                                             Image.setImageBitmap(b);
                                             progressBar.setVisibility(View.GONE);
                                             Image.setVisibility(View.VISIBLE);
+                                        }
+                                    });
+                                    final Button CloseBtn = dialog.findViewById(R.id.ImageCloseBtn);
+                                    CloseBtn.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            dialog.dismiss();
                                         }
                                     });
 
@@ -162,7 +168,7 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
                         holder.MediaView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                Dialog dialog = new Dialog(c);
+                                final Dialog dialog = new Dialog(c);
                                 dialog.setContentView(R.layout.image_dialog);
                                 dialog.show();
                                 final ImageView Image = dialog.findViewById(R.id.image_dialog_imageview);
@@ -177,6 +183,13 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
                                         Image.setVisibility(View.VISIBLE);
                                     }
                                 });
+                                final Button CloseBtn = dialog.findViewById(R.id.ImageCloseBtn);
+                                CloseBtn.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        dialog.dismiss();
+                                    }
+                                });
 
                             }
                         });
@@ -184,7 +197,7 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
             }else if(publication.Type == Publication.TYPE_VIDEO){
 
                 if(BitmapMap.get(publication.ID) == null) {
-                    String UrlImg = FireBaseInteraction.Storage_Paths.OPTIONS_VIDEOS_THUMBNAILS + publication.ID + ".jpg";
+                    String UrlImg = FireBaseInteraction.Storage_Paths.PUBLICATION_VIDEOS_THUMBNAILS + publication.ID + ".jpg";
                     StorageReference AvatarRef = FirebaseStorage.getInstance().getReference().child(UrlImg);
                     AvatarRef.getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
                         @Override
@@ -201,16 +214,10 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
                             holder.MediaView.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
-                                    FragmentManager fm = ((AdaptListener) c).getFragmentManagerQ();
-                                    FragmentTransaction ft = fm.beginTransaction();
-                                    android.app.Fragment prev = fm.findFragmentByTag("fragment_video_dialog");
-                                    if (prev != null) {
-                                        ft.remove(prev);
-                                    }
-                                    ft.addToBackStack(null);
-                                    //la vidéo n'est pas en ligne;
-                                    VideoDialogFragment creerOptionDialog = VideoDialogFragment.newInstance(publication.Media, false);
-                                    creerOptionDialog.show(ft, "fragment_video_dialog");
+                                    Intent intent = new Intent(c, VideoPopupActivity.class);
+                                    intent.putExtra("Path", publication.Media);
+                                    intent.putExtra("NotOnServer", false);
+                                    c.startActivity(intent);
                                 }
                             });
                         }
@@ -226,16 +233,10 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
                     holder.MediaView.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            FragmentManager fm = ((AdaptListener) c).getFragmentManagerQ();
-                            FragmentTransaction ft = fm.beginTransaction();
-                            android.app.Fragment prev = fm.findFragmentByTag("fragment_video_dialog");
-                            if (prev != null) {
-                                ft.remove(prev);
-                            }
-                            ft.addToBackStack(null);
-                            //la vidéo n'est pas en ligne;
-                            VideoDialogFragment creerOptionDialog = VideoDialogFragment.newInstance(publication.Media, false);
-                            creerOptionDialog.show(ft, "fragment_video_dialog");
+                            Intent intent = new Intent(c, VideoPopupActivity.class);
+                            intent.putExtra("Path", publication.Media);
+                            intent.putExtra("NotOnServer", false);
+                            c.startActivity(intent);
                         }
                     });
                 }
@@ -290,6 +291,7 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
         }
         if(publication.AuteurRef.equals(user.getUid())){
             holder.ZoneAdmin.setVisibility(View.VISIBLE);
+            holder.Shadow.setVisibility(View.VISIBLE);
             holder.BtnEdit.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -307,40 +309,50 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
                             {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    final DatabaseReference PublicationRef = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Publications_Keys.STRUCT_NAME).child(publication.ID);
-                                    if(publication.Type == Publication.TYPE_VIDEO){
-                                        StorageReference PubMediaRef = FirebaseStorage.getInstance().getReference().child(publication.Media);
-                                        PubMediaRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.PUBLICATION_VIDEOS_THUMBNAILS).child(publication.ID+".jpg").delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    final ProgressDialog progressDialog = new ProgressDialog(c);
+                                    progressDialog.setTitle("Suppression de la publication...");
+                                    progressDialog.show();
+                                    Thread mThread = new Thread(){
+                                        @Override
+                                        public void run(){
+                                            final DatabaseReference PublicationRef = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Publications_Keys.STRUCT_NAME).child(publication.ID);
+                                            if(publication.Type == Publication.TYPE_VIDEO){
+                                                StorageReference PubMediaRef = FirebaseStorage.getInstance().getReference().child(publication.Media);
+                                                PubMediaRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                                                     @Override
                                                     public void onSuccess(Void aVoid) {
+                                                        FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.PUBLICATION_VIDEOS_THUMBNAILS).child(publication.ID+".jpg").delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                            @Override
+                                                            public void onSuccess(Void aVoid) {
+                                                                PublicationRef.removeValue();
+                                                                publicationAdapter.remove(publication);
+                                                                publicationAdapter.notifyDataSetChanged();
+                                                                progressDialog.dismiss();
+
+                                                            }
+                                                        });
+                                                    }
+                                                });
+                                            }else if(publication.Type == Publication.TYPE_IMAGE){
+                                                FirebaseStorage.getInstance().getReference().child(publication.Media).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.PUBLICATION_IMAGES_THUMBNAILS).child(publication.ID+".jpg").delete();
                                                         PublicationRef.removeValue();
                                                         publicationAdapter.remove(publication);
                                                         publicationAdapter.notifyDataSetChanged();
-
+                                                        progressDialog.dismiss();
                                                     }
                                                 });
-                                            }
-                                        });
-                                    }else if(publication.Type == Publication.TYPE_IMAGE){
-                                        FirebaseStorage.getInstance().getReference().child(publication.Media).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.PUBLICATION_IMAGES_THUMBNAILS).child(publication.ID+".jpg").delete();
+                                            }else{//que ce soit sondage ou texte
                                                 PublicationRef.removeValue();
                                                 publicationAdapter.remove(publication);
                                                 publicationAdapter.notifyDataSetChanged();
+                                                progressDialog.dismiss();
                                             }
-                                        });
-                                    }else{//que ce soit sondage ou texte
-                                        PublicationRef.removeValue();
-                                        publicationAdapter.remove(publication);
-                                        publicationAdapter.notifyDataSetChanged();
-                                    }
-
-
+                                        }
+                                    };
+                                    mThread.start();
                                 }
 
                             })
@@ -350,6 +362,7 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
             });
         }else{
             holder.ZoneAdmin.setVisibility(View.GONE);
+            holder.Shadow.setVisibility(View.GONE);
         }
         holder.BtnPlainte.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -372,7 +385,7 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
     private class SondageImgLoadListener implements ValueEventListener {
         PublicationAdapter.ViewHolder holder;
         FirebaseUser user;
-        public SondageImgLoadListener(PublicationAdapter.ViewHolder holder, FirebaseUser user){
+        SondageImgLoadListener(PublicationAdapter.ViewHolder holder, FirebaseUser user){
             this.holder = holder;
             this.user = user;
         }
@@ -395,7 +408,7 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
                         holder.MediaView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                ((AdaptListener) c).changePage(AnswerSondageFragment.newInstance(S, true, "Publications", Si_Admin));
+                                ((AdaptListener) c).changePage(AnswerSondageFragment.newInstance(S, true));
                             }
                         });
                     }else if(UtilConn.Sondages_Faits.containsKey(S.ID)) {
@@ -412,7 +425,7 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
                             holder.MediaView.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    ((AdaptListener) c).changePage(AnswerSondageFragment.newInstance(S, false, "Publications", Si_Admin));
+                                    ((AdaptListener) c).changePage(AnswerSondageFragment.newInstance(S, false));
                                 }
                             });
                         }
@@ -422,7 +435,7 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
                         holder.MediaView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                ((AdaptListener) c).changePage(AnswerSondageFragment.newInstance(S, false, "Publications", Si_Admin));
+                                ((AdaptListener) c).changePage(AnswerSondageFragment.newInstance(S, false));
                             }
                         });
                     }
@@ -434,7 +447,7 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
                     holder.MediaView.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            ((AdaptListener) c).changePage(AnswerSondageFragment.newInstance(S, false, "Publications", Si_Admin));
+                            ((AdaptListener) c).changePage(AnswerSondageFragment.newInstance(S, false));
                         }
                     });
                 }
@@ -449,7 +462,7 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
                         holder.MediaView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                ((AdaptListener) c).changePage(AnswerSondageFragment.newInstance(S, true, "Publications", Si_Admin));
+                                ((AdaptListener) c).changePage(AnswerSondageFragment.newInstance(S, true));
                             }
                         });
                     }else if(UtilConn.Sondages_Faits.containsKey(S.ID)) {
@@ -463,7 +476,7 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
                                 holder.MediaView.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) {
-                                        ((AdaptListener) c).changePage(AnswerSondageFragment.newInstance(S, true, "Publications", Si_Admin));
+                                        ((AdaptListener) c).changePage(AnswerSondageFragment.newInstance(S, true));
                                     }
                                 });
                             } else {
@@ -497,12 +510,12 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
 
     static class ViewHolder{
         TextView TitreView, TexteView, UserNameView, DateView, AlertSondage, Instruct;
-        ImageView MediaView, Icon;
-        ImageView AvatarView;
+        ImageView MediaView, Icon, AvatarView;
         LinearLayout ZoneAdmin;
+        View Shadow;
         ProgressBar Loading;
         ImageButton BtnPlainte, BtnSupp, BtnEdit;
-        public ViewHolder(View view, int position){
+        ViewHolder(View view){
             Icon = view.findViewById(R.id.pub_elem_img_icon);
             Instruct = view.findViewById(R.id.pub_elem_instruct);
             TitreView = view.findViewById(R.id.pub_elem_titre);
@@ -517,6 +530,7 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
             BtnSupp = view.findViewById(R.id.pub_elem_del_btn);
             Loading = view.findViewById(R.id.pub_elem_progress);
             BtnEdit = view.findViewById(R.id.pub_elem_edit_btn);
+            Shadow = view.findViewById(R.id.PubElemShadow);
         }
     }
 

@@ -10,9 +10,6 @@ import java.util.ArrayList;
 public class FireBaseInteraction {
     Context context;
     FirebaseDatabase database;
-    DatabaseReference databaseReference;
-    ArrayList<Sondage> Sondage_list;
-    Sondage SondageSolo;
     public FireBaseInteraction(){
     }
     public static class Storage_Paths{
@@ -27,28 +24,28 @@ public class FireBaseInteraction {
         final static String PUBLICATION_IMAGES = "Media/Publications/Images/";
         final static String PUBLICATION_IMAGES_THUMBNAILS = "Media/Publications/Images/Thumbnails/";
         final static String PROFILS_AVATARS = "Media/Profils/";
-        final static String IMAGES_APPS = "Media/ImagesApp/";
-        final static String LOGO = "Media/ImagesApp/AppLogo.jpg";
     }
 
-    public static class Sondage_Keys{
+    static class Sondage_Keys{
         final static String STRUCT_NAME = "Sondages";
         final static String TITRE = "Titre";
         final static String DATE_PUBLIC = "Date_Public";
         final static String DATE_ECHEANCE = "Date_Echeance";
+        final static String DATE_CREATED = "Date_Created";
         final static String COMPIL_PUBLIC = "Compil_Public";
         final static String CHEMIN_IMAGE = "Chemin_Image";
         final static String AUTEUR_REF = "AuteurRef";
         final static String PUBLIED = "Publied";
     }
-    public static class Question_Keys{
+    static class Question_Keys{
         final static String STRUCT_NAME = "Questions";
         final static String SONDAGE_REF = "SondageRef";
         final static String TEXTE_QUESTION = "Texte_Question";
+        final static String ORDRE = "Numero";
         final static String TYPE_QUESTION = "Type_Question";
         final static String OPTIONS = "Options";
     }
-    public static class Option_Keys{
+    static class Option_Keys{
         final static String TEXTE = "Texte";
         final static String CHEMIN_MEDIA = "Chemin_Media";
         final static String SCORE = "Score";
@@ -61,7 +58,7 @@ public class FireBaseInteraction {
         final static String SONDAGES = "Sondages";
         final static String AUTEURS_SUIVIS = "Auteurs_Suivis";
     }
-    public static class Publications_Keys{
+    static class Publications_Keys{
         final static String STRUCT_NAME = "Publications";
         final static String TITRE = "Titre";
         final static String TEXTE = "Texte";
@@ -71,7 +68,7 @@ public class FireBaseInteraction {
         final static String TYPE_MEDIA = "Type";
         final static String DATE_PUBLIC = "date_public";
     }
-    public static class Plainte_Keys{
+    static class Plainte_Keys{
         final static String STRUCT_NAME = "Plaintes";
         final static String RAISON = "Raison";
         final static String CIBLE = "Cible";

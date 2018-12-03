@@ -6,12 +6,9 @@ import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +18,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,7 +27,6 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserInfo;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -43,33 +38,39 @@ import com.google.firebase.functions.HttpsCallableResult;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 /**
  * Created by Henrick on 2018-09-20.
+ * 1. Crud sondages
+ * 2. crud Publication
+ * 3. crud comptes
+ * 4. repondre sondages
+ * 5. enregistrer progress sondages
+ * 6. Plaintes
+ * 7. Suivre auteurs
+ * 8. Notifications
+ * 9. filtrer sondages par auteurs
+ * 10. consulter les réponses post echeance;
  */
 
 public class SondageAdapter  extends ArrayAdapter<Sondage>{
     private boolean si_Admin;
-    private static Context c;
+    private Context c;
     private LayoutInflater mInflater;
-    private static AdaptListener adaptListener;
     private SondageAdapter sondageAdapter;
-    private boolean Si_Filter;
     private HashMap<String, Bitmap> BitmapMap;
     private FirebaseFunctions mFunctions;
+    private ProgressDialog progressDialog;
 
-    public SondageAdapter(Context context, ArrayList<Sondage> sondages, boolean Si_Admin, boolean Si_Filter){
+    public SondageAdapter(Context context, ArrayList<Sondage> sondages, boolean Si_Admin){
         super(context, 0, sondages);
         si_Admin = Si_Admin;
-        this.Si_Filter = Si_Filter;
         c = context;
         BitmapMap = new HashMap<>();
         mFunctions = FirebaseFunctions.getInstance();
@@ -109,6 +110,7 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
         });
         if(((AdaptListener)c).getUser() == null){
             holder.zone_Admin.setVisibility(View.GONE);
+            holder.Shadow.setVisibility(View.GONE);
         }else{
             if(((AdaptListener)c).getUser().getUid().equals(sondage.AuteurRef)){
                 holder.btn_commencer.setVisibility(View.GONE);
@@ -117,12 +119,10 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
                     holder.BtnStatText.setText(R.string.Sondage_Elem_BtnPublish_Desc);
                     holder.btn_Statistiques.setContentDescription(c.getString(R.string.Sondage_Elem_BtnPublish_Desc));
                 }else{
-                    holder.btn_modifier.setEnabled(false);
-                    holder.BtnEditText.setText(R.string.Sondage_Elem_BtnEdit_Desc_Disabled);
-                    holder.btn_modifier.setContentDescription(c.getString(R.string.Sondage_Elem_BtnEdit_Desc_Disabled));
+                    holder.ZoneEdit.setVisibility(View.GONE);
                 }
-
             }else{
+                holder.Shadow.setVisibility(View.GONE);
                 holder.zone_Admin.setVisibility(View.GONE);
             }
         }
@@ -134,7 +134,7 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
                     holder.btn_commencer.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            ((AdaptListener) c).changePage(AnswerSondageFragment.newInstance(sondage, false, Si_Filter?sondage.Auteur.ID:null, si_Admin));
+                            ((AdaptListener) c).changePage(AnswerSondageFragment.newInstance(sondage, false));
                         }
                     });
                 }else{//si ce n'est pas la première fois;
@@ -150,7 +150,7 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
                             holder.btn_commencer.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    ((AdaptListener) c).changePage(AnswerSondageFragment.newInstance(sondage, false, Si_Filter ? sondage.Auteur.ID : null, si_Admin));
+                                    ((AdaptListener) c).changePage(AnswerSondageFragment.newInstance(sondage, false));
                                 }
                             });
                         }
@@ -158,7 +158,7 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
                         holder.btn_commencer.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                ((AdaptListener) c).changePage(AnswerSondageFragment.newInstance(sondage, false, Si_Filter?sondage.Auteur.ID:null, si_Admin));
+                                ((AdaptListener) c).changePage(AnswerSondageFragment.newInstance(sondage, false));
                             }
                         });
                     }
@@ -168,7 +168,7 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
                 holder.btn_commencer.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        ((AdaptListener) c).changePage(AnswerSondageFragment.newInstance(sondage, false, Si_Filter?sondage.Auteur.ID:null, si_Admin));
+                        ((AdaptListener) c).changePage(AnswerSondageFragment.newInstance(sondage, false));
                     }
                 });
             }
@@ -184,7 +184,7 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
                                 holder.btn_commencer.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) {
-                                        ((AdaptListener) c).changePage(AnswerSondageFragment.newInstance(sondage, true, Si_Filter ? sondage.Auteur.ID : null, si_Admin));
+                                        ((AdaptListener) c).changePage(AnswerSondageFragment.newInstance(sondage, true));
                                     }
                                 });
                             } else {
@@ -234,7 +234,11 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
         }
         holder.Titre.setText(sondage.Titre);
         SimpleDateFormat format = new SimpleDateFormat("dd-MM-yy", c.getResources().getConfiguration().locale);
-        holder.DateDebut.setText(String.format(c.getString(R.string.Sondage_Elem_Date_Publie), format.format(sondage.date_public)));
+        if(si_Admin){
+            holder.DateDebut.setText(String.format(c.getString(R.string.Sondage_Elem_Date_Created), format.format(new Date(sondage.Date_Created))));
+        }else {
+            holder.DateDebut.setText(String.format(c.getString(R.string.Sondage_Elem_Date_Publie), format.format(sondage.date_public)));
+        }
         holder.DateFin.setText(String.format(c.getString(R.string.Sondage_Elem_Date_End), format.format(sondage.date_echeance)));
 
         ValueEventListener auteurListener = new ValueEventListener() {
@@ -268,7 +272,7 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
                     holder.btn_Statistiques.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            ((AdaptListener) c).changePage(AnswerSondageFragment.newInstance(sondage, true, Si_Filter ? sondage.Auteur.ID : null, si_Admin));
+                            ((AdaptListener) c).changePage(AnswerSondageFragment.newInstance(sondage, true));
                         }
                     });
                 }else{
@@ -286,10 +290,12 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
                                     {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
-                                            FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Sondage_Keys.STRUCT_NAME).child(sondage.ID).child(FireBaseInteraction.Sondage_Keys.PUBLIED).setValue(true).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            final DatabaseReference SondageRef = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Sondage_Keys.STRUCT_NAME).child(sondage.ID);
+                                            SondageRef.child(FireBaseInteraction.Sondage_Keys.PUBLIED).setValue(true).addOnCompleteListener(new OnCompleteListener<Void>() {
                                                 @Override
                                                 public void onComplete(@NonNull Task<Void> task) {
                                                     if(task.isSuccessful()){
+                                                        SondageRef.child(FireBaseInteraction.Sondage_Keys.DATE_PUBLIC).setValue(Calendar.getInstance().getTime().getTime());
                                                         PublishPoll(sondage)
                                                                 .addOnCompleteListener(new OnCompleteListener<String>() {
                                                                     @Override
@@ -315,12 +321,11 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
                                                         holder.btn_Statistiques.setOnClickListener(new View.OnClickListener() {
                                                             @Override
                                                             public void onClick(View view) {
-                                                                ((AdaptListener) c).changePage(AnswerSondageFragment.newInstance(sondage, true, Si_Filter ? sondage.Auteur.ID : null, si_Admin));
+                                                                ((AdaptListener) c).changePage(AnswerSondageFragment.newInstance(sondage, true));
                                                             }
                                                         });
                                                         sondage.Publied = true;
-                                                        holder.btn_modifier.setEnabled(false);
-                                                        holder.BtnEditText.setText(R.string.Sondage_Elem_BtnEdit_Desc_Disabled);
+                                                        holder.ZoneEdit.setVisibility(View.GONE);
                                                         holder.btn_modifier.setContentDescription(c.getString(R.string.Sondage_Elem_BtnEdit_Desc_Disabled));
                                                     }
                                                 }
@@ -371,22 +376,14 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
                 });
     }
     private class ViewHolder{
-        TextView AuteurNom;
-        ImageButton btn_plainte;
-        LinearLayout zone_Admin;
+        LinearLayout zone_Admin, btnVote, ZoneEdit;
+        View Shadow;
         Button btn_commencer;
-        RelativeLayout btnVote;
-        ImageButton btn_modifier;
-        ImageButton btn_Statistiques;
-        ImageButton btn_supprimer;
-        TextView Titre;
-        TextView DateDebut;
-        TextView DateFin;
-        TextView BtnEditText;
-        TextView BtnStatText;
+        ImageButton btn_modifier, btn_Statistiques, btn_supprimer, btn_plainte;
+        TextView AuteurNom, Titre, DateDebut, DateFin, BtnEditText, BtnStatText;
         ImageView Image;
         ProgressBar Loading;
-        public ViewHolder(View view){
+        ViewHolder(View view){
             AuteurNom = view.findViewById(R.id.sondage_elem_nom_auteur);
             btn_plainte = view.findViewById(R.id.sondage_elem_plainte_btn);
             zone_Admin = view.findViewById(R.id.sondage_elem_zone_admin);
@@ -403,6 +400,8 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
             DateDebut = view.findViewById(R.id.sondage_elem_date_debut);
             DateFin = view.findViewById(R.id.sondage_elem_date_fin);
             Image = view.findViewById(R.id.sondage_elem_image);
+            Shadow = view.findViewById(R.id.SondElemShadow);
+            ZoneEdit = view.findViewById(R.id.SondElemEditZone);
         }
     }
     private void Confirm(final Sondage s){
@@ -414,6 +413,9 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
                 {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        progressDialog = new ProgressDialog(c);
+                        progressDialog.setTitle("Suppression du sondage en cours...");
+                        progressDialog.show();
                         DatabaseReference QuestionsRef = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Question_Keys.STRUCT_NAME);
                         QuestionsRef.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
@@ -452,9 +454,7 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
                 .show();
     }
     private void DeleteSondage(Sondage s){
-        ProgressDialog progressDialog = new ProgressDialog(c);
-        progressDialog.setTitle("Suppression du sondage en cours...");
-        progressDialog.show();
+
         DatabaseReference SondageRef = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Sondage_Keys.STRUCT_NAME).child(s.ID);
         StorageReference SondageMediaRef = FirebaseStorage.getInstance().getReference();
         for(Question q : s.Questions){
@@ -475,16 +475,13 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
             QuestionRef.removeValue();
         }
         if(!s.Chemin_Image.equals("N")){
-            SondageMediaRef.child(s.Chemin_Image);
-            SondageMediaRef.delete();
+            SondageMediaRef.child(FireBaseInteraction.Storage_Paths.SONDAGES_IMAGES).child(s.ID+".jpg").delete();
             FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.SONDAGES_IMAGES_THUMBNAILS).child(s.ID+".jpg").delete();
         }
         SondageRef.removeValue();
-        progressDialog.setTitle("Sondage supprimé.");
         progressDialog.dismiss();
         sondageAdapter.remove(s);
         sondageAdapter.notifyDataSetChanged();
-
     }
     public interface AdaptListener{
         void changePage(Fragment fragment);

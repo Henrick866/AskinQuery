@@ -43,11 +43,6 @@
     </item>
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_recherche"
-            android:icon="@drawable/ic_search"
-            android:title="Rechercher" />
-        <!--Dialog fiel-->
-        <item
             android:id="@+id/nav_sondages"
             android:icon="@drawable/ic_menu_sondages"
             android:title="Sondages" />

@@ -43,11 +43,10 @@ public class ConsultProfilFragment extends Fragment {
 
     private Profil mProfil, profilUser;
     private ImageView Avatar;
-    private FloatingActionButton Fab;
-    private TextView Username, ListSondages, ListPublications;
+
     private Button AbonnementBtn;
     private OnFragmentInteractionListener mListener;
-    private FirebaseAuth mAuth;
+
     private FirebaseUser user;
     private DatabaseReference profilUserRef;
 
@@ -81,6 +80,9 @@ public class ConsultProfilFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        FloatingActionButton Fab;
+        TextView Username, ListSondages, ListPublications;
+        FirebaseAuth mAuth;
         View view = inflater.inflate(R.layout.fragment_consult_profil, container, false);
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();

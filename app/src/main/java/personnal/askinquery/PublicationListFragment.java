@@ -2,16 +2,15 @@ package personnal.askinquery;
 
 import android.app.ListFragment;
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -26,6 +25,8 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,11 +49,12 @@ public class PublicationListFragment extends ListFragment {
     // TODO: Rename and change types of parameters
     private boolean Si_Gestion;
     private String Filtre;
-    private FirebaseAuth mAuth;
+
+
     private FirebaseUser user;
     private FirebaseMultiQuery firebaseMultiQuery;
     private OnFragmentInteractionListener mListener;
-    private ProgressBar progressBar;
+    private SwipeRefreshLayout swipeRefreshLayout;
     private TextView Empty;
 
     public PublicationListFragment() {
@@ -83,13 +85,11 @@ public class PublicationListFragment extends ListFragment {
             Si_Gestion = getArguments().getBoolean(ARG_PARAM1);
             Filtre = getArguments().getString(ARG_PARAM2);
         }
-
-        mAuth = FirebaseAuth.getInstance();
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
     }
-    @Override
-    public void onStart(){
-        super.onStart();
+    private void LoadPublications(){
+        swipeRefreshLayout.setRefreshing(true);
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Publications_Keys.STRUCT_NAME);
         Query query;
         if(Filtre != null) {//si filtré
@@ -112,6 +112,11 @@ public class PublicationListFragment extends ListFragment {
             }
 
         }
+    }
+    @Override
+    public void onStart(){
+        super.onStart();
+        LoadPublications();
 
     }
     @Override
@@ -134,10 +139,19 @@ public class PublicationListFragment extends ListFragment {
             }
             if(PublicationList.isEmpty()){
                 Empty.setVisibility(View.VISIBLE);
+                swipeRefreshLayout.setRefreshing(false);
+            }else{
+                Collections.sort(PublicationList, new Comparator<Publication>() {
+                    @Override
+                    public int compare(Publication p1, Publication p2) {
+                        return Long.compare(p2.date_public, p1.date_public);
+                    }
+                });
+                swipeRefreshLayout.setRefreshing(false);
+                PublicationAdapter adapter = new PublicationAdapter(getActivity(), PublicationList);
+                setListAdapter(adapter);
             }
-            progressBar.setVisibility(View.GONE);
-            PublicationAdapter adapter = new PublicationAdapter(getActivity(), PublicationList, Si_Gestion);
-            setListAdapter(adapter);
+
         }
 
         @Override
@@ -169,22 +183,49 @@ public class PublicationListFragment extends ListFragment {
             // Do stuff with views
             if(PublicationList.isEmpty()){
                 Empty.setVisibility(View.VISIBLE);
+                swipeRefreshLayout.setRefreshing(false);
+            }else{
+                Collections.sort(PublicationList, new Comparator<Publication>() {
+                    @Override
+                    public int compare(Publication p1, Publication p2) {
+                        return Long.compare(p2.date_public, p1.date_public);
+                    }
+                });
+                swipeRefreshLayout.setRefreshing(false);
+                PublicationAdapter adapter = new PublicationAdapter(getActivity(), PublicationList);
+                setListAdapter(adapter);
             }
-            progressBar.setVisibility(View.GONE);
-            PublicationAdapter adapter = new PublicationAdapter(getActivity(), PublicationList, Si_Gestion);
-            setListAdapter(adapter);
+
         }
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        View Shadow;
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_publication_list, container, false);
-        progressBar = view.findViewById(R.id.pub_list_loader);
         Empty = view.findViewById(R.id.pub_list_empty);
+        Shadow = view.findViewById(R.id.pub_list_shadow);
+        swipeRefreshLayout = view.findViewById(R.id.PubListRefresh);
+        swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorSecondary));
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                LoadPublications();
+            }
+        });
+        final Button AddBtn = view.findViewById(R.id.pub_list_add_btn);
         if(Si_Gestion){
             mListener.ChangeTitle("Publications | Gestion");
+            AddBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mListener.changePage(CreatePostFragment.newInstance(false, null));
+                }
+            });
+            Shadow.setVisibility(View.VISIBLE);
         }else if(Filtre != null){
+            AddBtn.setVisibility(View.GONE);
             FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Profil_Keys.STRUCT_NAME).child(Filtre).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -198,103 +239,12 @@ public class PublicationListFragment extends ListFragment {
                 }
             });
         }else{
+            AddBtn.setVisibility(View.GONE);
             mListener.ChangeTitle("Publications");
         }
 
 
-        final Button AddBtn = view.findViewById(R.id.pub_list_add_btn);
-        if(Si_Gestion){
-            AddBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    mListener.changePage(CreatePostFragment.newInstance(false, null));
-                }
-            });
-
-        }else{
-            AddBtn.setVisibility(View.GONE);
-        }
-
-
         return view;
-    }
-
-    public void LoadPubFiltre(){
-        DatabaseReference PublicRef = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Publications_Keys.STRUCT_NAME);
-        PublicRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                ArrayList<Publication> ListePubs = new ArrayList<>();
-                for(DataSnapshot dataSnapshot1: dataSnapshot.getChildren()){
-                    String AuteurID = (String)dataSnapshot1.child(FireBaseInteraction.Publications_Keys.AUTEUR).getValue();
-                    if(AuteurID.equals(Filtre)) {
-                        Publication p = dataSnapshot1.getValue(Publication.class);
-                        p.Date_Public = new Date(p.date_public);
-                        p.ID = dataSnapshot1.getKey();
-                        ListePubs.add(p);
-                    }
-                }
-                PublicationAdapter publicationAdapter = new PublicationAdapter(getActivity(), ListePubs, Si_Gestion);
-                setListAdapter(publicationAdapter);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-    }
-    public void LoadGestionFiltre(){
-        DatabaseReference PublicRef = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Publications_Keys.STRUCT_NAME);
-        PublicRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                ArrayList<Publication> ListePubs = new ArrayList<>();
-                for(DataSnapshot dataSnapshot1: dataSnapshot.getChildren()){
-                    String AuteurID = (String)dataSnapshot1.child(FireBaseInteraction.Publications_Keys.AUTEUR).getValue();
-                    if(AuteurID.equals(user.getUid())) {
-                        Publication p = dataSnapshot1.getValue(Publication.class);
-                        p.Date_Public = new Date(p.date_public);
-                        p.ID = dataSnapshot1.getKey();
-                        ListePubs.add(p);
-                    }
-                }
-                PublicationAdapter publicationAdapter = new PublicationAdapter(getActivity(), ListePubs, Si_Gestion);
-                setListAdapter(publicationAdapter);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-    }
-    public void LoadAllRelated(){
-        //etape 1, charger la liste des abonnement
-        final Profil p = mListener.getUtilisateur_Connecte();
-                DatabaseReference PublicRef = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Publications_Keys.STRUCT_NAME);
-                PublicRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        ArrayList<Publication> ListePubs = new ArrayList<>();
-                        for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
-                            String AuteurID = (String)dataSnapshot1.child(FireBaseInteraction.Publications_Keys.AUTEUR).getValue();
-                            if(p.Auteurs_Suivis.containsKey(AuteurID) || AuteurID.equals(user.getUid())){
-                                Publication p = dataSnapshot1.getValue(Publication.class);
-                                p.ID = dataSnapshot1.getKey();
-                                p.Date_Public = new Date(p.date_public);
-                                ListePubs.add(p);
-                            }
-                        }
-                        PublicationAdapter publicationAdapter = new PublicationAdapter(getActivity(), ListePubs, Si_Gestion);
-                        setListAdapter(publicationAdapter);
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                });
     }
 
     @Override

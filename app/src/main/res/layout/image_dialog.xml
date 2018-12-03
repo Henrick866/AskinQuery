@@ -1,7 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+    <com.balysv.materialripple.MaterialRippleLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/ImageCloseBtn"
+            style="@style/buttonNoBorderCustom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableEnd="@drawable/ic_clear_color"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:text="@string/Close_Dialog"
+            android:textColor="@color/colorRed" />
+    </com.balysv.materialripple.MaterialRippleLayout>
     <ImageView
         android:id="@+id/image_dialog_imageview"
         android:layout_width="wrap_content"
@@ -17,6 +33,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:indeterminate="true"
-        android:indeterminateDrawable="@drawable/progress" />
+        android:theme="@style/LoaderAccent" />
 
 </LinearLayout>

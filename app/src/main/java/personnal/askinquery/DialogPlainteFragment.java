@@ -2,7 +2,6 @@ package personnal.askinquery;
 
 import android.app.DialogFragment;
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.support.annotation.NonNull;
@@ -41,12 +40,9 @@ public class DialogPlainteFragment extends DialogFragment {
     // TODO: Rename and change types of parameters
     private String CibleID;
     private String Type;
-    private Button BtnConfirm, BtnCancel;
+
     private EditText PlainteField;
     private TextView PlainteErr;
-
-    private OnFragmentInteractionListener mListener;
-
     public DialogPlainteFragment() {
         // Required empty public constructor
     }
@@ -85,6 +81,7 @@ public class DialogPlainteFragment extends DialogFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        Button BtnConfirm, BtnCancel;
         PlainteField = view.findViewById(R.id.plainte_field);
         BtnConfirm = view.findViewById(R.id.plainte_confirm);
         BtnCancel = view.findViewById(R.id.plainte_cancel);
@@ -132,7 +129,6 @@ public class DialogPlainteFragment extends DialogFragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
     }
 
     /**

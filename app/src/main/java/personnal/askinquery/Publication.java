@@ -8,17 +8,17 @@ import java.util.Map;
 public class Publication implements Serializable {
     String ID;
     public String Media;
-    public String AuteurRef;
-    public String Titre;
+    String AuteurRef;
+    String Titre;
     Profil Auteur;
-    public int Type; //0:txt;1:img;2:vid;3:sondage;
-    public String Texte;
-    public String SondageRef;
+    int Type; //0:txt;1:img;2:vid;3:sondage;
+    String Texte;
+    String SondageRef;
     static final int TYPE_TEXTE = 0;
     static final int TYPE_IMAGE = 1;
     static final int TYPE_VIDEO = 2;
     static final int TYPE_SONDAGE = 3;
-    public long date_public;
+    long date_public;
     Date Date_Public;
     public Publication(){
 
@@ -32,7 +32,7 @@ public class Publication implements Serializable {
         this.SondageRef = SondageRef;
         this.date_public = date_public;
     }
-    public Map<String, Object> toMap(){
+    Map<String, Object> toMap(){
         Map<String, Object> map = new HashMap<>();
         map.put(FireBaseInteraction.Publications_Keys.AUTEUR, this.AuteurRef);
         map.put(FireBaseInteraction.Publications_Keys.MEDIA, this.Media);

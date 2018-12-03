@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<RelativeLayout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
+    android:minWidth="400dp"
     android:layout_height="wrap_content"
     android:padding="7dp"
     >
@@ -29,9 +32,11 @@
             android:visibility="invisible" />
 
         <com.balysv.materialripple.MaterialRippleLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
             android:layout_marginTop="5dp"
+            app:mrl_rippleOverlay="true"
             android:layout_marginBottom="5dp">
 
             <Button
@@ -39,15 +44,16 @@
                 style="@style/buttonCustom"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
                 android:padding="10dp"
                 android:text="@string/Username_Check"
                 android:textColor="@color/colorSecondaryMedDark" />
         </com.balysv.materialripple.MaterialRippleLayout>
 
         <com.balysv.materialripple.MaterialRippleLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            app:mrl_rippleOverlay="true"
             android:layout_marginTop="5dp">
 
             <Button
@@ -55,12 +61,11 @@
                 style="@style/buttonCustom"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
                 android:padding="10dp"
                 android:text="@string/Mng_Profil_Confirm" />
         </com.balysv.materialripple.MaterialRippleLayout>
     </LinearLayout>
-
+<!--Modifier Courriel-->
     <LinearLayout
         android:id="@+id/dialog_email_edit"
         android:layout_width="match_parent"
@@ -84,8 +89,10 @@
             android:visibility="invisible" />
 
         <com.balysv.materialripple.MaterialRippleLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            app:mrl_rippleOverlay="true"
             android:layout_marginTop="5dp">
 
             <Button
@@ -93,14 +100,15 @@
                 style="@style/buttonCustom"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
                 android:padding="10dp"
                 android:text="@string/Mng_Profil_Confirm" />
         </com.balysv.materialripple.MaterialRippleLayout>
 
         <com.balysv.materialripple.MaterialRippleLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            app:mrl_rippleOverlay="true"
             android:layout_marginTop="5dp">
 
             <Button
@@ -108,13 +116,12 @@
                 style="@style/buttonCustom"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
                 android:padding="10dp"
                 android:text="@string/Mng_Profil_Cancel"
                 android:textColor="@color/colorRed" />
         </com.balysv.materialripple.MaterialRippleLayout>
     </LinearLayout>
-
+<!--Modifier Mot de passe-->
     <LinearLayout
         android:id="@+id/dialog_pass_edit"
         android:layout_width="match_parent"
@@ -152,8 +159,10 @@
             android:visibility="invisible" />
 
         <com.balysv.materialripple.MaterialRippleLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            app:mrl_rippleOverlay="true"
             android:layout_marginTop="5dp">
 
             <Button
@@ -162,14 +171,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
 
-                android:layout_gravity="center_horizontal"
                 android:padding="10dp"
                 android:text="@string/Mng_Profil_Confirm" />
         </com.balysv.materialripple.MaterialRippleLayout>
 
         <com.balysv.materialripple.MaterialRippleLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            app:mrl_rippleOverlay="true"
             android:layout_marginTop="5dp">
 
             <Button
@@ -177,13 +187,12 @@
                 style="@style/buttonCustom"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
                 android:padding="10dp"
                 android:text="@string/Mng_Profil_Cancel"
                 android:textColor="@color/colorRed" />
         </com.balysv.materialripple.MaterialRippleLayout>
     </LinearLayout>
-
+<!--Autres-->
     <LinearLayout
         android:id="@+id/dialog_more_options"
         android:layout_width="match_parent"
@@ -192,7 +201,9 @@
         android:visibility="gone">
 
         <com.balysv.materialripple.MaterialRippleLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
+            app:mrl_rippleOverlay="true"
+            android:layout_gravity="center_horizontal"
             android:layout_height="wrap_content">
 
             <Button
@@ -200,35 +211,16 @@
                 style="@style/buttonNoBorderCustom"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
                 android:background="@color/transparent"
                 android:padding="10dp"
                 android:text="@string/Mng_Profil_Delete"
                 android:textColor="@color/colorRed" />
         </com.balysv.materialripple.MaterialRippleLayout>
-
-        <!--<View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="@color/LightGrey" />
-
         <com.balysv.materialripple.MaterialRippleLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <Button
-                android:id="@+id/manage_profil_deactivate"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:background="@color/transparent"
-                android:padding="10dp"
-                android:text="Désactiver le compte"
-                android:textColor="@color/colorRed" />
-        </com.balysv.materialripple.MaterialRippleLayout>-->
-        <com.balysv.materialripple.MaterialRippleLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            app:mrl_rippleOverlay="true"
             android:layout_marginTop="5dp">
 
             <Button
@@ -236,7 +228,6 @@
                 style="@style/buttonCustom"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
                 android:padding="10dp"
                 android:text="@string/Close_Dialog"
                 android:textColor="@color/colorRed" />
@@ -244,4 +235,4 @@
 
     </LinearLayout>
 
-</FrameLayout>
+</RelativeLayout>

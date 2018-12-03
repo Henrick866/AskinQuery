@@ -2,9 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:paddingEnd="7dp"
-    android:paddingStart="7dp"
-    android:layout_marginTop="5dp"
+    android:padding="7dp"
+    android:layout_marginTop="10dp"
+    android:layout_marginBottom="10dp"
+    android:background="@drawable/list_item_bg"
     android:layout_height="wrap_content">
 
     <LinearLayout
@@ -60,6 +61,7 @@
         android:id="@+id/sondage_edit_option_upload">
         <com.balysv.materialripple.MaterialRippleLayout
             android:layout_width="wrap_content"
+            app:mrl_rippleOverlay="true"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:layout_height="wrap_content">
@@ -99,41 +101,45 @@
         android:layout_height="wrap_content"
         android:indeterminate="true"
         android:indeterminateDrawable="@drawable/progress"/>
-    <com.balysv.materialripple.MaterialRippleLayout
-        android:layout_width="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="5dp"
-        android:layout_height="wrap_content">
+
         <RelativeLayout
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="5dp">
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:srcCompat="@drawable/ic_menu_gallery"
-        android:adjustViewBounds="true"
-        android:cropToPadding="false"
-        android:visibility="gone"
-        android:maxHeight="128dp"
-        android:scaleType="fitCenter"
-        android:contentDescription="@string/Poll_Answ_Option_Img_Desc"
-        android:id="@+id/sondage_edit_option_image_preview" />
+            <com.balysv.materialripple.MaterialRippleLayout
+                android:layout_width="wrap_content"
+                app:mrl_rippleOverlay="true"
+                android:id="@+id/EditOptRipple"
+                android:layout_height="wrap_content">
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:srcCompat="@drawable/ic_menu_gallery"
+                        android:adjustViewBounds="true"
+                        android:cropToPadding="false"
+                        android:visibility="gone"
+                        android:maxHeight="128dp"
+                        android:scaleType="fitCenter"
+                        android:contentDescription="@string/Poll_Answ_Option_Img_Desc"
+                        android:id="@+id/sondage_edit_option_image_preview" />
+            </com.balysv.materialripple.MaterialRippleLayout>
             <ImageView
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:src="@drawable/ic_loupe_black_24dp"
-                android:tint="@color/colorPrimaryMedLight"
-                android:layout_alignEnd="@id/sondage_edit_option_image_preview"
-                android:layout_alignBottom="@id/sondage_edit_option_image_preview"
+                android:tint="#fff"
+                android:background="@drawable/round_btn"
+                android:padding="5dp"
+                android:layout_alignEnd="@id/EditOptRipple"
+                android:layout_alignBottom="@id/EditOptRipple"
                 android:layout_marginBottom="5dp"
                 android:contentDescription="@string/Poll_Answ_Option_Img_Icon_Desc"
                 android:layout_marginEnd="5dp"
                 android:visibility="gone"
                 android:id="@+id/sondage_edit_option_image_preview_icon"/>
         </RelativeLayout>
-    </com.balysv.materialripple.MaterialRippleLayout>
+
 
 
 </LinearLayout>

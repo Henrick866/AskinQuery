@@ -6,23 +6,18 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.Fragment;
 import android.app.ProgressDialog;
-import android.arch.lifecycle.ViewModelProvider;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Parcel;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -52,8 +47,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.database.core.view.Change;
-import com.google.firebase.provider.FirebaseInitProvider;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
@@ -75,13 +68,11 @@ import java.util.HashMap;
 public class ManageProfilFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
     private static final int AVATAR_GET = 5;
     private static final int MY_PERMISSION_REQUEST_READ_STORAGE = 200;
 
     private String mParam1;
-    private String mParam2;
-    private TextView UsernameText, EmailText, PassText, OtherText, DeleteAvatar, ChangeAvatar, Abonnements;
+    private TextView UsernameText, EmailText;
     private ImageView AvatarPreview;
     private Dialog dialog;
     private FirebaseAuth mAuth;
@@ -91,7 +82,6 @@ public class ManageProfilFragment extends Fragment {
     private ProgressBar PassStrength;
     private TextView PassStrengthIndic;
     private LinearLayout Layout;
-    private Profil Utilisateur;
     private Bitmap ImageBitmap;
     private Uri Image;
     private int SumPass;
@@ -134,6 +124,7 @@ public class ManageProfilFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        TextView PassText, OtherText, DeleteAvatar, ChangeAvatar, Abonnements;
         mListener.ChangeTitle("Profil | Gestion");
         user = mAuth.getCurrentUser();
         progressDialog = new ProgressDialog(getActivity());
@@ -550,7 +541,12 @@ public class ManageProfilFragment extends Fragment {
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        progressDialog.setTitle(FlavorText + "Terminé");
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                progressDialog.setTitle(FlavorText + "Terminé");
+                            }
+                        });
                         UserReference.child(FireBaseInteraction.Profil_Keys.AVATAR).setValue(FireBaseInteraction.Storage_Paths.PROFILS_AVATARS+user.getUid()+".jpg");
                         UserProfileChangeRequest profileUpdates;
                         profileUpdates = new UserProfileChangeRequest.Builder()
@@ -572,7 +568,12 @@ public class ManageProfilFragment extends Fragment {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        progressDialog.setTitle(FlavorText + "Échoué");
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                progressDialog.setTitle(FlavorText + "Échoué");
+                            }
+                        });
                         progressDialog.dismiss();
                     }
                 })
@@ -694,6 +695,7 @@ public class ManageProfilFragment extends Fragment {
                                 UsernameText.setText(InputField.getEditableText().toString());
                                 Toast.makeText(getActivity(), "Nom d'utilisateur changé.", Toast.LENGTH_LONG).show();
                                 Layout.setVisibility(View.GONE);
+                                mListener.updateMenu(user);
                                 dialog.dismiss();
                             }else{
                                 Toast.makeText(getActivity(), "Erreur, nom d'utilisateur inchangé.", Toast.LENGTH_LONG).show();
@@ -735,7 +737,6 @@ public class ManageProfilFragment extends Fragment {
         void ChangeTitle(String newTitle);
         void updateMenu(FirebaseUser user);
         Profil getUtilisateur_Connecte();
-        void setUtilisateur_Connecte(Profil utilisateur_Connecte);
     }
     public String getTitle(){
         return "Profil | Gérér";

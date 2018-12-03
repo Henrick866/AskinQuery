@@ -15,10 +15,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Sondage implements Serializable {
+public class Sondage implements Serializable{
     String ID; //vrai id
     public long Date_Public;
     public long Date_Echeance;
+    public long Date_Created;
     public String AuteurRef;
     public String Titre;
     Profil Auteur;
@@ -29,40 +30,22 @@ public class Sondage implements Serializable {
     Date date_echeance;
     Date date_public;
     Uri Image;
-    public Sondage(){
+    Sondage(){
 
     }
-    public Sondage(String AuteurRef, long Date_Public, long Date_Echeance, boolean Compil_Public, String Titre, String Chemin_Image, boolean Publied){
+    public Sondage(String AuteurRef, long Date_Public, long Date_Echeance, long Date_Created, boolean Compil_Public, String Titre, String Chemin_Image, boolean Publied){
 
         this.Date_Public = Date_Public;
         this.Date_Echeance = Date_Echeance;
         this.Titre = Titre;
         this.AuteurRef = AuteurRef;
+        this.Date_Created = Date_Created;
         this.Compil_Public = Compil_Public;
         this.Chemin_Image = Chemin_Image;
         this.Publied = Publied;
 
 
 
-    }
-    public void QueryGetAuteur(){
-        ValueEventListener AuteurListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Profil A = dataSnapshot.getValue(Profil.class);
-                A.ID = dataSnapshot.getKey();
-                Auteur = A;
-                Auteur.notifyAll();
-                Log.w("Test",Auteur.toString());
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        };
-        DatabaseReference ProfilRef = FirebaseDatabase.getInstance().getReference().child("Profils").child(AuteurRef);
-        ProfilRef.addListenerForSingleValueEvent(AuteurListener);
     }
     public void ConvertDates(){
         date_echeance = new Date(Date_Echeance);
@@ -73,6 +56,7 @@ public class Sondage implements Serializable {
         newMap.put(FireBaseInteraction.Sondage_Keys.AUTEUR_REF, AuteurRef);
         newMap.put(FireBaseInteraction.Sondage_Keys.DATE_ECHEANCE, Date_Echeance);
         newMap.put(FireBaseInteraction.Sondage_Keys.DATE_PUBLIC, Date_Public);
+        newMap.put(FireBaseInteraction.Sondage_Keys.DATE_CREATED, Date_Created);
         newMap.put(FireBaseInteraction.Sondage_Keys.TITRE, Titre);
         newMap.put(FireBaseInteraction.Sondage_Keys.CHEMIN_IMAGE, Chemin_Image);
         newMap.put(FireBaseInteraction.Sondage_Keys.COMPIL_PUBLIC, Compil_Public);

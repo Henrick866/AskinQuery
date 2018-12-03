@@ -27,7 +27,7 @@ public class FirebaseMultiQuery {
             add(ref);
         }
     }
-    public FirebaseMultiQuery(final ArrayList<DatabaseReference> refs) {
+    FirebaseMultiQuery(final ArrayList<DatabaseReference> refs) {
         for (final DatabaseReference ref : refs) {
             add(ref);
         }
@@ -62,7 +62,7 @@ public class FirebaseMultiQuery {
         });
     }
 
-    public void stop() {
+    void stop() {
         for (final Map.Entry<DatabaseReference, ValueEventListener> entry : listeners.entrySet()) {
             entry.getKey().removeEventListener(entry.getValue());
         }
@@ -74,7 +74,7 @@ public class FirebaseMultiQuery {
         private final DatabaseReference ref;
         private final TaskCompletionSource<DataSnapshot> taskSource;
 
-        public MyValueEventListener(DatabaseReference ref, TaskCompletionSource<DataSnapshot> taskSource) {
+        MyValueEventListener(DatabaseReference ref, TaskCompletionSource<DataSnapshot> taskSource) {
             this.ref = ref;
             this.taskSource = taskSource;
         }

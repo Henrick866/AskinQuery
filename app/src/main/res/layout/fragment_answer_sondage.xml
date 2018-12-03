@@ -3,11 +3,28 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingEnd="7dp"
-    android:paddingStart="7dp"
     tools:context=".AnswerSondageFragment">
 
-
+    <ImageView
+        android:id="@+id/answer_sondage_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/answer_sondage_btn_zone"
+        android:layout_below="@id/headeranswer"
+        android:layout_centerInParent="true"
+        android:layout_gravity="center"
+        android:background="@color/LighterGrey"
+        android:contentDescription="@string/Sondage_Elem_Img_Desc"
+        android:maxHeight="150dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_menu_gallery"
+        android:visibility="invisible" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:id="@+id/headeranswer"
+        android:paddingEnd="7dp"
+        android:paddingStart="7dp"
+        android:layout_height="wrap_content">
     <TextView
         android:id="@+id/answer_sondage_title"
         android:layout_width="match_parent"
@@ -21,26 +38,25 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAlignment="center" />
+    </RelativeLayout>
 
-    <ImageView
-        android:layout_below="@id/answer_sondage_auteur"
-        android:id="@+id/answer_sondage_image"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:maxHeight="150dp"
-        android:layout_gravity="center"
-        android:contentDescription="@string/Sondage_Elem_Img_Desc"
-        android:scaleType="fitCenter"
-        android:src="@drawable/ic_menu_gallery" />
 
     <ListView
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:clipToPadding="false"
         android:id="@+id/answer_sondage_questions"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/answer_sondage_btn_zone"
-        android:layout_below="@id/answer_sondage_image" />
+        android:layout_below="@id/headeranswer"
+        android:divider="@color/transparent"
+        android:dividerHeight="10dp"
+        android:paddingEnd="7dp"
+        android:paddingStart="7dp"/>
     <LinearLayout
+        android:paddingEnd="7dp"
+        android:paddingStart="7dp"
         android:layout_width="match_parent"
         android:id="@+id/answer_sondage_btn_zone"
         android:layout_alignParentBottom="true"
@@ -83,5 +99,14 @@
                 android:visibility="visible" />
         </com.balysv.materialripple.MaterialRippleLayout>
     </LinearLayout>
-
+    <View
+        android:layout_below="@id/headeranswer"
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:background="@drawable/shadow_top_down" />
+    <View
+        android:layout_above="@id/answer_sondage_btn_zone"
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:background="@drawable/shadow_down_top" />
 </RelativeLayout>

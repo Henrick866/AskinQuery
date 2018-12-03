@@ -9,7 +9,7 @@ public class Question implements Serializable {
     String ID;
     Sondage Sondage_parent;
     public int Type_Question;
-    public int ID_Nomenclature;
+    public int Numero;
     public final static int TYPE_TEXTE = 1;
     public final static int TYPE_IMAGE = 2;
     public final static int TYPE_VIDEO = 3;
@@ -22,19 +22,19 @@ public class Question implements Serializable {
 
 
     }
-    public Question(String Texte_Question, int Type_Question, int ID_Nomenclature, String SondageRef){
-        this.ID_Nomenclature = ID_Nomenclature;
+    public Question(String Texte_Question, int Type_Question, int Numero, String SondageRef){
+        this.Numero = Numero;
         this.Texte_Question = Texte_Question;
         this.Type_Question = Type_Question;
         this.SondageRef = SondageRef;
     }
-    public Question(String Texte_Question, long Type_Question, long ID_Nomenclature, String SondageRef){
-        this.ID_Nomenclature = (int)ID_Nomenclature;
+    public Question(String Texte_Question, long Type_Question, long Numero, String SondageRef){
+        this.Numero = (int)Numero;
         this.Texte_Question = Texte_Question;
         this.Type_Question = (int)Type_Question;
         this.SondageRef = SondageRef;
     }
-    public void SetOptions(ArrayList<Option> o){
+    void SetOptions(ArrayList<Option> o){
         Options = o;
     }
     public int getTotal(){
@@ -49,6 +49,7 @@ public class Question implements Serializable {
         newMap.put(FireBaseInteraction.Question_Keys.SONDAGE_REF, SondageRef);
         newMap.put(FireBaseInteraction.Question_Keys.TEXTE_QUESTION, Texte_Question);
         newMap.put(FireBaseInteraction.Question_Keys.TYPE_QUESTION, Type_Question);
+        newMap.put(FireBaseInteraction.Question_Keys.ORDRE, Numero);
         newMap.put(FireBaseInteraction.Question_Keys.OPTIONS, "");
         return newMap;
     }

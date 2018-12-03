@@ -47,7 +47,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.google.firebase.storage.internal.Util;
 
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
@@ -63,19 +62,17 @@ import java.util.HashMap;
  */
 public class CreerProfilFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
-    private TextView Title, UserErr, EmailErr, PassErr, PassStrengthIndic;
+    private TextView UserErr, EmailErr, PassErr, PassStrengthIndic;
     private EditText UserField, EmailField, PassField;
     private ImageView AvatarPreview;
-    private Button btnConfirm, btnUpload, BtnAvailable;
+
     private ProgressBar PassStrength;
     private Bitmap ImageBitmap;
     private Uri Image;
-    private int SumPass;
+    private int SumPass, TaskTodo, TaskDone;
     private ProgressDialog progressDialog;
     private boolean HasChecked, UsernameFound;
     private static final int MY_PERMISSION_REQUEST_READ_STORAGE = 200;
@@ -105,8 +102,6 @@ public class CreerProfilFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-        }
     }
 
     @Override
@@ -114,8 +109,8 @@ public class CreerProfilFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         mListener.ChangeTitle("Profil | Créer");
+        Button btnConfirm, btnUpload, BtnAvailable;
         View view = inflater.inflate(R.layout.fragment_profil, container, false);
-        Title = view.findViewById(R.id.profil_form_title);
         UserErr = view.findViewById(R.id.profil_form_username_err);
         EmailErr = view.findViewById(R.id.profil_form_email_err);
         PassErr = view.findViewById(R.id.profil_form_pass_err);
@@ -133,7 +128,7 @@ public class CreerProfilFragment extends Fragment {
         BtnAvailable.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AvailableUsername(UserField.getEditableText().toString());
+                    AvailableUsername(UserField.getEditableText().toString());
             }
         });
         btnUpload.setOnClickListener(new View.OnClickListener() {
@@ -230,7 +225,6 @@ public class CreerProfilFragment extends Fragment {
         }
     };
     private void AvailableUsername(final String tempUser){
-        UserField.setCompoundDrawablesWithIntrinsicBounds(null, null, getResources().getDrawable(R.drawable.progress), null);
         ValueEventListener ProfileUsernameVerifier = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -262,6 +256,7 @@ public class CreerProfilFragment extends Fragment {
                 UserErr.setVisibility(View.VISIBLE);
             }else {
                 UserErr.setVisibility(View.INVISIBLE);
+                UserField.setCompoundDrawablesWithIntrinsicBounds(null, null, getResources().getDrawable(R.drawable.ic_wait), null);
                 DatabaseReference profilRef = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Profil_Keys.STRUCT_NAME);
                 profilRef.addListenerForSingleValueEvent(ProfileUsernameVerifier);
             }
@@ -355,23 +350,41 @@ public class CreerProfilFragment extends Fragment {
             UserErr.setText(R.string.Gen_Empty_Field);
         }else{
             if(User.length() < 3){
+                Valid = false;
                 UserErr.setText(R.string.Username_Err_Short);
                 UserErr.setVisibility(View.VISIBLE);
             }else if(User.length() > 25){
+                Valid = false;
                 UserErr.setText(R.string.Username_Err_Long);
                 UserErr.setVisibility(View.VISIBLE);
-            }else {
+            }else if(UsernameFound){//on regarde si le nom existe, si oui, c'est invalide, si non, c'est valide
+                Valid = false;
+                UserErr.setText(R.string.Username_Err_Found);
+                UserErr.setVisibility(View.VISIBLE);
+            }
+            else {
                 UserErr.setVisibility(View.INVISIBLE);
             }
         }
         if(Valid){
             progressDialog = new ProgressDialog(getActivity());
-            progressDialog.setTitle("Enregistrement du compte...");
+            progressDialog.setTitle("Enregistrement du profil...");
             progressDialog.show();
-            RegisterClient(User, Email, Pass);
+            final String UserF = User, EmailF = Email, PassF = Pass;
+            Thread mThread = new Thread(){
+                @Override
+                public void run(){
+                    TaskDone = 0;
+                    TaskTodo = 0;
+                    RegisterClient(UserF, EmailF, PassF);
+                }
+            };
+            mThread.start();
+
         }
     }
     private void RegisterClient(final String user, final String email, final String pass){
+        AddTask();
         final StorageReference AvatarRef = FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.PROFILS_AVATARS);
         final DatabaseReference UserDataRef = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Profil_Keys.STRUCT_NAME);
         if(currentUser == null) {
@@ -396,25 +409,29 @@ public class CreerProfilFragment extends Fragment {
                                 Profil p = new Profil(user, email, avatarPath);
                                 HashMap<String, Object> map = p.toMap();
                                 UserDataRef.child(currentUser.getUid()).setValue(map);
-                                progressDialog.setTitle("enregistrement du profil");
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        progressDialog.setTitle("Enregistrement du profil...");
+                                    }
+                                });
                                 currentUser.updateProfile(profileUpdates)
                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if (task.isSuccessful()) {
-                                                    progressDialog.dismiss();
-                                                    mListener.updateMenu(currentUser);
-                                                    mListener.changePage(SondageListFragment.newInstance(false, null));
+                                                   TaskDone();
                                                 }
                                             }
                                         });
 
                             } else {
                                 Toast.makeText(getActivity(), "Enregistrement échoué", Toast.LENGTH_LONG).show();
+                                progressDialog.dismiss();
                             }
                         }
                     });
-        }else{//totest : Fusion anonyme-compte;
+        }else{
             if(currentUser.isAnonymous()){//si l'utilisateur est anonyme, on crée un compte et on le lui associe, question de transférer les données
                             final AuthCredential credential = EmailAuthProvider.getCredential(email, pass);
                             currentUser.linkWithCredential(credential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -437,20 +454,24 @@ public class CreerProfilFragment extends Fragment {
                                         Profil p = new Profil(user, email, avatarPath);
                                         final HashMap<String, Object> map = p.toMap();
                                         DatabaseReference SondagesDoneListGetter = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Profil_Keys.STRUCT_NAME).child(OldUserId).child(FireBaseInteraction.Profil_Keys.SONDAGES);
+
                                         SondagesDoneListGetter.addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                 map.put(FireBaseInteraction.Profil_Keys.SONDAGES, dataSnapshot.getValue());
                                                 UserDataRef.child(currentUser.getUid()).setValue(map);
-                                                progressDialog.setTitle("Enregistrement du profil");
+                                                getActivity().runOnUiThread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        progressDialog.setTitle("Enregistrement du profil...");
+                                                    }
+                                                });
                                                 currentUser.updateProfile(profileUpdates)
                                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                             @Override
                                                             public void onComplete(@NonNull Task<Void> task) {
                                                                 if (task.isSuccessful()) {
-                                                                    progressDialog.dismiss();
-                                                                    mListener.updateMenu(currentUser);//switch au nouvel utilisateur;
-                                                                    mListener.changePage(SondageListFragment.newInstance(false, null));
+                                                                    TaskDone();
                                                                 }
                                                             }
                                                         });
@@ -465,16 +486,32 @@ public class CreerProfilFragment extends Fragment {
 
                                     } else {
                                         Toast.makeText(getActivity(), "Enregistrement échoué", Toast.LENGTH_LONG).show();
+                                        progressDialog.dismiss();
                                     }
                                 }
                             });
             }
         }
     }
-
+    private void AddTask(){
+        TaskTodo++;
+    }
+    private void TaskDone(){
+        TaskDone++;
+        if(TaskTodo == TaskDone){
+            progressDialog.dismiss();
+            mListener.updateMenu(currentUser);//switch au nouvel utilisateur;
+            mListener.changePage(SondageListFragment.newInstance(false, null));
+        }
+    }
     private void UploadFile(StorageReference storageReference, Bitmap Image, final String FlavorText){
-        progressDialog.setTitle(FlavorText);
-        progressDialog.show();
+        AddTask();
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                progressDialog.setTitle(FlavorText);
+            }
+        });
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Image.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         byte[] data = baos.toByteArray();
@@ -483,15 +520,25 @@ public class CreerProfilFragment extends Fragment {
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        progressDialog.setTitle(FlavorText + "Terminé");
-                        mListener.updateMenu(currentUser);
-
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                progressDialog.setTitle(FlavorText + "Terminé");
+                            }
+                        });
+                        TaskDone();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        progressDialog.setTitle(FlavorText + "Échoué");
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                progressDialog.setTitle(FlavorText + "Échoué");
+                            }
+                        });
+                        TaskDone();
                     }
                 })
                 .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {

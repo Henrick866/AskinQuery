@@ -5,11 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@drawable/background"
     tools:context=".ManageProfilFragment">
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp">
+        android:background="#AAFAFAFA">
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/profil_check_flag_account"
@@ -19,33 +21,46 @@
             android:layout_margin="16dp"
             android:src="@drawable/ic_flag_white"
             android:tint="@color/colorRed"
-            app:backgroundTint="@color/transparent" />
+            app:backgroundTint="@color/LighterGrey" />
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="10dp"
             android:orientation="vertical"
             android:paddingTop="10dp">
-                <de.hdodenhof.circleimageview.CircleImageView
-                    xmlns:app="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/profil_check_avatar"
-                    android:layout_width="150dp"
-                    android:layout_height="150dp"
-                    android:layout_marginBottom="5dp"
-                    android:src="@mipmap/ic_launcher"
-                    app:civ_border_color="@color/colorPrimary"
-                    app:civ_border_width="0dp" />
+
+            <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/profil_check_avatar"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_marginBottom="5dp"
+                android:src="@mipmap/ic_launcher"
+                app:civ_border_color="@color/colorPrimary"
+                app:civ_border_width="0dp" />
 
         </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:layout_gravity="bottom"
+            android:background="@drawable/shadow_down_top" />
     </FrameLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="match_parent"
+        android:background="@color/Blanc"
+        android:orientation="vertical"
+        android:paddingTop="7dp">
+
         <com.balysv.materialripple.MaterialRippleLayout
             android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_height="wrap_content">
+            app:mrl_rippleOverlay="true">
 
             <Button
                 android:id="@+id/profil_check_abonnement"
@@ -67,20 +82,22 @@
             android:text="@string/Mng_Profil_UsernameTag" />
 
         <TextView
-                android:id="@+id/profil_check_usernameText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:paddingStart="20dp"
-                android:paddingTop="10dp"
-                android:paddingEnd="20dp"
-                android:paddingBottom="10dp"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                android:textSize="16sp" />
+            android:id="@+id/profil_check_usernameText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:paddingStart="20dp"
+            android:paddingTop="10dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="10dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textSize="16sp" />
+
         <View
             android:layout_width="match_parent"
             android:layout_height="2dp"
-            android:background="@color/LightGrey"/>
+            android:background="@color/LightGrey" />
+
         <com.balysv.materialripple.MaterialRippleLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -102,10 +119,12 @@
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 android:textSize="16sp" />
         </com.balysv.materialripple.MaterialRippleLayout>
+
         <View
             android:layout_width="match_parent"
             android:layout_height="2dp"
-            android:background="@color/LightGrey"/>
+            android:background="@color/LightGrey" />
+
         <com.balysv.materialripple.MaterialRippleLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">

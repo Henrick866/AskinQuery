@@ -7,11 +7,14 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -29,8 +32,11 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -51,18 +57,17 @@ public class SondageListFragment extends ListFragment {
     private static final String mParam1 = "Si_Gestion_Sond";
     private static final String mParam2 = "Filter";
     private static final String mParam3 = "Answered";
-    private ProgressBar progressBar;
     private TextView Empty;
     Profil Utilisateur;
     private String Filter;
     boolean Answered;
     boolean Loading_DONE, Si_Gestion_Sond;
-    ArrayList<Sondage> SondageList;
     private OnFragmentInteractionListener mListener;
-    private FirebaseAuth mAuth;
+
     private FirebaseUser user;
-    private ProgressDialog progressDialog;
+
     private FirebaseMultiQuery firebaseMultiQuery;
+    private SwipeRefreshLayout swipeRefreshLayout;
     public SondageListFragment() {
         // Required empty public constructor
     }
@@ -103,10 +108,10 @@ public class SondageListFragment extends ListFragment {
             Answered = getArguments().getBoolean(mParam3);
         }
         Loading_DONE = false;
-
+        ProgressDialog progressDialog;
         progressDialog = new ProgressDialog(getActivity());
         progressDialog.setTitle("Chargement des sondages...");
-        mAuth = FirebaseAuth.getInstance();
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
         if(user != null && Si_Gestion_Sond) {
             String Avatar;
@@ -118,11 +123,9 @@ public class SondageListFragment extends ListFragment {
             Utilisateur = new Profil(user.getDisplayName(), user.getEmail(), Avatar);
             Utilisateur.ID = user.getUid();
         }
-
     }
-    @Override
-    public void onStart(){
-        super.onStart();
+    private void LoadSondages(){
+        swipeRefreshLayout.setRefreshing(true);
         DatabaseReference DataRef = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Sondage_Keys.STRUCT_NAME);
         Query query;
         if(Si_Gestion_Sond){ //si on gere les sondages, on ne retire que ceux qui nous intéresse
@@ -131,6 +134,7 @@ public class SondageListFragment extends ListFragment {
         }else {
             if(Filter != null) {
                 query = DataRef.orderByChild(FireBaseInteraction.Sondage_Keys.AUTEUR_REF).equalTo(Filter);
+
                 query.addListenerForSingleValueEvent(loadListeSimple);
             }else{
                 if(Answered){
@@ -142,7 +146,6 @@ public class SondageListFragment extends ListFragment {
                     firebaseMultiQuery = new FirebaseMultiQuery(listdbref);
                     final Task<Map<DatabaseReference, DataSnapshot>> allLoad = firebaseMultiQuery.start();
                     allLoad.addOnCompleteListener(getActivity(), new AllOnCompleteListener());
-
                 }else {//tout
                     query = DataRef.orderByChild(FireBaseInteraction.Sondage_Keys.PUBLIED).equalTo(true);
                     query.addListenerForSingleValueEvent(loadListeSimple);
@@ -150,23 +153,53 @@ public class SondageListFragment extends ListFragment {
             }
         }
     }
+    @Override
+    public void onStart(){
+        super.onStart();
+        LoadSondages();
+    }
     private ValueEventListener loadListeSimple = new ValueEventListener() {
         @Override
         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
             ArrayList<Sondage> SondageList = new ArrayList<>();
             for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
                 Sondage S = dataSnapshot1.getValue(Sondage.class);
-                if(S.Publied) {
+                if(!Si_Gestion_Sond) {
+                    if (S.Publied) {
+                        S.ID = dataSnapshot1.getKey();
+                        SondageList.add(S);
+                    }
+                }else{//sinon prends tout même si non publié (préfiltré à l'id de l'auteur)
                     S.ID = dataSnapshot1.getKey();
                     SondageList.add(S);
                 }
             }
             if(SondageList.isEmpty()){
                 Empty.setVisibility(View.VISIBLE);
+                swipeRefreshLayout.setRefreshing(false);
+            }else {
+                if(Si_Gestion_Sond){
+                    Collections.sort(SondageList, new Comparator<Sondage>() {
+                        @Override
+                        public int compare(Sondage s1, Sondage s2) {
+                            return Long.compare(s2.Date_Created, s1.Date_Created);
+                        }
+                    });
+                }else {
+                    Collections.sort(SondageList, new Comparator<Sondage>() {
+                        @Override
+                        public int compare(Sondage s1, Sondage s2) {
+                            return Long.compare(s2.Date_Public, s1.Date_Public);
+                        }
+                    });
+                }
+               // progressBar.setVisibility(View.GONE);
+                swipeRefreshLayout.setRefreshing(false);
+                SondageAdapter adapter = new SondageAdapter(getActivity(), SondageList, Si_Gestion_Sond);
+                setListAdapter(adapter);
             }
-            progressBar.setVisibility(View.GONE);
-            SondageAdapter adapter = new SondageAdapter(getActivity(), SondageList, Si_Gestion_Sond, Filter!=null);
-            setListAdapter(adapter);
+
+
         }
 
         @Override
@@ -190,16 +223,22 @@ public class SondageListFragment extends ListFragment {
                 }
                 // Look up DataSnapshot objects using the same DatabaseReferences you passed into FirebaseMultiQuery
             }
-            else {
-                // log the error or whatever you need to do
-            }
             // Do stuff with views
             if(SondageList.isEmpty()){
                 Empty.setVisibility(View.VISIBLE);
+                swipeRefreshLayout.setRefreshing(false);
+            }else{
+                Collections.sort(SondageList, new Comparator<Sondage>() {
+                    @Override
+                    public int compare(Sondage s1, Sondage s2) {
+                        return Long.compare(s2.Date_Public, s1.Date_Public);
+                    }
+                });
+                swipeRefreshLayout.setRefreshing(false);
+               // progressBar.setVisibility(View.GONE);
+                SondageAdapter adapter = new SondageAdapter(getActivity(), SondageList, Si_Gestion_Sond);
+                setListAdapter(adapter);
             }
-            progressBar.setVisibility(View.GONE);
-            SondageAdapter adapter = new SondageAdapter(getActivity(), SondageList, Si_Gestion_Sond, Filter!=null);
-            setListAdapter(adapter);
         }
     }
     @Override
@@ -214,13 +253,30 @@ public class SondageListFragment extends ListFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        View Shadow;
         View view = inflater.inflate(R.layout.fragment_sondage_list, container, false);
         final Button btn_Ajout = view.findViewById(R.id.sondage_ajout_btn);
-
-        progressBar = view.findViewById(R.id.sondage_list_loader);
+        //progressBar = view.findViewById(R.id.sondage_list_loader);
         Empty = view.findViewById(R.id.sondage_list_empty);
+        Shadow = view.findViewById(R.id.sondage_list_shadow);
+        swipeRefreshLayout = view.findViewById(R.id.PollRefresh);
+        swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorSecondary));
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                LoadSondages();
+
+            }
+        });
         if(Si_Gestion_Sond){
             mListener.ChangeTitle("Sondages | Gestion");
+            btn_Ajout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mListener.changePage(CreerSondageFragment.newInstance(false, null));
+                }
+            });
+            Shadow.setVisibility(View.VISIBLE);
         }else if(Filter!=null){
             FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Profil_Keys.STRUCT_NAME).child(Filter).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -233,31 +289,16 @@ public class SondageListFragment extends ListFragment {
 
                 }
             });
+            btn_Ajout.setVisibility(View.GONE);
         }else if(Answered){
             mListener.ChangeTitle("Sondages | Répondus");
-        }else{
-            mListener.ChangeTitle("Sondages");
-        }
-        SondageList = new ArrayList<>();
-        if(!Si_Gestion_Sond){
             btn_Ajout.setVisibility(View.GONE);
         }else{
-
-            btn_Ajout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                     mListener.changePage(CreerSondageFragment.newInstance(false, null));
-                }
-            });
+            mListener.ChangeTitle("Sondages");
+            btn_Ajout.setVisibility(View.GONE);
         }
         //progressDialog.show();
         return view;
-    }
-    public void multiTasker(){
-        Collection<Task<Void>> tasks;
-
-// during onCreate:
-
     }
 
 

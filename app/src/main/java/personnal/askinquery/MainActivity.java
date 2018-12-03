@@ -10,7 +10,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -38,23 +37,17 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.internal.Util;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Set;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         SondageListFragment.OnFragmentInteractionListener,
         CreerSondageFragment.OnFragmentInteractionListener,
-        CreerOptionDialog.OnFragmentInteractionListener,
         CreerQuestionAdapter.AdaptListener,
         SondageAdapter.AdaptListener,
         LoginFragment.OnFragmentInteractionListener,
@@ -69,14 +62,15 @@ public class MainActivity extends AppCompatActivity
 {
     FragmentManager fragmentManager;
     FragmentTransaction fragmentTransaction;
-    public FireBaseInteraction fireBaseInteraction;
     private FirebaseAuth mAuth;
     private DrawerLayout drawer;
     private TextView MenuUsername, MenuUserEmail, ConnectLink;
     private ImageView MenuUserAvatar;
-    private NavigationView navigationView;
+
+    private Boolean ActivitySaved, FragmentLoaded;
+
     private MenuItem Connected, NotConnected;
-    private Menu menu;
+
     private Profil Utilisateur_Connecte;
     private FirebaseUser user;
     private Fragment fragmentToLoad;
@@ -85,7 +79,7 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         drawer = findViewById(R.id.drawer_layout);
 
@@ -93,13 +87,14 @@ public class MainActivity extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
-
+        FragmentLoaded = false;
+        NavigationView navigationView;
         navigationView = findViewById(R.id.nav_view);
         MenuUserAvatar = navigationView.getHeaderView(0).findViewById(R.id.menu_user_avatar);
         MenuUserEmail = navigationView.getHeaderView(0).findViewById(R.id.menu_user_email);
         MenuUsername = navigationView.getHeaderView(0).findViewById(R.id.menu_user_username);
         ConnectLink = navigationView.getHeaderView(0).findViewById(R.id.menu_loginoff);
-        menu = navigationView.getMenu();
+        Menu menu = navigationView.getMenu();
         ConnectLink.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -115,8 +110,20 @@ public class MainActivity extends AppCompatActivity
         user = mAuth.getCurrentUser();
         updateMenu(user);
 
-        Intent intent = getIntent();
 
+
+        //changePage(BlankFragment.newInstance("",""));
+    }
+    @Override
+    protected void onStart(){
+        super.onStart();
+        ActivitySaved = false;
+        if(!FragmentLoaded){
+            ActivityInitFragment();
+        }
+    }
+    private void ActivityInitFragment(){
+        Intent intent = getIntent();
         if(intent != null){//si on a recu une notification, on est connecté.
             if(intent.getStringExtra("FragmentName")!=null) {
                 if (intent.getStringExtra("FragmentName").equals("NewPoll")) {
@@ -126,7 +133,7 @@ public class MainActivity extends AppCompatActivity
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             Sondage s = dataSnapshot.getValue(Sondage.class);
                             s.ID = dataSnapshot.getKey();
-                            fragmentToLoad = AnswerSondageFragment.newInstance(s, false, null, false);
+                            fragmentToLoad = AnswerSondageFragment.newInstance(s, false);
                             LoadUser();
                         }
 
@@ -149,38 +156,40 @@ public class MainActivity extends AppCompatActivity
             fragmentToLoad = SondageListFragment.newInstance(false, null);
             LoadUser();
         }
-
-
-        //changePage(BlankFragment.newInstance("",""));
     }
+    @Override
+    protected void onPause(){
+        super.onPause();
+    }
+    private ValueEventListener valueEventListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            Utilisateur_Connecte = dataSnapshot.getValue(Profil.class);
+            HashMap<String, Object> MapSondagesDone = new HashMap<>();
+            for (DataSnapshot dataSnapshot1 : dataSnapshot.child(FireBaseInteraction.Profil_Keys.SONDAGES).getChildren()) {
+                MapSondagesDone.put(dataSnapshot1.getKey(), dataSnapshot1.getValue());
+            }
+            if (!user.isAnonymous()) {
+                HashMap<String, String> MapAbonn = new HashMap<>();
+                for (DataSnapshot dataSnapshot1 : dataSnapshot.child(FireBaseInteraction.Profil_Keys.AUTEURS_SUIVIS).getChildren()) {
+                    MapAbonn.put(dataSnapshot1.getKey(), (String) dataSnapshot1.getValue());
+                }
+                Utilisateur_Connecte.Auteurs_Suivis = MapAbonn;
+            }
+            Utilisateur_Connecte.Sondages_Faits = MapSondagesDone;
+            changePage(fragmentToLoad);
+        }
+
+        @Override
+        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+        }
+    };
     private void LoadUser(){
+        DatabaseReference UtilRef;
         if(user != null) {
-            final boolean isAnonyme = user.isAnonymous();
-            DatabaseReference UtilRef = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Profil_Keys.STRUCT_NAME).child(user.getUid());
-            UtilRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    Utilisateur_Connecte = dataSnapshot.getValue(Profil.class);
-                    HashMap<String, Object> MapSondagesDone = new HashMap<>();
-                    for (DataSnapshot dataSnapshot1 : dataSnapshot.child(FireBaseInteraction.Profil_Keys.SONDAGES).getChildren()) {
-                        MapSondagesDone.put(dataSnapshot1.getKey(), dataSnapshot1.getValue());
-                    }
-                    if (!isAnonyme) {
-                        HashMap<String, String> MapAbonn = new HashMap<>();
-                        for (DataSnapshot dataSnapshot1 : dataSnapshot.child(FireBaseInteraction.Profil_Keys.AUTEURS_SUIVIS).getChildren()) {
-                            MapAbonn.put(dataSnapshot1.getKey(), (String) dataSnapshot1.getValue());
-                        }
-                        Utilisateur_Connecte.Auteurs_Suivis = MapAbonn;
-                    }
-                    Utilisateur_Connecte.Sondages_Faits = MapSondagesDone;
-                    changePage(fragmentToLoad);
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
+            UtilRef = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Profil_Keys.STRUCT_NAME).child(user.getUid());
+            UtilRef.addListenerForSingleValueEvent(valueEventListener);
         }else{
             changePage(SondageListFragment.newInstance(false, null));
         }
@@ -188,7 +197,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -213,9 +222,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }else if(id == R.id.action_home){
+        if(id == R.id.action_home){
             changePage(SondageListFragment.newInstance(false, null));
         }
 
@@ -250,19 +257,24 @@ public class MainActivity extends AppCompatActivity
                                     public void onClick(final DialogInterface dialog, int id) {
                                         // get user input and set it to result
                                         // edit text
-                                        AuthCredential credential = EmailAuthProvider.getCredential(user.getEmail(), userInput.getEditableText().toString());
-                                        user.reauthenticate(credential).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<Void> task) {
-                                                if(task.isSuccessful()){
-                                                    changePage(ManageProfilFragment.newInstance(userInput.getEditableText().toString()));
-                                                    Toast.makeText(getApplicationContext(), "Vous êtes bien "+user.getDisplayName(), Toast.LENGTH_LONG).show();
-                                                    dialog.dismiss();
-                                                }else{
-                                                    Toast.makeText(getApplicationContext(), "Erreur, veuillez rééssayer", Toast.LENGTH_LONG).show(); //message volontairement vague pour tenter de dissuader le brute force manuel
+                                        if(!userInput.getEditableText().toString().isEmpty()) {
+                                            AuthCredential credential = EmailAuthProvider.getCredential(user.getEmail(), userInput.getEditableText().toString());
+                                            user.reauthenticate(credential).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    if (task.isSuccessful()) {
+                                                        changePage(ManageProfilFragment.newInstance(userInput.getEditableText().toString()));
+                                                        Toast.makeText(getApplicationContext(), "Vous êtes bien " + user.getDisplayName(), Toast.LENGTH_LONG).show();
+                                                        dialog.dismiss();
+                                                    } else {
+                                                        Toast.makeText(getApplicationContext(), "Erreur, veuillez rééssayer", Toast.LENGTH_LONG).show(); //message volontairement vague pour tenter de dissuader le brute force manuel
+                                                    }
                                                 }
-                                            }
-                                        });
+                                            });
+                                        }
+                                        else {
+                                            Toast.makeText(getApplicationContext(), "Champ vide, veuillez rééssayer", Toast.LENGTH_LONG).show(); //message volontairement vague pour tenter de dissuader le brute force manuel
+                                        }
                                     }
                                 })
                         .setNegativeButton("Annuler",
@@ -291,7 +303,6 @@ public class MainActivity extends AppCompatActivity
             b.setItems(AuteursNom.toArray(ListeString), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(final DialogInterface dialogInterface, int i) {
-                    final int index = i;
                     DatabaseReference profilRef = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Profil_Keys.STRUCT_NAME).child(AuteursId.get(i));
                     profilRef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
@@ -342,11 +353,20 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void changePage(Fragment fragment){
+    public void changePage(Fragment fragment) {
+
         fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.Fragment_Container, fragment);
         fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
+        if (!ActivitySaved) {
+            FragmentLoaded = true;
+            fragmentTransaction.commit();
+        }
+    }
+    @Override
+    protected void onSaveInstanceState(Bundle OutState){
+        super.onSaveInstanceState(OutState);
+        ActivitySaved = true;
     }
     public FragmentManager getFragmentManagerQ(){
         return fragmentManager;
@@ -356,8 +376,8 @@ public class MainActivity extends AppCompatActivity
         this.user = user;
         if(user == null){
             MenuUserAvatar.setImageDrawable(getResources().getDrawable(R.drawable.ic_menu_profil_connecter));
-            MenuUsername.setText("Non connecté.");
-            MenuUserEmail.setText("Veuillez vous connecter.");
+            MenuUsername.setText(R.string.Main_NotConnected);
+            MenuUserEmail.setText(R.string.Main_PleaseConnect);
             Connected.setVisible(false);
             NotConnected.setVisible(true);
             ConnectLink.setText(R.string.Connexion);
@@ -365,8 +385,8 @@ public class MainActivity extends AppCompatActivity
 
             if(user.isAnonymous()){
                 MenuUserAvatar.setImageDrawable(getResources().getDrawable(R.drawable.ic_menu_profil_connecter));
-                MenuUsername.setText("Non connecté.");
-                MenuUserEmail.setText("Veuillez vous connecter.");
+                MenuUsername.setText(R.string.Main_NotConnected);
+                MenuUserEmail.setText(R.string.Main_PleaseConnect);
                 Connected.setVisible(false);
                 NotConnected.setVisible(true);
                 ConnectLink.setText(R.string.Connexion);
