@@ -46,6 +46,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
@@ -401,39 +402,57 @@ public class ManageProfilFragment extends Fragment {
                 DeleteAccountBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        credential = EmailAuthProvider.getCredential(user.getEmail(), mParam1);
-                        final String UserId = user.getUid();
-                        user.reauthenticate(credential).addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                if(task.isSuccessful()) {
-                                    user.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            if (task.isSuccessful()) {
-                                                DatabaseReference delProfileRef = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Profil_Keys.STRUCT_NAME).child(UserId);
+                        new AlertDialog.Builder(getActivity())
+                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                .setTitle("Supprimer le compte")
+                                .setMessage("Voulez-vous vraiment supprimer votre compte (incluant vos sondages et publications)?")
+                                .setPositiveButton("Oui", new DialogInterface.OnClickListener()
+                                {
+                                    @Override
+                                    public void onClick(final DialogInterface dialogInner, int which) {
+                                        credential = EmailAuthProvider.getCredential(user.getEmail(), mParam1);
+                                        final String UserId = user.getUid();
+                                        user.reauthenticate(credential).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if(task.isSuccessful()) {
+                                                    user.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                        @Override
+                                                        public void onComplete(@NonNull Task<Void> task) {
+                                                            if (task.isSuccessful()) {
+                                                                DatabaseReference delProfileRef = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Profil_Keys.STRUCT_NAME).child(UserId);
 
-                                                delProfileRef.removeValue();
+                                                                delProfileRef.removeValue();
 
-                                                if (!user.getPhotoUrl().toString().equals("N")) {
-                                                    StorageReference delAvatarRef = FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.PROFILS_AVATARS + UserId + ".jpg");
-                                                    delAvatarRef.delete();
+                                                                if (!user.getPhotoUrl().toString().equals("N")) {
+                                                                    StorageReference delAvatarRef = FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.PROFILS_AVATARS + UserId + ".jpg");
+                                                                    delAvatarRef.delete();
+                                                                }
+                                                                DeleteAllPublications(UserId);
+                                                                DeleteSondages(UserId);
+                                                                dialog.dismiss();
+                                                                Toast.makeText(getActivity(), "Compte supprimé avec succès", Toast.LENGTH_LONG).show();
+                                                                Layout.setVisibility(View.GONE);
+                                                                mListener.updateMenu(mAuth.getCurrentUser());
+                                                                mListener.changePage(SondageListFragment.newInstance(false, null));
+                                                            } else {
+                                                                Toast.makeText(getActivity(), "Erreur, compte non supprimé.", Toast.LENGTH_LONG).show();
+                                                            }
+                                                        }
+                                                    });
+                                                }else{
+                                                    Toast.makeText(getActivity(), "Erreur, réauthentification échouée",Toast.LENGTH_LONG).show();
                                                 }
-                                                Toast.makeText(getActivity(), "Compte supprimé avec succès", Toast.LENGTH_LONG).show();
-                                                Layout.setVisibility(View.GONE);
-                                                dialog.dismiss();
-                                                mListener.updateMenu(mAuth.getCurrentUser());
-                                                mListener.changePage(SondageListFragment.newInstance(false, null));
-                                            } else {
-                                                Toast.makeText(getActivity(), "Erreur, compte non supprimé.", Toast.LENGTH_LONG).show();
                                             }
-                                        }
-                                    });
-                                }else{
-                                    Toast.makeText(getActivity(), "Erreur, réauthentification échouée",Toast.LENGTH_LONG).show();
-                                }
-                            }
-                        });
+
+                                        });
+                                        dialogInner.dismiss();
+                                    }
+
+                                })
+                                .setNegativeButton("Non", null)
+                                .show();
+
 
                     }
                 });
@@ -484,6 +503,123 @@ public class ManageProfilFragment extends Fragment {
         });
         return view;
     }
+
+    private void DeleteSondages(String user){
+        FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Sondage_Keys.STRUCT_NAME).orderByChild(FireBaseInteraction.Sondage_Keys.AUTEUR_REF).equalTo(user).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
+                    final Sondage S = dataSnapshot1.getValue(Sondage.class);
+                    FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Question_Keys.STRUCT_NAME).orderByChild(FireBaseInteraction.Question_Keys.SONDAGE_REF).equalTo(S.ID).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            ArrayList<Question> Questions = new ArrayList<>();
+                            for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
+                                Question q = dataSnapshot1.getValue(Question.class);
+
+                                    ArrayList<Option> Options = new ArrayList<>();
+                                    for(DataSnapshot dataSnapshot2 : dataSnapshot1.child(FireBaseInteraction.Question_Keys.OPTIONS).getChildren()){
+                                        Option o = dataSnapshot2.getValue(Option.class);
+                                        o.ID = dataSnapshot2.getKey();
+                                        Options.add(o);
+                                    }
+                                    q.ID = dataSnapshot1.getKey();
+                                    q.Options = Options;
+                                    Questions.add(q);
+
+                            }
+                            S.Questions = Questions;
+                            DeleteSondage(S);
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+    private void DeleteSondage(Sondage S){
+        DatabaseReference SondageRef = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Sondage_Keys.STRUCT_NAME).child(S.ID);
+        StorageReference SondageMediaRef = FirebaseStorage.getInstance().getReference();
+        for(Question q : S.Questions){
+            DatabaseReference QuestionRef = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Question_Keys.STRUCT_NAME).child(q.ID);
+            if(q.Type_Question != Question.TYPE_TEXTE) {
+                for (Option o : q.Options){
+                    String ThumbPath;
+                    if(q.Type_Question == Question.TYPE_IMAGE){
+                        ThumbPath = FireBaseInteraction.Storage_Paths.OPTIONS_IMAGES_THUMBNAILS;
+                    }else{
+                        ThumbPath = FireBaseInteraction.Storage_Paths.OPTIONS_VIDEOS_THUMBNAILS;
+                    }
+                    FirebaseStorage.getInstance().getReference().child(ThumbPath).child(o.ID+".jpg").delete();
+                    StorageReference OptionMediaRef = FirebaseStorage.getInstance().getReference().child(o.Chemin_Media);
+                    OptionMediaRef.delete();
+                }
+            }
+            QuestionRef.removeValue();
+        }
+        if(!S.Chemin_Image.equals("N")){
+            SondageMediaRef.child(FireBaseInteraction.Storage_Paths.SONDAGES_IMAGES).child(S.ID+".jpg").delete();
+            FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.SONDAGES_IMAGES_THUMBNAILS).child(S.ID+".jpg").delete();
+        }
+        SondageRef.removeValue();
+    }
+    private void DeleteAllPublications(String user){
+        FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Publications_Keys.STRUCT_NAME).orderByChild(FireBaseInteraction.Publications_Keys.AUTEUR).equalTo(user).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
+                    Publication P = dataSnapshot1.getValue(Publication.class);
+                    DeletePublic(P);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+    private void DeletePublic(final Publication publication){
+                final DatabaseReference PublicationRef = FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Publications_Keys.STRUCT_NAME).child(publication.ID);
+                if(publication.Type == Publication.TYPE_VIDEO){
+                    StorageReference PubMediaRef = FirebaseStorage.getInstance().getReference().child(publication.Media);
+                    PubMediaRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.PUBLICATION_VIDEOS_THUMBNAILS).child(publication.ID+".jpg").delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    PublicationRef.removeValue();
+                                    progressDialog.dismiss();
+
+                                }
+                            });
+                        }
+                    });
+                }else if(publication.Type == Publication.TYPE_IMAGE){
+                    FirebaseStorage.getInstance().getReference().child(publication.Media).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.PUBLICATION_IMAGES_THUMBNAILS).child(publication.ID+".jpg").delete();
+                            PublicationRef.removeValue();
+                            progressDialog.dismiss();
+                        }
+                    });
+                }else{//que ce soit sondage ou texte
+                    PublicationRef.removeValue();
+                    progressDialog.dismiss();
+                }
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data){
         if (requestCode == AVATAR_GET && resultCode == Activity.RESULT_OK) {
