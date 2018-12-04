@@ -782,7 +782,7 @@ public class CreatePostFragment extends Fragment {
         MediaPreview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Dialog dialog = new Dialog(getActivity());
+                final Dialog dialog = new Dialog(getActivity());
                 dialog.setContentView(R.layout.image_dialog);
                 dialog.show();
                 final ImageView Image = dialog.findViewById(R.id.image_dialog_imageview);
@@ -790,6 +790,13 @@ public class CreatePostFragment extends Fragment {
                 Image.setImageBitmap(ImageBitmap);
                 progressBar.setVisibility(View.GONE);
                 Image.setVisibility(View.VISIBLE);
+                final Button CloseBtn = dialog.findViewById(R.id.ImageCloseBtn);
+                CloseBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dialog.dismiss();
+                    }
+                });
             }
         });
         MedRmvBtn.setVisibility(View.VISIBLE);
