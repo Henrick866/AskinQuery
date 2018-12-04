@@ -9,6 +9,9 @@ import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
+import android.text.SpannableString;
+import android.text.style.UnderlineSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,6 +47,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * Created by Henrick on 2018-09-20.
@@ -147,6 +152,8 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
                         } else {//si il a sauvegardé, on réponds avec sauvegarde;
                             //sauvegarde
                             holder.btn_commencer.setText(R.string.Sondage_Elem_Poll_Saved);
+                            holder.btn_commencer.setEnabled(true);
+                            holder.btn_commencer.setTextColor(c.getResources().getColor(R.color.colorPrimaryMedDark));
                             holder.btn_commencer.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
@@ -155,6 +162,9 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
                             });
                         }
                     }else{
+                        holder.btn_commencer.setText(R.string.Sondage_Elem_Poll_Start);
+                        holder.btn_commencer.setEnabled(true);
+                        holder.btn_commencer.setTextColor(c.getResources().getColor(R.color.colorPrimaryMedDark));
                         holder.btn_commencer.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -165,6 +175,9 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
                 }
 
             }else{//si l'util n'est pas connecté quand le sondage est en cours, il réponds
+                holder.btn_commencer.setText(R.string.Sondage_Elem_Poll_Start);
+                holder.btn_commencer.setEnabled(true);
+                holder.btn_commencer.setTextColor(c.getResources().getColor(R.color.colorPrimaryMedDark));
                 holder.btn_commencer.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -181,6 +194,7 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
                             if (sondage.Compil_Public) {//si la compilation est publique
                                 holder.btn_commencer.setTextColor(getContext().getResources().getColor(R.color.colorSecondaryMedDark));
                                 holder.btn_commencer.setText(R.string.Sondage_Elem_Poll_Results);
+                                holder.btn_commencer.setEnabled(true);
                                 holder.btn_commencer.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) {
@@ -233,7 +247,7 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
                 }
         }
         holder.Titre.setText(sondage.Titre);
-        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yy", c.getResources().getConfiguration().locale);
+        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy", c.getResources().getConfiguration().locale);
         if(si_Admin){
             holder.DateDebut.setText(String.format(c.getString(R.string.Sondage_Elem_Date_Created), format.format(new Date(sondage.Date_Created))));
         }else {
@@ -246,8 +260,26 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
             public void onDataChange(DataSnapshot dataSnapshot) {
                 sondage.Auteur = dataSnapshot.getValue(Profil.class);
                 sondage.Auteur.ID = dataSnapshot.getKey();
-                holder.AuteurNom.setText(sondage.Auteur.Username);
+                SpannableString content = new SpannableString(sondage.Auteur.Username);
+                content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+
+                holder.AuteurNom.setText(content);
                 holder.AuteurNom.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        ((AdaptListener)c).changePage(ConsultProfilFragment.newInstance(sondage.Auteur));
+                    }
+                });
+                if(!sondage.Auteur.Avatar.equals("N")){
+                    FirebaseStorage.getInstance().getReference().child(sondage.Auteur.Avatar).getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                        @Override
+                        public void onSuccess(byte[] bytes) {
+                            Bitmap b = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                            holder.Avatar.setImageBitmap(b);
+                        }
+                    });
+                }
+                holder.Avatar.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         ((AdaptListener)c).changePage(ConsultProfilFragment.newInstance(sondage.Auteur));
@@ -379,11 +411,13 @@ public class SondageAdapter  extends ArrayAdapter<Sondage>{
         LinearLayout zone_Admin, btnVote, ZoneEdit;
         View Shadow;
         Button btn_commencer;
+        CircleImageView Avatar;
         ImageButton btn_modifier, btn_Statistiques, btn_supprimer, btn_plainte;
         TextView AuteurNom, Titre, DateDebut, DateFin, BtnEditText, BtnStatText;
         ImageView Image;
         ProgressBar Loading;
         ViewHolder(View view){
+            Avatar = view.findViewById(R.id.sondage_elem_avatar);
             AuteurNom = view.findViewById(R.id.sondage_elem_nom_auteur);
             btn_plainte = view.findViewById(R.id.sondage_elem_plainte_btn);
             zone_Admin = view.findViewById(R.id.sondage_elem_zone_admin);

@@ -37,6 +37,7 @@
     </LinearLayout>
 
     <EditText
+        android:theme="@style/LoaderAccent"
         android:id="@+id/sondage_edit_question_titre"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

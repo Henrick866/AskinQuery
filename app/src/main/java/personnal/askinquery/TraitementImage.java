@@ -54,16 +54,15 @@ public class TraitementImage {
     }
     static Bitmap createSquaredBitmap(Bitmap srcBmp, Context context) {//pour profil
         int dim = Math.max(srcBmp.getWidth(), srcBmp.getHeight());
-        Bitmap dstBmp = Bitmap.createBitmap(dim, dim, Bitmap.Config.ARGB_8888);
+        Bitmap dstBmp = Bitmap.createBitmap(dim, dim, Bitmap.Config.ARGB_8888), FinalBitmap = Bitmap.createBitmap(dstBmp);
+        Canvas canvas = new Canvas(dstBmp);
+        canvas.drawColor(Color.WHITE);
         Resources resources = context.getResources();
         DisplayMetrics metrics = resources.getDisplayMetrics();
         float px = 150 * ((float)metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
-
-        Canvas canvas = new Canvas(dstBmp);
-        canvas.drawColor(Color.WHITE);
-        canvas.drawBitmap(srcBmp, (px - srcBmp.getWidth()) / 2, (px - srcBmp.getHeight()) / 2, null);
-
-        return dstBmp;
+        canvas.drawBitmap(srcBmp, (dim - srcBmp.getWidth()) / 2, (dim - srcBmp.getHeight()) / 2, null);
+        FinalBitmap = Bitmap.createScaledBitmap(dstBmp, Math.round(px), Math.round(px), false);
+        return FinalBitmap;
     }
     static Bitmap CreateThumbnail(Bitmap srcBmp, Context context, int DstHeight){
         int oHeight = srcBmp.getHeight(), oWidth = srcBmp.getWidth();

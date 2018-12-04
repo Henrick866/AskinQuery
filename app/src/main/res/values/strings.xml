@@ -26,6 +26,7 @@
     <string name="Sondage_Elem_Date_Publie">Publié le : %1$s</string>
     <string name="Sondage_Elem_Date_Created">Créé le : %1$s</string>
     <string name="Sondage_Elem_Date_End">Échéance le : %1$s</string>
+    <string name="Sondage_Elem_Profil_Username"><u>%1$s</u></string>
     <string name="Sondage_Elem_ImgBtn_Plainte_Desc">Portez plainte sur ce sondage</string>
     <string name="Sondage_Elem_Img_Desc">Bannière du sondage</string>
     <string name="Sondage_Elem_BtnEdit_Desc">Modifiez le sondage</string>
@@ -39,10 +40,11 @@
     <!--Publication List-->
     <string name="Post_Elem_Instruct_Img">Appuyez sur l\'image pour la voir en grand format</string>
     <string name="Post_Elem_Instruct_Vid">Appuyez sur l\'image pour lire la vidéo</string>
-    <string name="Post_Elem_Instruct_Poll">Appuyez sur l\'image pour répondre au sondage</string>
-    <string name="Post_Elem_Instruct_Poll_Disabled">(Désactivé pour ne pas perdre la progression) Appuyez sur l\'image pour répondre au sondage</string>
+    <string name="Post_Elem_Instruct_Poll">Appuyez sur l\'image pour accéder au sondage</string>
+    <string name="Post_Elem_Instruct_Poll_Disabled">(Désactivé pour ne pas perdre la progression) Appuyez sur l\'image pour accéder au sondage</string>
     <string name="Post_Elem_Desc_Media">Média lié avec la publication</string>
     <string name="Post_Elem_Desc_Media_icon">icône d\'action du média de la publication</string>
+    <string name="Post_Elem_Date">Publié le : %1$s</string>
     <string name="Post_Elem_BtnEdit_Desc">Modifiez la publication</string>
     <string name="Post_Elem_BtnDelete_Desc">Supprimez la publication</string>
     <string name="Post_Elem_BtnPlainte_Desc">Portez plainte sur cette publication</string>
@@ -50,6 +52,7 @@
     <string name="Post_Elem_Alert_Poll_Continue">Continuez le sondage</string>
     <string name="Post_Elem_Alert_Poll_Results">Consultez les résultats du sondage</string>
     <string name="Post_Elem_Alert_Poll_Answered">Sondage répondu</string>
+    <string name="Post_Elem_Username"><u>%1$s</u></string>
     <string name="Post_New_Post">Créez une publication</string>
     <string name="Post_List_Empty">Aucune publication trouvée.</string>
 
@@ -95,6 +98,7 @@
     <string name="Poll_Answ_GoBack">Revenir</string>
     <string name="Poll_Answ_Done">Terminer</string>
     <string name="Poll_Answ_Save">Enregistrer et partir</string>
+    <string name="Poll_Ans_Author">Par : <u>%1$s</u></string>
 
     <!--Consult Profil-->
     <string name="Profil_Consult_Subscribe">S\'abonner</string>
@@ -107,7 +111,7 @@
     <string name="Post_Form_Title_Edit">Modifier la publication</string>
     <string name="Post_Form_Title_Field_Hint">Titre</string>
     <string name="Post_Form_Content_Field_Hint">Contenu de la publication</string>
-    <string name="Post_Form_Media_Pick">Choisir un média ou un sondage (que vous avez créé) à partager (optionnel)</string>
+    <string name="Post_Form_Media_Pick">Choisir un média ou un sondage (que vous avez publié) à partager (optionnel)</string>
     <string name="Post_Form_Media_Pick_Img">Image</string>
     <string name="Post_Form_Media_Pick_Vid">Vidéo</string>
     <string name="Post_Form_Media_Pick_Poll">Sondage</string>
@@ -171,6 +175,7 @@
     <string name="Close_Dialog">Fermer</string>
     <string name="Image_Dialog_Desc">Grande version de l\'image sélectionnée</string>
     <string name="Video_Dialog_Err">Téléchargement échoué</string>
+
 
 
     <string name="Gen_Empty_Field">Le champ est vide.</string>

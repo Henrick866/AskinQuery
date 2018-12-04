@@ -24,6 +24,8 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
 
     <EditText
+
+        android:theme="@style/LoaderAccent"
         android:id="@+id/login_email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -32,6 +34,8 @@
         android:inputType="textEmailAddress" />
 
     <EditText
+
+        android:theme="@style/LoaderAccent"
         android:id="@+id/login_pass"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

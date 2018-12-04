@@ -17,6 +17,7 @@
         android:visibility="gone">
 
         <EditText
+            android:theme="@style/LoaderAccent"
             android:id="@+id/manage_profil_edit_username"
             android:layout_width="match_parent"
             android:hint="@string/Username_Field_Hint"
@@ -74,6 +75,7 @@
         android:visibility="gone">
 
         <EditText
+            android:theme="@style/LoaderAccent"
             android:id="@+id/manage_profil_edit_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -130,6 +132,7 @@
         android:visibility="gone">
 
         <EditText
+            android:theme="@style/LoaderAccent"
             android:id="@+id/manage_profil_edit_pass"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

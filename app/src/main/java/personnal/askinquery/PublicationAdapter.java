@@ -12,6 +12,8 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
+import android.text.SpannableString;
+import android.text.style.UnderlineSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,7 +72,9 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 final Profil auteur = dataSnapshot.getValue(Profil.class);
-                holder.UserNameView.setText(auteur.Username);
+                SpannableString content = new SpannableString(auteur.Username);
+                content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+                holder.UserNameView.setText(content);
                 if(auteur.Avatar.equals("N")){
                     holder.AvatarView.setImageResource(R.mipmap.ic_launcher);
                 }else{
@@ -80,15 +84,15 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
                         public void onSuccess(byte[] bytes) {
                             Bitmap b = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                             holder.AvatarView.setImageBitmap(b);
-                            holder.AvatarView.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    ((AdaptListener)c).changePage(ConsultProfilFragment.newInstance(auteur));
-                                }
-                            });
                         }
                     });
                 }
+                holder.AvatarView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        ((AdaptListener)c).changePage(ConsultProfilFragment.newInstance(auteur));
+                    }
+                });
                 holder.UserNameView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -105,8 +109,8 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
         });
         holder.TitreView.setText(publication.Titre);
         holder.TexteView.setText(publication.Texte);
-        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yy", c.getResources().getConfiguration().locale);
-        holder.DateView.setText(format.format(publication.Date_Public));
+        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy", c.getResources().getConfiguration().locale);
+        holder.DateView.setText(String.format(c.getString(R.string.Post_Elem_Date), format.format(publication.Date_Public)));
 
         if(publication.Type != Publication.TYPE_TEXTE){
             holder.Loading.setVisibility(View.VISIBLE);
@@ -404,6 +408,7 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
                         holder.Instruct.setText(R.string.Post_Elem_Instruct_Poll);
                         holder.Instruct.setVisibility(View.VISIBLE);
                         holder.AlertSondage.setText(R.string.Post_Elem_Alert_Poll_Results);
+                        holder.AlertSondage.setTextColor(getContext().getResources().getColor(R.color.colorSecondaryMedDark));
                         holder.AlertSondage.setVisibility(View.VISIBLE);
                         holder.MediaView.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -415,12 +420,14 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
                         if (UtilConn.Sondages_Faits.get(S.ID) instanceof Boolean) {//si il a terminé, le sondage a été répondu
                             //ne peut plus répondre
                             holder.AlertSondage.setText(R.string.Post_Elem_Alert_Poll_Answered);
+                            holder.AlertSondage.setTextColor(getContext().getResources().getColor(R.color.colorAccentMedDark));
                             holder.AlertSondage.setVisibility(View.VISIBLE);
                         } else {//si il a sauvegardé, on réponds avec sauvegarde;
                             //sauvegarde
                             holder.Instruct.setText(R.string.Post_Elem_Instruct_Poll);
                             holder.Instruct.setVisibility(View.VISIBLE);
                             holder.AlertSondage.setText(R.string.Post_Elem_Alert_Poll_Continue);
+                            holder.AlertSondage.setTextColor(c.getResources().getColor(R.color.colorPrimaryMedDark));
                             holder.AlertSondage.setVisibility(View.VISIBLE);
                             holder.MediaView.setOnClickListener(new View.OnClickListener() {
                                 @Override
@@ -432,6 +439,7 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
                     }else{
                         holder.Instruct.setText(R.string.Post_Elem_Instruct_Poll);
                         holder.Instruct.setVisibility(View.VISIBLE);
+                        holder.AlertSondage.setVisibility(View.INVISIBLE);
                         holder.MediaView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -444,6 +452,7 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
                 }else{//si l'util n'est pas connecté quand le sondage est en cours, il réponds
                     holder.Instruct.setText(R.string.Post_Elem_Instruct_Poll);
                     holder.Instruct.setVisibility(View.VISIBLE);
+                    holder.AlertSondage.setVisibility(View.INVISIBLE);
                     holder.MediaView.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -458,6 +467,7 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
                         holder.Instruct.setText(R.string.Post_Elem_Instruct_Poll);
                         holder.Instruct.setVisibility(View.VISIBLE);
                         holder.AlertSondage.setText(R.string.Post_Elem_Alert_Poll_Results);
+                        holder.AlertSondage.setTextColor(getContext().getResources().getColor(R.color.colorSecondaryMedDark));
                         holder.AlertSondage.setVisibility(View.VISIBLE);
                         holder.MediaView.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -472,6 +482,7 @@ public class PublicationAdapter extends ArrayAdapter<Publication> {
                                 holder.Instruct.setText(R.string.Post_Elem_Instruct_Poll);
                                 holder.Instruct.setVisibility(View.VISIBLE);
                                 holder.AlertSondage.setText(R.string.Post_Elem_Alert_Poll_Results);
+                                holder.AlertSondage.setTextColor(getContext().getResources().getColor(R.color.colorSecondaryMedDark));
                                 holder.AlertSondage.setVisibility(View.VISIBLE);
                                 holder.MediaView.setOnClickListener(new View.OnClickListener() {
                                     @Override

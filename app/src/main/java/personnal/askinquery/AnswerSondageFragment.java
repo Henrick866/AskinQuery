@@ -2,11 +2,15 @@ package personnal.askinquery;
 
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.text.SpannableString;
+import android.text.style.UnderlineSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +35,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -46,7 +51,6 @@ import java.util.Map;
  * Use the {@link AnswerSondageFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-//TODO:: TEMPS RÉEL SI L'USER EST L'AUTEUR;
 public class AnswerSondageFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -55,7 +59,7 @@ public class AnswerSondageFragment extends Fragment {
     private Sondage sondage;
     private boolean Si_Resultats;
     private ArrayList<Question> liste_questions;
-    private TextView AuteurText;
+    private TextView AuteurText, DateDebut, DateFin;
     private AnswerQuestionAdapter answerQuestionAdapter;
     private ImageView ImageSondage;
     private ListView ListeQuestion;
@@ -103,7 +107,7 @@ public class AnswerSondageFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+                             final Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         Button BtnTerminer, BtnSave;
         TextView TitreText;
@@ -120,6 +124,12 @@ public class AnswerSondageFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_answer_sondage, container, false);
         TitreText = view.findViewById(R.id.answer_sondage_title);
         TitreText.setText(sondage.Titre);
+        DateDebut = view.findViewById(R.id.sondage_answer_date_debut);
+        DateFin = view.findViewById(R.id.sondage_answer_date_fin);
+        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy", getActivity().getResources().getConfiguration().locale);
+        DateDebut.setText(String.format(getActivity().getString(R.string.Sondage_Elem_Date_Publie), format.format(sondage.date_public)));
+        DateFin.setText(String.format(getActivity().getString(R.string.Sondage_Elem_Date_End), format.format(sondage.date_echeance)));
+
         AuteurText = view.findViewById(R.id.answer_sondage_auteur);
         if(sondage.Auteur == null){
             FirebaseDatabase.getInstance().getReference().child(FireBaseInteraction.Profil_Keys.STRUCT_NAME)
@@ -127,7 +137,11 @@ public class AnswerSondageFragment extends Fragment {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     sondage.Auteur = dataSnapshot.getValue(Profil.class);
-                    AuteurText.setText(sondage.Auteur.Username);
+                    sondage.Auteur.ID = dataSnapshot.getKey();
+                    SpannableString content = new SpannableString(sondage.Auteur.Username);
+                    content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+                    AuteurText.setText(getResources().getString(R.string.Poll_Ans_Author, content));
+                    AuteurText.setOnClickListener(ProfilListener);
                 }
 
                 @Override
@@ -136,8 +150,12 @@ public class AnswerSondageFragment extends Fragment {
                 }
             });
         }else{
-            AuteurText.setText(sondage.Auteur.Username);
+            SpannableString content = new SpannableString(sondage.Auteur.Username);
+            content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+            AuteurText.setText(getResources().getString(R.string.Poll_Ans_Author, content));
+            AuteurText.setOnClickListener(ProfilListener);
         }
+
         ImageSondage = view.findViewById(R.id.answer_sondage_image);
         ListeQuestion = view.findViewById(R.id.answer_sondage_questions);
         if(!sondage.Chemin_Image.equals("N")) {
@@ -225,6 +243,40 @@ public class AnswerSondageFragment extends Fragment {
         }
         return view;
     }
+    private View.OnClickListener ProfilListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            if(!Si_Resultats) {
+                String Message;
+                if (user != null) {
+                    if (!user.isAnonymous()) {
+                        Message = "Toutes vos réponses non sauvegardées seront perdues.";
+                    } else {
+                        Message = "Toutes vos réponses seront perdues.";
+                    }
+                } else {
+                    Message = "Toutes vos réponses seront perdues.";
+
+                }
+                new AlertDialog.Builder(getActivity())
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setTitle("Quitter le sondage?")
+                        .setMessage("Voulez-vous vraiment quitter ce sondage? " + Message)
+                        .setPositiveButton("Oui", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                mListener.changePage(ConsultProfilFragment.newInstance(sondage.Auteur));
+                            }
+
+                        })
+                        .setNegativeButton("Non", null)
+                        .show();
+            }else{
+                mListener.changePage(ConsultProfilFragment.newInstance(sondage.Auteur));
+            }
+        }
+    };
     private View.OnClickListener DoneListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {

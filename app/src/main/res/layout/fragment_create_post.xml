@@ -12,13 +12,16 @@
 <LinearLayout
 android:layout_width="match_parent"
 android:layout_height="wrap_content"
-    android:padding="7dp"
     android:background="@drawable/list_item_bg"
     android:orientation="vertical"
+    android:paddingTop="7dp"
+    android:paddingBottom="7dp"
     tools:context=".CreatePostFragment">
 
     <!-- TODO: Update blank fragment layout -->
     <TextView
+        android:layout_marginEnd="7dp"
+        android:layout_marginStart="7dp"
         android:id="@+id/publication_edit_title_form"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -27,6 +30,10 @@ android:layout_height="wrap_content"
         android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
 
     <EditText
+
+        android:theme="@style/LoaderAccent"
+        android:layout_marginEnd="7dp"
+        android:layout_marginStart="7dp"
         android:id="@+id/publication_edit_titre_field"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -36,6 +43,8 @@ android:layout_height="wrap_content"
         android:inputType="textPersonName" />
 
     <TextView
+        android:layout_marginEnd="7dp"
+        android:layout_marginStart="7dp"
         android:id="@+id/publication_edit_titre_err"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -46,6 +55,9 @@ android:layout_height="wrap_content"
         android:visibility="invisible" />
 
     <EditText
+        android:theme="@style/LoaderAccent"
+        android:layout_marginEnd="7dp"
+        android:layout_marginStart="7dp"
         android:id="@+id/publication_edit_contenu_field"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -55,6 +67,8 @@ android:layout_height="wrap_content"
         android:inputType="textMultiLine" />
 
     <TextView
+        android:layout_marginEnd="7dp"
+        android:layout_marginStart="7dp"
         android:id="@+id/publication_edit_contenu_err"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -65,66 +79,86 @@ android:layout_height="wrap_content"
         android:visibility="invisible" />
 
     <TextView
+        android:layout_marginEnd="7dp"
+        android:layout_marginStart="7dp"
         android:layout_marginTop="5dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/Post_Form_Media_Pick"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:background="@drawable/shadow_down_top"
+        android:layout_marginTop="5dp"/>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_marginTop="5dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:background="#AAfafafa"
+        android:orientation="horizontal"
+        android:paddingStart="7dp"
+        android:paddingEnd="7dp">
+
         <com.balysv.materialripple.MaterialRippleLayout
             android:layout_width="match_parent"
-            android:layout_weight="1"
-            android:layout_height="wrap_content">
-        <Button
-            android:id="@+id/publication_edit_imgUpBtn"
-            style="@style/buttonNoBorderCustom"
-            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/Post_Form_Media_Pick_Img" />
+            android:layout_weight="1">
+
+            <Button
+                android:id="@+id/publication_edit_imgUpBtn"
+                style="@style/buttonNoBorderCustom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/Post_Form_Media_Pick_Img" />
         </com.balysv.materialripple.MaterialRippleLayout>
 
         <View
             android:layout_width="2dp"
             android:layout_height="match_parent"
             android:background="@color/LightGrey" />
+
         <com.balysv.materialripple.MaterialRippleLayout
             android:layout_width="match_parent"
-            android:layout_weight="1"
-            android:layout_height="wrap_content">
-        <Button
-            android:id="@+id/publication_edit_vidUpBtn"
-            style="@style/buttonNoBorderCustom"
-            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/Post_Form_Media_Pick_Vid" />
+            android:layout_weight="1">
+
+            <Button
+                android:id="@+id/publication_edit_vidUpBtn"
+                style="@style/buttonNoBorderCustom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/Post_Form_Media_Pick_Vid" />
         </com.balysv.materialripple.MaterialRippleLayout>
 
         <View
             android:layout_width="2dp"
             android:layout_height="match_parent"
             android:background="@color/LightGrey" />
+
         <com.balysv.materialripple.MaterialRippleLayout
             android:layout_width="match_parent"
-            android:layout_weight="1"
-            android:layout_height="wrap_content">
-        <Button
-            android:id="@+id/publication_edit_pollLinkBtn"
-            style="@style/buttonNoBorderCustom"
-            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_weight="1">
 
-            android:enabled="false"
-            android:text="@string/Post_Form_Media_Pick_Poll" />
+            <Button
+                android:id="@+id/publication_edit_pollLinkBtn"
+                style="@style/buttonNoBorderCustom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:enabled="false"
+                android:text="@string/Post_Form_Media_Pick_Poll" />
         </com.balysv.materialripple.MaterialRippleLayout>
     </LinearLayout>
-
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:background="@drawable/shadow_top_down"/>
     <RelativeLayout
+        android:layout_marginEnd="7dp"
+        android:layout_marginStart="7dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
@@ -158,12 +192,15 @@ android:layout_height="wrap_content"
             android:layout_alignEnd="@id/CreatePostRipple"
             android:layout_marginEnd="5dp"
             android:layout_marginBottom="5dp"
+            android:background="@drawable/round_btn"
 
             android:visibility="gone"
             android:src="@drawable/ic_loupe_black_24dp"/>
     </RelativeLayout>
 
     <TextView
+        android:layout_marginEnd="7dp"
+        android:layout_marginStart="7dp"
         android:id="@+id/publication_edit_instruct"
         android:layout_width="match_parent"
         android:layout_marginTop="5dp"
@@ -172,6 +209,8 @@ android:layout_height="wrap_content"
         android:textAlignment="center" />
 
     <com.balysv.materialripple.MaterialRippleLayout
+        android:layout_marginEnd="7dp"
+        android:layout_marginStart="7dp"
         android:layout_width="wrap_content"
         android:layout_marginTop="5dp"
         app:mrl_rippleOverlay="true"
@@ -190,6 +229,8 @@ android:layout_height="wrap_content"
     </com.balysv.materialripple.MaterialRippleLayout>
 
     <com.balysv.materialripple.MaterialRippleLayout
+        android:layout_marginEnd="7dp"
+        android:layout_marginStart="7dp"
         android:layout_width="match_parent"
         android:layout_marginTop="5dp"
         app:mrl_rippleOverlay="true"

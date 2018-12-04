@@ -685,8 +685,6 @@ public class ManageProfilFragment extends Fragment {
         ImageBitmap = TraitementImage.createSquaredBitmap(TempImageBitmap, getActivity());
         AvatarPreview.setImageBitmap(ImageBitmap);
         AvatarPreview.setVisibility(View.VISIBLE);
-        Toast.makeText(getActivity(), "Le fichier sera envoyé au serveur lorsque le sondage sera créé/modifié",Toast.LENGTH_LONG).show();
-
     }
     private void UploadFile(StorageReference storageReference, Bitmap Image, final String FlavorText){
         progressDialog.setTitle(FlavorText);
