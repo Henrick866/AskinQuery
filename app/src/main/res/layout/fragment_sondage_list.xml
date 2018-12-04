@@ -24,15 +24,6 @@
     </com.balysv.materialripple.MaterialRippleLayout>
 
 
-    <!--<ProgressBar
-        android:layout_below="@id/PollListRipple"
-        android:id="@+id/sondage_list_loader"
-        style="?android:attr/progressBarStyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:indeterminate="true"
-        android:indeterminateDrawable="@drawable/progress" />-->
 
     <TextView
         android:id="@+id/sondage_list_empty"
@@ -40,6 +31,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/PollListRipple"
         android:layout_marginTop="5dp"
+        android:textColor="@color/Blanc"
         android:text="@string/Sondage_List_Empty"
         android:textAlignment="center"
         android:visibility="gone" />

@@ -126,10 +126,11 @@ public class CreerOptionDialog extends DialogFragment implements CreerOptionAdap
         btnAjout = view.findViewById(R.id.sondage_edit_question_add_option);
         Done = view.findViewById(R.id.option_edit_done_btn);
         Cancel = view.findViewById(R.id.option_edit_cancel_btn);
+
+        creerOptionAdapter = new CreerOptionAdapter(getActivity(), mParam1.Options, mParam1.Type_Question, this);
         if(mParam1.Type_Question != Question.TYPE_TEXTE){
             DownloadImagesList();
         }
-        creerOptionAdapter = new CreerOptionAdapter(getActivity(), mParam1.Options, mParam1.Type_Question, this);
         OptionListe.setAdapter(creerOptionAdapter);
         btnAjout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -169,7 +170,7 @@ public class CreerOptionDialog extends DialogFragment implements CreerOptionAdap
     private void TaskDone(){
         TaskDone++;
         if(TaskDone == TaskTodo){
-            creerOptionAdapter.notifyDataSetChanged();
+                    creerOptionAdapter.notifyDataSetChanged();
         }
     }
     @Override
@@ -242,7 +243,6 @@ public class CreerOptionDialog extends DialogFragment implements CreerOptionAdap
                 String picturePath = cursor.getString(columnIndex);
                 cursor.close();
                 mParam1.Options.get(this.optionPosition).ImagePreload = ThumbnailUtils.createVideoThumbnail(picturePath, MediaStore.Video.Thumbnails.MINI_KIND);
-                Log.e("test", "Done");
                     //création bitmap + assignation bitmap;
                 creerOptionAdapter.notifyDataSetChanged();
                 mParam1.Options.get(this.optionPosition).DataChanged = true;

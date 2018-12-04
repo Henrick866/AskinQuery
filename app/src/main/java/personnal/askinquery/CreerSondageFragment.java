@@ -53,6 +53,8 @@ import com.google.firebase.functions.FirebaseFunctionsException;
 import com.google.firebase.functions.HttpsCallableResult;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageException;
+import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
@@ -830,17 +832,17 @@ public class CreerSondageFragment extends Fragment implements Serializable {
                             if(!o.notOnServer){//si il existe sur le serveur, on éfface les fichiers médias
                                 final String ID = o.ID;
                                 final StorageReference ImgRefDel = FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.OPTIONS_IMAGES).child(o.ID+".jpg");
-                                ImgRefDel.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                ImgRefDel.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
                                     @Override
-                                    public void onSuccess(Uri uri) {//il existe on supprime, sinon, rien;
+                                    public void onSuccess(StorageMetadata storageMetadata) {
                                         ImgRefDel.delete();
                                         FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.OPTIONS_IMAGES_THUMBNAILS).child(ID+".jpg").delete();
                                     }
                                 });
                                 final StorageReference VidRef = FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.OPTIONS_VIDEOS).child(o.ID+".mp4");
-                                VidRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                VidRef.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
                                     @Override
-                                    public void onSuccess(Uri uri) {//il existe on supprime, sinon, rien;
+                                    public void onSuccess(StorageMetadata storageMetadata) {//il existe on supprime, sinon, rien;
                                         VidRef.delete();
                                         FirebaseStorage.getInstance().getReference().child(FireBaseInteraction.Storage_Paths.OPTIONS_VIDEOS_THUMBNAILS).child(ID+".jpg").delete();
                                     }
@@ -881,14 +883,19 @@ public class CreerSondageFragment extends Fragment implements Serializable {
     private void AddTask(){
         TaskToDoCount++;
     }
-    private synchronized void TaskDone(){
+    private void TaskDone(){
         TaskDoneCount++;
         if(TaskToDoCount == TaskDoneCount){
             progressDialog.dismiss();
             if(UploadFileFailed){
                 Toast.makeText(getActivity(), "Des fichiers n'ont pas étés envoyés, veuillez recommencer.", Toast.LENGTH_LONG).show();
             }else {
-                mListener.changePage(SondageListFragment.newInstance(true, null));
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mListener.changePage(SondageListFragment.newInstance(true, null));
+                    }
+                });
             }
         }
     }

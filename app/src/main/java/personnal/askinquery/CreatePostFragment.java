@@ -531,8 +531,13 @@ public class CreatePostFragment extends Fragment {
     private void TaskDone(){
         TaskDone++;
         if(TaskTotal == TaskDone){
-            progressDialog.dismiss();
-            mListener.changePage(PublicationListFragment.newInstance(true, null));
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    progressDialog.dismiss();
+                    mListener.changePage(PublicationListFragment.newInstance(true, null));
+                }
+            });
         }
     }
     private void PublishPost(Publication P) {

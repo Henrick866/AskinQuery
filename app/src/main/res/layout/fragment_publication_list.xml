@@ -22,19 +22,11 @@
         android:text="@string/Post_New_Post" />
     </com.balysv.materialripple.MaterialRippleLayout>
 
-    <!--<ProgressBar
-        android:layout_below="@id/PubListRipple"
-        android:layout_marginTop="5dp"
-        android:id="@+id/pub_list_loader"
-        style="?android:attr/progressBarStyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:indeterminate="true"
-        android:indeterminateDrawable="@drawable/progress" />-->
     <TextView
         android:layout_below="@id/PubListRipple"
         android:layout_marginTop="5dp"
         android:layout_width="match_parent"
+        android:textColor="@color/Blanc"
         android:textAlignment="center"
         android:visibility="gone"
         android:text="@string/Post_List_Empty"

@@ -499,9 +499,14 @@ public class CreerProfilFragment extends Fragment {
     private void TaskDone(){
         TaskDone++;
         if(TaskTodo == TaskDone){
-            progressDialog.dismiss();
-            mListener.updateMenu(currentUser);//switch au nouvel utilisateur;
-            mListener.changePage(SondageListFragment.newInstance(false, null));
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    progressDialog.dismiss();
+                    mListener.updateMenu(currentUser);//switch au nouvel utilisateur;
+                    mListener.changePage(SondageListFragment.newInstance(false, null));
+                }
+            });
         }
     }
     private void UploadFile(StorageReference storageReference, Bitmap Image, final String FlavorText){

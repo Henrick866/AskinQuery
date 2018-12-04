@@ -509,8 +509,13 @@ public class ManageProfilFragment extends Fragment {
     private void TaskFinish(){
         TaskDone++;
         if(TaskTodo == TaskDone){
-            mListener.updateMenu(mAuth.getCurrentUser());
-            mListener.changePage(SondageListFragment.newInstance(false, null));
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mListener.updateMenu(mAuth.getCurrentUser());
+                    mListener.changePage(SondageListFragment.newInstance(false, null));
+                }
+            });
         }
     }
     private void DeleteSondages(String user){

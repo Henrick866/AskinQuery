@@ -100,7 +100,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:indeterminate="true"
-        android:indeterminateDrawable="@drawable/progress"/>
+        android:theme="@style/LoaderAccent"/>
 
         <RelativeLayout
             android:layout_height="wrap_content"
